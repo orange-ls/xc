@@ -3,10 +3,11 @@ import tkinter as tk
 from tkinter import filedialog
 import threading
 import pandas as pd
+from sqlalchemy import create_engine, text
 # import DI
 from tkinter import messagebox
 # import table_handling
-from time import sleep
+# from time import sleep
 import os
 # import utils
 
@@ -16,14 +17,6 @@ class App(object):
 
         root.title("华为云RPA")
         root.geometry('500x500')
-
-        self.two_four_data = tk.StringVar()
-        label01 = tk.Label(root, text="24年数据：")
-        label01.grid(row=0, column=0)
-        entry01 = tk.Entry(root, textvariable=self.two_four_data, width=40)
-        entry01.grid(row=0, column=1)
-        btn01 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_four_data))
-        btn01.grid(row=0, column=2)
 
         self.two_five_data = tk.StringVar()
         label02 = tk.Label(root, text="25年业绩表：")
@@ -57,6 +50,17 @@ class App(object):
         btn05 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.data_requirements))
         btn05.grid(row=4, column=2)
 
+        self.two_four_data = tk.StringVar()
+        label01 = tk.Label(root, text="24年数据：")
+        label01.grid(row=5, column=0)
+        entry01 = tk.Entry(root, textvariable=self.two_four_data, width=40)
+        entry01.grid(row=5, column=1)
+        btn01 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_four_data))
+        btn01.grid(row=5, column=2)
+
+        btn007 = tk.Button(root, text="导入24年数据", command=self.import_24_data)
+        btn007.grid(row=7, column=0)
+
         btn005 = tk.Button(root, text="匹配", command=self.start)
         btn005.grid(row=7, column=2)
 
@@ -65,7 +69,7 @@ class App(object):
         self.text.grid(row=9, column=0, columnspan=10)
 
     def start(self):
-        self.T = threading.Thread(target=self.ming_xi_handling)
+        self.T = threading.Thread(target=self.data_handling)
         self.T.setDaemon(True)
         self.T.start()
 
@@ -73,7 +77,7 @@ class App(object):
         path_ = filedialog.askopenfilename()
         path.set(path_)
 
-    def ming_xi_handling(self):
+    def data_handling(self):
         try:
             self.text.insert(tk.END, "开始...\r\n")
             two_four_path = self.two_four_data.get()
@@ -92,6 +96,12 @@ class App(object):
 
             self.text.insert(tk.END, "数据解析中...\r\n")
             # 数据入库
+            connect_db = self.connect_db()
+            if not connect_db:
+                return
+            self.common_excel_to_db(connect_db, product_details_path, customer_cor_path)
+
+
 
 
             self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
@@ -113,6 +123,9 @@ class App(object):
         except BaseException as e:
             self.text.insert(tk.END, "发生错误！\r\n")
             self.text.insert(tk.END, e)
+
+    # 导入24年数据
+    def import_24_data(self):
 
     # 验证客户对应关系表是否完整
     def check_customer_cor(self, customer_cor_path):
@@ -140,6 +153,72 @@ class App(object):
             return True
         except Exception as e:
             self.text.insert(tk.END, f"验证客户表时发生错误: {str(e)}\r\n")
+            return False
+
+    # 配置数据库连接
+    def connect_db(self):
+        try:
+            # 数据库配置
+            DB_HOST = 'localhost'
+            DB_PORT = 3306
+            DB_USER = 'root'
+            DB_PASS = '1234'
+            DB_NAME = 'test_sync'
+
+            # 创建数据库连接
+            engine = create_engine(f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
+            return engine
+        except Exception as e:
+            self.text.insert(tk.END, f"数据库连接失败: {str(e)}\r\n")
+            return False
+
+    # 客户关系表和2025年产品明细表入库
+    def common_excel_to_db(self, engine, product_details_path, customer_cor_path):
+        # 先把客户关系表和2025年产品明细表入库
+        try:
+            # 读取Excel文件
+            df_customer_cor = pd.read_excel(customer_cor_path).rename(columns={'客户名称': 'customer_name', '销售员': 'salesperson', '区域': 'region'})
+
+            # 筛选出2025产品明细 需要入库的字段
+            cloud_services = pd.read_excel(product_details_path, sheet_name='云服务名称')[['云服务编码', '服务产品部']].rename(columns={'云服务编码': 'cloud_services_code', '服务产品部': 'service_department'})
+            details_flow = pd.read_excel(product_details_path, sheet_name='流量产品清单')[['产品类型编码', '产品类型']].rename(columns={'产品类型编码': 'product_code', '产品类型': 'product_type'})
+            details_special = pd.read_excel(product_details_path, sheet_name='2025年产品专项', header=1)[['L4层产品编码', '名称']].rename(columns={'L4层产品编码': 'product_code', '名称': 'product_name'})
+            details_collaborate = pd.read_excel(product_details_path, sheet_name='企业协同')[['云服务编码', '云服务名称']].rename(columns={'云服务编码': 'cloud_services_code', '云服务名称': 'cloud_services_name'})
+
+            # # 读取24年数据
+            # df_two_four = pd.read_excel(two_four_path)[['业绩ID', '业绩金额(¥)', '业绩形成时间', '二级经销商名称', '客户名称', '产品类型编码', '客户标签', '销售纵队', '服务产品部', '是否流量型产品', '专线产品', '企业协同', '销售员', '区域', '季度']]
+            # df_two_four = df_two_four.rename(columns={'业绩ID': 'performance_id', '业绩金额(¥)': 'sales_amount', '业绩形成时间': 'performance_date', '二级经销商名称': 'secondary_dealer', '客户名称': 'customer_name', '产品类型编码': 'product_code', '客户标签': 'customer_tag', '销售纵队': 'sales_team', '服务产品部': 'service_department', '是否流量型产品': 'is_traffic_product', '专线产品': 'leased_line_product', '企业协同': 'enterprise_coop', '销售员': 'salesperson', '区域': 'region', '季度': 'quarter'})
+            # 写入数据库
+            with engine.begin() as conn:  # 自动提交/回滚
+                # 阶段1：清空旧数据
+                conn.execute(text("DELETE FROM customer_correspondence"))
+                conn.execute(text("DELETE FROM two_five_details_cloud_services"))
+                conn.execute(text("DELETE FROM two_five_details_flow"))
+                conn.execute(text("DELETE FROM two_five_details_special"))
+                conn.execute(text("DELETE FROM two_five_details_collaborate"))
+
+                # 阶段2：插入新数据.'append'表示在现有表中追加数据（保留原有数据）、False表示不写入索引、'multi'表示使用多行组合的批量插入语法、批量插入1000条
+                df_customer_cor.to_sql(name='customer_correspondence', con=conn, if_exists='append', index=False, method='multi', chunksize=1000)
+                cloud_services.to_sql(name='two_five_details_cloud_services', con=conn, if_exists='append', index=False, method='multi', chunksize=1000)
+                details_flow.to_sql(name='two_five_details_flow', con=conn, if_exists='append', index=False, method='multi', chunksize=1000)
+                details_special.to_sql(name='two_five_details_special', con=conn, if_exists='append', index=False, method='multi', chunksize=1000)
+                details_collaborate.to_sql(name='two_five_details_collaborate', con=conn, if_exists='append', index=False, method='multi', chunksize=1000)
+
+            # 写入24年数据
+            # for _, row in df_two_four.iterrows():
+            #     # 使用INSERT ... ON DUPLICATE KEY UPDATE语法
+            #     stmt = text("""
+            #             INSERT INTO hw_two_four_data
+            #             (performance_id, sales_amount, performance_date, secondary_dealer, customer_name, product_code, customer_tag, sales_team, service_department, is_traffic_product, leased_line_product, enterprise_coop, salesperson, region, quarter)
+            #             VALUES (:performance_id, :sales_amount, :performance_date, :secondary_dealer, :customer_name, :product_code, :customer_tag, :sales_team, :service_department, :is_traffic_product, :leased_line_product, :enterprise_coop, :salesperson, :region, :quarter)
+            #             ON DUPLICATE KEY UPDATE
+            #             performance_id = VALUES(performance_id)
+            #         """)
+            #     conn.execute(stmt, row.to_dict())
+
+
+        except Exception as e:
+            self.text.insert(tk.END, f"写入表时发生错误: {str(e)}\r\n")
             return False
 
 
