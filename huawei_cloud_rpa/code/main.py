@@ -1,19 +1,14 @@
 import gc
 import tkinter as tk
-# from tkinter.filedialog import askdirectory
+
 from tkinter import filedialog
 import threading
 
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine, text
-from openpyxl import load_workbook
 # import DI
-from tkinter import messagebox
-# import table_handling
-# from time import sleep
 import os
-# import utils
 from python_calamine import CalamineWorkbook
 
 # 字段映射配置
@@ -35,30 +30,6 @@ column_mapping = {
     '季度': 'quarter'
 }
 selected_columns = list(column_mapping.keys())
-# _column_config = {
-#             'mapping': {
-#                 '业绩ID': ('A', 'str'),
-#                 '业绩金额(¥)': ('G', 'float32'),
-#                 '业绩形成时间': ('H', 'date32'),
-#                 '二级经销商名称': ('Y', 'str'),
-#                 '客户名称': ('AC', 'str'),
-#                 '产品类型编码': ('AH', 'str'),
-#                 '客户标签': ('BB', 'str'),
-#                 '销售纵队': ('BF', 'str'),
-#                 '服务产品部': ('BI', 'str'),
-#                 '是否流量型产品': ('BJ', 'str'),
-#                 '专线产品': ('BK', 'str'),
-#                 '企业协同': ('BL', 'str'),
-#                 '销售员': ('BM', 'str'),
-#                 '区域': ('BN', 'str'),
-#                 '季度': ('BO', 'str'),
-#             },
-#             'output_columns': [
-#                 ('服务产品部', 'BI'), ('是否流量型产品', 'BJ'),
-#                 ('专线产品', 'BK'), ('企业协同', 'BL'),
-#                 ('销售员', 'BM'), ('区域', 'BN'), ('季度', 'BO')
-#             ]
-#         }
 
 class App(object):
     def __init__(self, root):
@@ -129,12 +100,11 @@ class App(object):
     def data_handling(self):
         try:
             self.text.insert(tk.END, "开始...\r\n")
-            two_four_path = self.two_four_data.get()
             two_five_path = self.two_five_data.get()
             product_details_path = self.product_details.get()
             customer_cor_path = self.customer_cor.get()
             data_requirements_path = self.data_requirements.get()
-            if not two_five_path or not product_details_path or not customer_cor_path or not data_requirements_path:
+            if not product_details_path or not customer_cor_path or not data_requirements_path:
                 self.text.insert(tk.END, "文件路径不能为空！\r\n")
                 return
             self.text.insert(tk.END, "检查客户对应关系表是否完整...\r\n")
@@ -145,14 +115,15 @@ class App(object):
 
             self.text.insert(tk.END, "数据解析中...\r\n")
             # 基础表 数据入库
-            connect_db = self.connect_db()
-            if not connect_db:
+            engine = self.connect_db()
+            if not engine:
                 return
-            # self.common_excel_to_db(connect_db, product_details_path, customer_cor_path)
+            self.common_excel_to_db(engine, product_details_path, customer_cor_path)
 
             self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
             # 25年业绩表增加BI到BO列
-            self.add_bi_to_bo(connect_db, two_five_path)
+            if two_five_path:
+                self.add_bi_to_bo(engine, two_five_path)
 
             self.text.insert(tk.END, "数据第一部分...\r\n")
             self.text.insert(tk.END, "数据第二部分...\r\n")
@@ -167,6 +138,7 @@ class App(object):
             self.text.insert(tk.END, "结果表下载中...\r\n")
 
             self.text.insert(tk.END, "处理完成！\r\n")
+            engine.dispose()
         except BaseException as e:
             self.text.insert(tk.END, "发生错误！\r\n")
             self.text.insert(tk.END, e)
@@ -294,135 +266,53 @@ class App(object):
                 sheet = wb.get_sheet_by_index(0)
                 # 读取所有数据（包含标题行）
                 rows = sheet.to_python()
+                selected_indices = [rows[0].index(col) for col in selected_columns]
                 # 转换为DataFrame
-                df = pd.DataFrame(rows[1:], columns=rows[0])[selected_columns]
+                df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
                 self.text.insert(tk.END, f"开始导入24年数据！\r\n")
                 self.big_data_to_db('hw_two_four_data', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
+                del df
                 # 获取第二个工作表
                 sheet = wb.get_sheet_by_name('SMBcore')
                 # 读取所有数据（包含标题行）
                 rows = sheet.to_python()
+                selected_indices = [rows[0].index(col) for col in selected_columns]
                 # 转换为DataFrame
-                df = pd.DataFrame(rows[1:], columns=rows[0])[selected_columns]
+                df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
                 self.text.insert(tk.END, f"开始导入24年SMBcore数据！\r\n")
                 self.big_data_to_db('hw_two_four_data_smbcore', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
+                del df
                 # 获取第三个工作表
                 sheet = wb.get_sheet_by_name('NA')
                 # 读取所有数据（包含标题行）
                 rows = sheet.to_python()
+                selected_indices = [rows[0].index(col) for col in selected_columns]
                 # 转换为DataFrame
-                df = pd.DataFrame(rows[1:], columns=rows[0])[selected_columns]
+                df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
                 self.text.insert(tk.END, f"开始导入24年NA数据！\r\n")
                 self.big_data_to_db('hw_two_four_data_na', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
-
-            self.text.insert(tk.END, "数据导入成功！\r\n")
+                del df, rows
+                gc.collect()
         except Exception as e:
             self.text.insert(tk.END, f"24年数据读取失败: {str(e)}\r\n")
+        finally:
+            engine.dispose()
 
     # 25年业绩表增加BI到BO列，含导出25年数据
     def add_bi_to_bo(self, engine, two_five_path):
-        # try:
-        #     # 读取25年业绩表
-        #     two_five_df = pd.read_excel(two_five_path)[['业绩ID', '业绩金额(¥)', '业绩形成时间', '二级经销商名称', '客户名称', '产品类型编码', '客户标签', '销售纵队', '服务产品部', '是否流量型产品', '专线产品', '企业协同', '销售员', '区域', '季度']]
-        #     # 查询数据库中产品明细表和客户关系表
-        #     with engine.connect() as conn:
-        #         # 云服务名称
-        #         cloud_services = conn.execute(text("SELECT * FROM two_five_details_cloud_services"), ).mappings().all()
-        #         cloud_services_dict = {row['cloud_services_code']: row['service_department'] for row in cloud_services}
-        #         # 流量产品清单
-        #         details_flow = conn.execute(text("SELECT * FROM two_five_details_flow"), ).mappings().all()
-        #         flow_dict = {row['product_code']: row['product_type'] for row in details_flow}
-        #         # 产品专项
-        #         details_special = conn.execute(text("SELECT * FROM two_five_details_special"), ).mappings().all()
-        #         special_dict = {row['product_code']: row['product_name'] for row in details_special}
-        #         # 企业协同
-        #         collaborate = conn.execute(text("SELECT * FROM two_five_details_collaborate"), ).mappings().all()
-        #         collaborate_dict = {row['cloud_services_code']: row['cloud_services_name'] for row in collaborate}
-        #         # 客户对应关系表
-        #         customer_cor = conn.execute(text("SELECT * FROM customer_correspondence"), ).mappings().all()
-        #         customer_cor_dict = {row['customer_name']: (row['salesperson'], row['region']) for row in customer_cor}
-        #     # 遍历每一条数据，增加BI到BO列
-        #     for index, row in two_five_df.iterrows():
-        #         row['服务产品部'] = cloud_services_dict.get(row['产品类型编码'], '')
-        #         row['是否流量型产品'] = '是' if flow_dict.get(row['产品类型编码'], '') else '否'
-        #         row['专线产品'] = special_dict.get(row['产品类型编码'], '')
-        #         row['企业协同'] = collaborate_dict.get(row['产品类型编码'], '')
-        #         salesperson, region = customer_cor_dict.get(row['客户名称'], ('', ''))
-        #         row['销售员'] = salesperson
-        #         row['区域'] = region
-        #         dt = pd.to_datetime(row['业绩形成时间'])
-        #         # 计算财务季度（假设财年从1月开始）
-        #         fiscal_quarter = (dt.month - 1) // 3 + 1
-        #         row['季度'] = f'Q{fiscal_quarter}'
-        #     # 将结果数据写入数据库，按业绩ID来插入或更新数据
-        #     with engine.begin() as conn:
-        #         # 创建带唯一会话标识的临时表
-        #         temp_table_name = f"temp_two_five_data"
-        #
-        #         try:
-        #             # 1. 创建支持事务的InnoDB临时表（MySQL 8.0+）
-        #             conn.execute(text(f"""
-        #                 CREATE TEMPORARY TABLE {temp_table_name} (
-        #                     performance_id BIGINT PRIMARY KEY,
-        #                     amount DECIMAL(18,2),
-        #                     product_type VARCHAR(20),
-        #                     quarter CHAR(2),
-        #                     INDEX idx_quarter (quarter)
-        #                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        #             """))
-        #
-        #             # 2. 分块批量插入（MySQL最大包大小限制）
-        #             chunk_size = 5000  # 根据max_allowed_packet调整
-        #             two_five_df = two_five_df.rename(columns={'业绩ID': 'performance_id', '业绩金额(¥)': 'sales_amount', '业绩形成时间': 'performance_date', '二级经销商名称': 'secondary_dealer', '客户名称': 'customer_name', '产品类型编码': 'product_code', '客户标签': 'customer_tag', '销售纵队': 'sales_team', '服务产品部': 'service_department', '是否流量型产品': 'is_traffic_product', '专线产品': 'leased_line_product', '企业协同': 'enterprise_coop', '销售员': 'salesperson', '区域': 'region', '季度': 'quarter'})
-        #             for i in range(0, len(two_five_df), chunk_size):
-        #                 chunk = two_five_df.iloc[i:i + chunk_size]
-        #                 chunk.to_sql(
-        #                     name=temp_table_name,
-        #                     con=conn,
-        #                     if_exists='append',
-        #                     index=False,
-        #                     method='multi',
-        #                     chunksize=1000
-        #                 )
-        #
-        #             # 3. 使用INSERT ... ON DUPLICATE KEY UPDATE
-        #             conn.execute(text(f"""
-        #                 INSERT INTO hw_two_five_data
-        #                 SELECT * FROM {temp_table_name}
-        #                 ON DUPLICATE KEY UPDATE
-        #                     amount = VALUES(amount),
-        #                     product_type = VALUES(product_type),
-        #                     quarter = VALUES(quarter),
-        #                     update_time = CURRENT_TIMESTAMP()
-        #             """))
-        #
-        #             # 4. 手动释放临时表空间（针对大表）
-        #             conn.execute(text(f"ALTER TABLE {temp_table_name} ENGINE=InnoDB ROW_FORMAT=COMPRESSED"))
-        #             conn.execute(text(f"OPTIMIZE LOCAL TABLE {temp_table_name}"))
-        #
-        #         finally:
-        #             # 5. 显式删除临时表（防御性措施）
-        #             try:
-        #                 conn.execute(text(f"DROP TEMPORARY TABLE IF EXISTS {temp_table_name}"))
-        #             except Exception as e:
-        #                 self.text.insert(tk.END, f"临时表清理失败: {str(e)}\r\n")
-        #
-        # except Exception as e:
-        #     self.text.insert(tk.END, f"读取25年业绩表时发生错误: {str(e)}\r\n")
-
-        # 1. Excel读取优化
-        # 1. 使用calamine引擎读取数据
+        # 1. Excel读取优化 使用calamine引擎读取数据
         try:
             wb = CalamineWorkbook.from_path(two_five_path)
             # 获取第一个工作表
             sheet = wb.get_sheet_by_index(0)
             # 读取所有数据（包含标题行）
             rows = sheet.to_python()
+            selected_indices = [rows[0].index(col) for col in selected_columns]
             # 转换为DataFrame
-            two_five_df = pd.DataFrame(rows[1:], columns=rows[0])[selected_columns]
+            two_five_df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
             wb.close()
         except Exception as e:
             raise ValueError(f"25年数据读取失败: {str(e)}")
@@ -430,32 +320,43 @@ class App(object):
         # 2. 数据库查询
         with engine.connect() as conn:
             # 批量获取所有字典数据
-            query = """
-                    SELECT cloud_services_code, service_department 
-                    FROM two_five_details_cloud_services;
-                    SELECT product_code, product_type
-                    FROM two_five_details_flow;
-                    SELECT product_code, product_name 
-                    FROM two_five_details_special;
-                    SELECT cloud_services_code, cloud_services_name 
-                    FROM two_five_details_collaborate;
-                    SELECT customer_name, salesperson, region 
-                    FROM customer_correspondence;
-                """
-            # 使用pandas多查询读取（比原生驱动快3-5倍）
-            dfs = pd.read_sql_query(query, conn, chunksize=None)
+            # query = """
+            #         SELECT cloud_services_code, service_department
+            #         FROM two_five_details_cloud_services;
+            #         SELECT product_code, product_type
+            #         FROM two_five_details_flow;
+            #         SELECT product_code, product_name
+            #         FROM two_five_details_special;
+            #         SELECT cloud_services_code, cloud_services_name
+            #         FROM two_five_details_collaborate;
+            #         SELECT customer_name, salesperson, region
+            #         FROM customer_correspondence;
+            #     """
+            # # 使用pandas多查询读取（比原生驱动快3-5倍）
+            # dfs = pd.read_sql_query(query, conn, chunksize=None)
+            sql_list = ['SELECT cloud_services_code, service_department FROM two_five_details_cloud_services;',
+                        'SELECT product_code, product_type FROM two_five_details_flow',
+                        'SELECT product_code, product_name FROM two_five_details_special',
+                        'SELECT cloud_services_code, cloud_services_name FROM two_five_details_collaborate',
+                        'SELECT customer_name, salesperson, region FROM customer_correspondence']
+            dfs = [
+                pd.read_sql_query(sql, conn, chunksize=None)
+                for sql in sql_list
+            ]
 
             # 解析查询结果
             cloud_services_map = dfs[0].set_index('cloud_services_code')['service_department']
-            flow_products = set(dfs[1].set_index('product_code')['product_type'])
+            flow_products = set(dfs[1]['product_code'])
             special_products_map = dfs[2].set_index('product_code')['product_name']
             collaborate_map = dfs[3].set_index('cloud_services_code')['cloud_services_name']
-            customer_relations = dfs[4].set_index('customer_name')['salesperson', 'region']
+            customer_relations = dfs[4][['customer_name', 'salesperson', 'region']]
+
+            two_five_df = two_five_df.merge(customer_relations, left_on='客户名称', right_on='customer_name',how='left')
 
         # 3. 数据加工
         try:
             # 服务产品部映射
-            two_five_df['服务产品部'] = two_five_df['产品类型编码'].map(cloud_services_map).fillna('')
+            # two_five_df['服务产品部'] = two_five_df['产品类型编码'].map(cloud_services_map).fillna('')
             # 流量产品标记
             two_five_df['是否流量型产品'] = np.where(two_five_df['产品类型编码'].isin(flow_products), '是', '否')
             # 专线产品映射
@@ -463,9 +364,10 @@ class App(object):
             # 企业协同映射
             two_five_df['企业协同'] = two_five_df['产品类型编码'].map(collaborate_map).fillna('')
             # 客户信息映射
-            customer_info = customer_relations.reindex(two_five_df['客户名称'])
-            two_five_df['销售员'] = customer_info['salesperson'].fillna('').astype('category')
-            two_five_df['区域'] = customer_info['region'].fillna('').astype('category')
+            two_five_df['销售员'] = two_five_df['salesperson'].fillna('').astype('category')
+            two_five_df['区域'] = two_five_df['region'].fillna('').astype('category')
+            # 清理临时列
+            two_five_df.drop(['customer_name', 'salesperson', 'region'], axis=1, inplace=True)
             # 季度
             months = pd.to_datetime(two_five_df['业绩形成时间']).dt.month
             two_five_df['季度'] = 'Q' + ((months - 1) // 3 + 1).astype(str)
@@ -473,44 +375,12 @@ class App(object):
             raise ValueError(f"数据加工异常，缺少关键字段: {str(e)}")
         # 4. 数据入库
         try:
+            self.text.insert(tk.END, f"25年数据入库中...\r\n")
             self.big_data_to_db('hw_two_five_data', engine, two_five_df)
         except Exception as e:
             self.text.insert(tk.END, f"25年数据入库失败: {str(e)}\r\n")
         # 5. 导出25年的数据
         self.text.insert(tk.END, "正在导出25年数据...\r\n")
-        try:
-            self.export_25_data(two_five_df, two_five_path)
-            self.text.insert(tk.END, "25年数据导出成功！\r\n")
-        except Exception as e:
-            self.text.insert(tk.END, f"25年数据导出失败: {str(e)}\r\n")
-
-    # 批量导出25年数据
-    def export_25_data(self, df, original_path):
-        wb = load_workbook(original_path)
-        ws = wb.active
-
-        # 批量写入优化
-        output_cols = [('服务产品部', 'BI'), ('是否流量型产品', 'BJ'), ('专线产品', 'BK'), ('企业协同', 'BL'),
-                       ('销售员', 'BM'), ('区域', 'BN'), ('季度', 'BO')]
-        col_indices = {col: ord(pos) - 65 for col, pos in output_cols}
-
-        # 内存分块处理
-        chunk_size = 5000
-        for i in range(0, len(df), chunk_size):
-            chunk = df.iloc[i:i + chunk_size]
-            for idx, row in chunk.iterrows():
-                for col in output_cols:
-                    ws.cell(
-                        row=idx + 2,  # 数据从第2行开始
-                        column=col_indices[col[0]] + 1,
-                        value=row[col[0]]
-                    )
-            # 阶段性提交和内存清理
-            wb.save(original_path.replace('.xlsx', '_updated.xlsx'))
-            gc.collect()
-
-        wb.close()
-
 
 
 if __name__ == '__main__':
