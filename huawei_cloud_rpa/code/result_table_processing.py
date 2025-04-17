@@ -9,7 +9,7 @@
     第8个结果表是：新增渠道
     第9个结果表是：新增客户
 '''
-
+from sqlalchemy import text
 
 def result_table_one(engine):
     '''
@@ -17,7 +17,7 @@ def result_table_one(engine):
     :param engine: 数据库连接
     :return: 结果表数据
     '''
-    # 构建查询sql,用于“整体业绩”、“NA业绩”、“SMB业绩”、“SMBcore业绩”`
+    # 构建查询sql,用于“整体业绩”、“NA业绩”、“SMB业绩”、“SMBcore业绩”
     def select_sql(where_sql):
         select_sql = f'''
             -- 分地区统计渠道/直客金额并生成二维报表，强制显示"其他"行
@@ -85,14 +85,23 @@ def result_table_one(engine):
         '''
         return select_sql
 
+    conn = engine.connect()
     select_params = {
         '整体业绩': "",
         'NA业绩': "AND d.sales_team = '华为云NA'",
         'SMB业绩': "AND d.sales_team in ('中长尾','电网销')",
-        'SMBcore业绩': "AND d.sales_team in ('中长尾','电网销') AND d.is_traffic_product = '否'"
+        'SMBcore业绩': "AND d.sales_team in ('中长尾','电网销') AND d.is_traffic_product IN ('否', '')"
     }
 
-    sql = '''
+    # 循环执行查询 “整体业绩”、“NA业绩”、“SMB业绩”、“SMBcore业绩” 并返回结果
+    result_data = {}
+    for k, v in select_params.items():
+        result = [dict(row) for row in conn.execute(text(select_sql(v))).mappings().fetchall()]
+        result = {re['grouped_region']: re for re in result}
+        result_data[k] = result
+
+    # 构建sql，查询“同期增长率”
+    growth_rate_sql = '''
         -- 分表统计24年与25年数据，计算增长率
         WITH 
         -- 1. 定义所有地区
@@ -131,21 +140,24 @@ def result_table_one(engine):
                     ELSE '其他' 
                 END AS grouped_region,
                 pt.ptype,
-                COALESCE(SUM(sales_amount), 0) AS amount
+                COALESCE(SUM(
+                    CASE
+                        WHEN pt.ptype = '整体业绩' THEN d.sales_amount
+                        WHEN pt.ptype = 'NA业绩' AND d.sales_team = '华为云NA' THEN d.sales_amount
+                        WHEN pt.ptype = 'SMB业绩' AND d.sales_team IN ('中长尾','电网销') THEN d.sales_amount
+                        WHEN pt.ptype = 'SMBcore业绩' AND d.sales_team IN ('中长尾','电网销') AND d.is_traffic_product IN ('否', '') THEN d.sales_amount
+                    END
+                ), 0) AS amount_2024
             FROM hw_two_four_data d
             CROSS JOIN performance_types pt
-            WHERE 1=1
-                AND CASE 
-                    WHEN pt.ptype = '整体业绩' THEN 1=1  -- 无附加条件
-                    ELSE 1=1  -- 动态应用条件
-                END
-                AND ( -- 动态拼接条件
-                    CASE pt.ptype
-                        WHEN '整体业绩' THEN ''
-                        ELSE SUBSTRING(pt.condition, 5) -- 去除开头的AND
-                    END
-                )
-            GROUP BY grouped_region, pt.ptype
+                WHERE d.performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+            GROUP BY 
+                CASE 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    THEN d.region 
+                    ELSE '其他' 
+                END, 
+                pt.ptype
         ),
         
         -- 4. 计算25年各维度数据（结构相同）
@@ -157,21 +169,23 @@ def result_table_one(engine):
                     ELSE '其他' 
                 END AS grouped_region,
                 pt.ptype,
-                COALESCE(SUM(sales_amount), 0) AS amount
+                COALESCE(SUM(
+                    CASE
+                        WHEN pt.ptype = '整体业绩' THEN d.sales_amount
+                        WHEN pt.ptype = 'NA业绩' AND d.sales_team = '华为云NA' THEN d.sales_amount
+                        WHEN pt.ptype = 'SMB业绩' AND d.sales_team IN ('中长尾','电网销') THEN d.sales_amount
+                        WHEN pt.ptype = 'SMBcore业绩' AND d.sales_team IN ('中长尾','电网销') AND d.is_traffic_product IN ('否', '') THEN d.sales_amount
+                    END
+                ), 0) AS amount_2025
             FROM hw_two_five_data d
             CROSS JOIN performance_types pt
-            WHERE 1=1
-                AND CASE 
-                    WHEN pt.ptype = '整体业绩' THEN 1=1
-                    ELSE 1=1
-                END
-                AND ( 
-                    CASE pt.ptype
-                        WHEN '整体业绩' THEN ''
-                        ELSE SUBSTRING(pt.condition, 5)
-                    END
-                )
-            GROUP BY grouped_region, pt.ptype
+            GROUP BY 
+                CASE 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    THEN d.region 
+                    ELSE '其他' 
+                END, 
+                pt.ptype
         ),
         
         -- 5. 合并两年数据并计算增长率
@@ -179,11 +193,11 @@ def result_table_one(engine):
             SELECT 
                 ar.region,
                 pt.ptype,
-                COALESCE(d24.amount, 0) AS amount_2024,
-                COALESCE(d25.amount, 0) AS amount_2025,
+                COALESCE(d24.amount_2024, 0) AS amount_2024,
+                COALESCE(d25.amount_2025, 0) AS amount_2025,
                 CASE 
-                    WHEN COALESCE(d24.amount, 0) = 0 THEN NULL
-                    ELSE ROUND((d25.amount - d24.amount) / d24.amount * 100, 2)
+                    WHEN COALESCE(d24.amount_2024, 0) = 0 THEN NULL  -- 处理除零
+                    ELSE ROUND((d25.amount_2025 - d24.amount_2024) / d24.amount_2024 * 100, 2)
                 END AS growth_rate
             FROM all_regions ar
             CROSS JOIN performance_types pt
@@ -212,17 +226,31 @@ def result_table_one(engine):
                 ROUND(
                     (SUM(amount_2025) - SUM(amount_2024)) / NULLIF(SUM(amount_2024), 0) * 100, 2
                 ) AS all_sales,
-                -- 同理计算其他列...
+                ROUND(
+                    (SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2025 END) - 
+                     SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END), 0) * 100, 2
+                ) AS na_sales,
+                ROUND(
+                    (SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2025 END) - 
+                     SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END), 0) * 100, 2
+                ) AS smb_sales,
+                ROUND(
+                    (SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2025 END) - 
+                     SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END), 0) * 100, 2
+                ) AS smbcore_sales
             FROM combined_data
         )
         
         -- 8. 最终结果
         SELECT 
             region,
-            CONCAT(all_sales, '%') AS all_sales,
-            CONCAT(na_sales, '%') AS na_sales,
-            CONCAT(smb_sales, '%') AS smb_sales,
-            CONCAT(smbcore_sales, '%') AS smbcore_sales
+                CONCAT(IFNULL(all_sales, 'N/A'), '%') AS all_sales,
+            CONCAT(IFNULL(na_sales, 'N/A'), '%') AS na_sales,
+            CONCAT(IFNULL(smb_sales, 'N/A'), '%') AS smb_sales,
+            CONCAT(IFNULL(smbcore_sales, 'N/A'), '%') AS smbcore_sales
         FROM (
             SELECT * FROM pivot_table
             UNION ALL
@@ -230,3 +258,11 @@ def result_table_one(engine):
         ) AS final
         ORDER BY FIELD(region, '北京','广州','深圳','上海','南京','成都','其他','总计');
     '''
+    result = [dict(row) for row in conn.execute(text(growth_rate_sql)).mappings().fetchall()]
+    result = {re['region']: re for re in result}
+    result_data['同期增长率'] = result
+
+    conn.close()
+    return result_data
+
+# def result_table_two(engine):

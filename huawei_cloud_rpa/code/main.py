@@ -7,7 +7,7 @@ import threading
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine, text
-# import DI
+import result_table_processing
 import os
 from python_calamine import CalamineWorkbook
 
@@ -88,6 +88,10 @@ class App(object):
         self.text = tk.Text(selectbackground="red", insertbackground="blue", spacing2=10, bd=0)
         self.text.grid(row=9, column=0, columnspan=10)
 
+        self.text.insert(tk.END, "24年数据导入一次即可，不用重复导入！\r\n")
+        self.text.insert(tk.END, "25年数据增量导入，全量导入会导致执行时间过长\r\n")
+        self.text.insert(tk.END, "2025产品明细、客户对应关系表、数据需求表 必须选择\r\n\r\n")
+
     def start(self):
         self.T = threading.Thread(target=self.data_handling)
         self.T.setDaemon(True)
@@ -114,10 +118,10 @@ class App(object):
                 return
 
             self.text.insert(tk.END, "数据解析中...\r\n")
-            # 基础表 数据入库
             engine = self.connect_db()
             if not engine:
                 return
+            # 基础表 数据入库
             self.common_excel_to_db(engine, product_details_path, customer_cor_path)
 
             self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
@@ -126,6 +130,7 @@ class App(object):
                 self.add_bi_to_bo(engine, two_five_path)
 
             self.text.insert(tk.END, "数据第一部分...\r\n")
+            result_table_one = result_table_processing.result_table_one(engine)
             self.text.insert(tk.END, "数据第二部分...\r\n")
             self.text.insert(tk.END, "数据第三部分...\r\n")
             self.text.insert(tk.END, "数据第四部分...\r\n")
