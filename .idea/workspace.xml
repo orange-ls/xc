@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="第一个结果表">
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="第2、3、4个结果表">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" afterDir="false" />
@@ -42,10 +42,11 @@
   "keyToString": {
     "Python.222.executor": "Run",
     "Python.main.executor": "Debug",
+    "Python.result_table_processing.executor": "Debug",
     "Python.test_1.executor": "Debug",
     "Python.test_2.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/Workspace/xc/huawei_cloud_rpa/files",
+    "last_opened_file_path": "D:/Workspace/xc/huawei_cloud_rpa/code/main.py",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
@@ -54,7 +55,7 @@
       <recent name="D:\Workspace\xc\huawei_cloud_rpa\files" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration name="222" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -77,6 +78,33 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.8 (odoo-14.0)" />
+      <option name="WORKING_DIRECTORY" value="D:\Workspace\xc\huawei_cloud_rpa" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.222" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.222" />
@@ -163,7 +191,23 @@
       <option name="project" value="LOCAL" />
       <updated>1744800008050</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="第一个结果表 完成">
+      <option name="closed" value="true" />
+      <created>1744860106910</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1744860106910</updated>
+    </task>
+    <task id="LOCAL-00010" summary="第2、3、4个结果表">
+      <option name="closed" value="true" />
+      <created>1744959838760</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1744959838760</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -186,7 +230,9 @@
     <MESSAGE value="数据入库" />
     <MESSAGE value="24年25年数据入库" />
     <MESSAGE value="第一个结果表" />
-    <option name="LAST_COMMIT_MESSAGE" value="第一个结果表" />
+    <MESSAGE value="第一个结果表 完成" />
+    <MESSAGE value="第2、3、4个结果表" />
+    <option name="LAST_COMMIT_MESSAGE" value="第2、3、4个结果表" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -203,53 +249,58 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>220</line>
+          <line>229</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>264</line>
+          <line>276</line>
           <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>275</line>
+          <line>287</line>
           <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>277</line>
+          <line>289</line>
           <option name="timeStamp" value="57" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>297</line>
+          <line>309</line>
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>288</line>
+          <line>300</line>
           <option name="timeStamp" value="62" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>273</line>
+          <line>285</line>
           <option name="timeStamp" value="66" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>142</line>
+          <line>151</line>
           <option name="timeStamp" value="67" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>348</line>
+          <line>360</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>149</line>
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="73" />
+          <line>545</line>
+          <option name="timeStamp" value="80" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

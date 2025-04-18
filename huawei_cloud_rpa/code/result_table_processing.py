@@ -270,13 +270,13 @@ def result_table_one(engine):
 def result_table_two(engine):
     sql = '''
         SELECT 
-            IFNULL(classified_region, '汇总') AS region_r,
-            SUM(national_num) AS national_num,
-            SUM(national_num_h1) AS national_num_h1,
-            SUM(national_year_num) AS national_year_num,
-            SUM(smb_sales) AS smb_sales,
-            SUM(smb_sales_h1) AS smb_sales_h1,
-            SUM(smb_sales_year) AS smb_sales_year
+            IFNULL(classified_region, '汇总') AS 区域,
+            SUM(national_num) AS 全量业绩,
+            SUM(national_num_h1) AS 全量H1进度,
+            SUM(national_year_num) AS 全量全年进度,
+            SUM(smb_sales) AS SMB业绩,
+            SUM(smb_sales_h1) AS SMBH1进度,
+            SUM(smb_sales_year) AS SMB全年进度
         FROM (
             SELECT 
                 CASE 
@@ -306,20 +306,20 @@ def result_table_two(engine):
     '''
 
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
-    result = {re['region']: re for re in result}
+    result = {re['区域']: re for re in result}
     return result
 
 
 def result_table_three(engine):
     sql = '''
         SELECT 
-            IFNULL(classified, '汇总') AS salesperson,
-            SUM(national_num) AS national_num,
-            SUM(national_num_h1) AS national_num_h1,
-            SUM(national_year_num) AS national_year_num,
-            SUM(smb_sales) AS smb_sales,
-            SUM(smb_sales_h1) AS smb_sales_h1,
-            SUM(smb_sales_year) AS smb_sales_year
+            IFNULL(classified, '汇总') AS 销售,
+            SUM(national_num) AS 全量业绩,
+            SUM(national_num_h1) AS 全量H1进度,
+            SUM(national_year_num) AS 全量全年进度,
+            SUM(smb_sales) AS SMB业绩,
+            SUM(smb_sales_h1) AS SMBH1进度,
+            SUM(smb_sales_year) AS SMB全年进度
         FROM (
             SELECT 
                 salesperson AS classified,
@@ -335,62 +335,46 @@ def result_table_three(engine):
         GROUP BY classified WITH ROLLUP
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
-    result = {re['salesperson']: re for re in result}
+    result = {re['销售']: re for re in result}
     return result
 
 
 def result_table_four(engine):
-    sql = f'''
-        WITH regions AS (
-            SELECT '北京' AS 区域
-            UNION ALL SELECT '广州'
-            UNION ALL SELECT '深圳'
-            UNION ALL SELECT '上海'
-            UNION ALL SELECT '南京'
-            UNION ALL SELECT '长春'
-            UNION ALL SELECT '其他'
-        ),
-        filtered_data AS (
-            SELECT 
-                CASE 
-                    WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region 
-                    ELSE '其他' 
-                END AS 区域,
-                MONTH(performance_date) AS month,
-                sales_amount
-            FROM hw_two_five_data
-            WHERE 
-                1=1
-                %s
-        )
-        SELECT 
-            r.区域,
-            COALESCE(SUM(CASE WHEN d.month = 1 THEN d.sales_amount ELSE 0 END), 0) AS `1月`,
-            COALESCE(SUM(CASE WHEN d.month = 2 THEN d.sales_amount ELSE 0 END), 0) AS `2月`,
-            COALESCE(SUM(CASE WHEN d.month = 3 THEN d.sales_amount ELSE 0 END), 0) AS `3月`,
-            COALESCE(SUM(CASE WHEN d.month = 4 THEN d.sales_amount ELSE 0 END), 0) AS `4月`,
-            COALESCE(SUM(CASE WHEN d.month = 5 THEN d.sales_amount ELSE 0 END), 0) AS `5月`,
-            COALESCE(SUM(CASE WHEN d.month = 6 THEN d.sales_amount ELSE 0 END), 0) AS `6月`,
-            COALESCE(SUM(CASE WHEN d.month = 7 THEN d.sales_amount ELSE 0 END), 0) AS `7月`,
-            COALESCE(SUM(CASE WHEN d.month = 8 THEN d.sales_amount ELSE 0 END), 0) AS `8月`,
-            COALESCE(SUM(CASE WHEN d.month = 9 THEN d.sales_amount ELSE 0 END), 0) AS `9月`,
-            COALESCE(SUM(CASE WHEN d.month = 10 THEN d.sales_amount ELSE 0 END), 0) AS `10月`,
-            COALESCE(SUM(CASE WHEN d.month = 11 THEN d.sales_amount ELSE 0 END), 0) AS `11月`,
-            COALESCE(SUM(CASE WHEN d.month = 12 THEN d.sales_amount ELSE 0 END), 0) AS `12月`,
-            COALESCE(SUM(d.sales_amount), 0) AS 合计
-        FROM regions r
-        LEFT JOIN filtered_data d ON r.区域 = d.区域
-        GROUP BY r.区域
-        
-        UNION ALL
-        
-        SELECT 
-            '汇总' AS 区域,
-            SUM(`1月`), SUM(`2月`), SUM(`3月`), SUM(`4月`),
-            SUM(`5月`), SUM(`6月`), SUM(`7月`), SUM(`8月`),
-            SUM(`9月`), SUM(`10月`), SUM(`11月`), SUM(`12月`),
-            SUM(合计)
-        FROM (
+    def select_sql(where_sql):
+        sql = f'''
+            WITH regions AS (
+                SELECT '北京' AS 区域
+                UNION ALL SELECT '广州'
+                UNION ALL SELECT '深圳'
+                UNION ALL SELECT '上海'
+                UNION ALL SELECT '南京'
+                UNION ALL SELECT '长春'
+                UNION ALL SELECT '其他'
+            ),
+            filtered_data AS (
+                  SELECT 
+                    CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
+                    MONTH(performance_date) AS month,
+                    SUM(sales_amount) AS sales_amount
+                FROM hw_two_five_data
+                WHERE 
+                    1=1
+                    {where_sql}
+                GROUP BY 区域, month
+            ),
+            last_year_data AS (
+                -- 新增2024年同期数据部分
+                SELECT 
+                    CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
+                            MONTH(performance_date) AS month,
+                    SUM(sales_amount) AS sales_amount
+                FROM hw_two_four_data
+                WHERE 
+                    performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+                    -- performance_date BETWEEN '2024-01-01' AND '2024-03-31'
+                    {where_sql}
+                GROUP BY 区域, month
+            )
             SELECT 
                 r.区域,
                 COALESCE(SUM(CASE WHEN d.month = 1 THEN d.sales_amount ELSE 0 END), 0) AS `1月`,
@@ -405,23 +389,57 @@ def result_table_four(engine):
                 COALESCE(SUM(CASE WHEN d.month = 10 THEN d.sales_amount ELSE 0 END), 0) AS `10月`,
                 COALESCE(SUM(CASE WHEN d.month = 11 THEN d.sales_amount ELSE 0 END), 0) AS `11月`,
                 COALESCE(SUM(CASE WHEN d.month = 12 THEN d.sales_amount ELSE 0 END), 0) AS `12月`,
-                COALESCE(SUM(d.sales_amount), 0) AS 合计
+                COALESCE(SUM(d.sales_amount), 0) AS 合计,
+                COALESCE(SUM(l.sales_amount), 0) AS `24年同期`
             FROM regions r
             LEFT JOIN filtered_data d ON r.区域 = d.区域
+            LEFT JOIN last_year_data l ON r.区域 = l.区域 AND d.month = l.month
             GROUP BY r.区域
-        ) AS sub
-        ORDER BY 
-            CASE 区域
-                WHEN '北京' THEN 1
-                WHEN '广州' THEN 2
-                WHEN '深圳' THEN 3
-                WHEN '上海' THEN 4
-                WHEN '南京' THEN 5
-                WHEN '长春' THEN 6
-                WHEN '其他' THEN 7
-                ELSE 8
-            END;
-    '''
+            
+            UNION ALL
+            
+            SELECT 
+                '汇总' AS 区域,
+                SUM(`1月`), SUM(`2月`), SUM(`3月`), SUM(`4月`),
+                SUM(`5月`), SUM(`6月`), SUM(`7月`), SUM(`8月`),
+                SUM(`9月`), SUM(`10月`), SUM(`11月`), SUM(`12月`),
+                SUM(合计),SUM(`24年同期`)
+            FROM (
+                SELECT 
+                    r.区域,
+                    COALESCE(SUM(CASE WHEN d.month = 1 THEN d.sales_amount ELSE 0 END), 0) AS `1月`,
+                    COALESCE(SUM(CASE WHEN d.month = 2 THEN d.sales_amount ELSE 0 END), 0) AS `2月`,
+                    COALESCE(SUM(CASE WHEN d.month = 3 THEN d.sales_amount ELSE 0 END), 0) AS `3月`,
+                    COALESCE(SUM(CASE WHEN d.month = 4 THEN d.sales_amount ELSE 0 END), 0) AS `4月`,
+                    COALESCE(SUM(CASE WHEN d.month = 5 THEN d.sales_amount ELSE 0 END), 0) AS `5月`,
+                    COALESCE(SUM(CASE WHEN d.month = 6 THEN d.sales_amount ELSE 0 END), 0) AS `6月`,
+                    COALESCE(SUM(CASE WHEN d.month = 7 THEN d.sales_amount ELSE 0 END), 0) AS `7月`,
+                    COALESCE(SUM(CASE WHEN d.month = 8 THEN d.sales_amount ELSE 0 END), 0) AS `8月`,
+                    COALESCE(SUM(CASE WHEN d.month = 9 THEN d.sales_amount ELSE 0 END), 0) AS `9月`,
+                    COALESCE(SUM(CASE WHEN d.month = 10 THEN d.sales_amount ELSE 0 END), 0) AS `10月`,
+                    COALESCE(SUM(CASE WHEN d.month = 11 THEN d.sales_amount ELSE 0 END), 0) AS `11月`,
+                    COALESCE(SUM(CASE WHEN d.month = 12 THEN d.sales_amount ELSE 0 END), 0) AS `12月`,
+                    COALESCE(SUM(d.sales_amount), 0) AS 合计,
+                    COALESCE(SUM(l.sales_amount), 0) AS `24年同期`
+                FROM regions r
+                LEFT JOIN filtered_data d ON r.区域 = d.区域
+                LEFT JOIN last_year_data l ON r.区域 = l.区域 AND d.month = l.month
+                GROUP BY r.区域
+            ) AS sub
+            ORDER BY 
+                CASE 区域
+                    WHEN '北京' THEN 1
+                    WHEN '广州' THEN 2
+                    WHEN '深圳' THEN 3
+                    WHEN '上海' THEN 4
+                    WHEN '南京' THEN 5
+                    WHEN '长春' THEN 6
+                    WHEN '其他' THEN 7
+                    ELSE 8
+                END;
+        '''
+        return sql
+
     select_params = {
         'SMBcore业绩': "AND sales_team in ('中长尾','电网销') AND is_traffic_product IN ('否', '')",
         'NA业绩': "AND sales_team = '华为云NA'"
@@ -429,13 +447,105 @@ def result_table_four(engine):
     conn = engine.connect()
     result_data = {}
     for k, v in select_params.items():
-        result = [dict(row) for row in conn.execute(text(sql % v)).mappings().fetchall()]
+        result = [dict(row) for row in conn.execute(text(select_sql(v))).mappings().fetchall()]
+        for re in result:
+            re_sum = float(re['合计'])
+            re_24 = float(re['24年同期'])
+            re['增长率'] = '0'
+            if re_sum and re_24:
+                re['增长率'] = f'{round((re_sum - re_24) / re_24 * 100, 2)}%'
         result = {re['区域']: re for re in result}
         result_data[k] = result
 
-    return result
+    return result_data
+
 
 def result_table_five(engine):
+    sql = '''
+        WITH base_data AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                ELSE '直客'
+                END AS secondary_dealer_re,
+                customer_name,
+                MONTH(performance_date) AS month_re,
+                SUM(sales_amount) AS sales_amount
+            FROM hw_two_five_data
+            WHERE
+                sales_team IN ('中长尾', '电网销')
+                AND is_traffic_product IN ('否','')
+            GROUP BY secondary_dealer_re, customer_name, month_re
+        )
+        SELECT 
+            secondary_dealer_re AS `渠道`,
+            customer_name AS `客户`,
+            COALESCE(SUM(CASE WHEN month_re = 1 THEN sales_amount ELSE 0 END), 0) AS `1月`,
+            COALESCE(SUM(CASE WHEN month_re = 2 THEN sales_amount ELSE 0 END), 0) AS `2月`,
+            COALESCE(SUM(CASE WHEN month_re = 3 THEN sales_amount ELSE 0 END), 0) AS `3月`,
+            COALESCE(SUM(CASE WHEN month_re = 4 THEN sales_amount ELSE 0 END), 0) AS `4月`,
+            COALESCE(SUM(CASE WHEN month_re = 5 THEN sales_amount ELSE 0 END), 0) AS `5月`,
+            COALESCE(SUM(CASE WHEN month_re = 6 THEN sales_amount ELSE 0 END), 0) AS `6月`,
+            COALESCE(SUM(CASE WHEN month_re = 7 THEN sales_amount ELSE 0 END), 0) AS `7月`,
+            COALESCE(SUM(CASE WHEN month_re = 8 THEN sales_amount ELSE 0 END), 0) AS `8月`,
+            COALESCE(SUM(CASE WHEN month_re = 9 THEN sales_amount ELSE 0 END), 0) AS `9月`,
+            COALESCE(SUM(CASE WHEN month_re = 10 THEN sales_amount ELSE 0 END), 0) AS `10月`,
+            COALESCE(SUM(CASE WHEN month_re = 11 THEN sales_amount ELSE 0 END), 0) AS `11月`,
+            COALESCE(SUM(CASE WHEN month_re = 12 THEN sales_amount ELSE 0 END), 0) AS `12月`,
+            COALESCE(SUM(sales_amount), 0) AS 合计
+        FROM
+            base_data
+        GROUP BY secondary_dealer_re, customer_name
+        ORDER BY 合计 DESC
+    '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    return result
+
+def result_table_six(engine):
+    sql = '''
+        WITH 
+        base_data_25 AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                    ELSE customer_name
+                END AS secondary_dealer_re,
+                customer_name,
+                SUM(sales_amount) AS sales_amount
+            FROM hw_two_five_data
+            WHERE
+                sales_team IN ('中长尾', '电网销')
+                AND is_traffic_product IN ('否','')
+            GROUP BY secondary_dealer_re,customer_name
+        ),
+        base_data_24 AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                    ELSE customer_name
+                END AS secondary_dealer_re,
+                SUM(sales_amount) AS sales_amount
+            FROM hw_two_four_data_smbcore
+            WHERE
+                performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+            GROUP BY secondary_dealer_re
+        )
+        
+        SELECT
+            bd25.secondary_dealer_re AS `SMBcore业绩`,
+            bd25.sales_amount AS `25年截止目前业绩`,
+            bd24.sales_amount AS `24年同期业绩`,
+            CASE 
+                WHEN bd24.sales_amount IS NULL THEN NULL
+                ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 2), '%')
+            END AS `同期增长率`,
+            bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
+        FROM
+        base_data_25 bd25
+        LEFT JOIN base_data_24 bd24 ON bd25.secondary_dealer_re = bd24.secondary_dealer_re
+    '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    result = {re['SMBcore业绩']: re for re in result}
+    return result
+
+def result_table_seven(engine):
     sql = '''
     
     '''
