@@ -132,8 +132,11 @@ class App(object):
             self.text.insert(tk.END, "数据第一部分...\r\n")
             result_table_one = result_table_processing.result_table_one(engine)
             self.text.insert(tk.END, "数据第二部分...\r\n")
+            result_table_two = result_table_processing.result_table_two(engine)
             self.text.insert(tk.END, "数据第三部分...\r\n")
+            result_table_three = result_table_processing.result_table_three(engine)
             self.text.insert(tk.END, "数据第四部分...\r\n")
+            result_table_four = result_table_processing.result_table_four(engine)
             self.text.insert(tk.END, "数据第五部分...\r\n")
             self.text.insert(tk.END, "数据第六部分...\r\n")
             self.text.insert(tk.END, "数据第七部分...\r\n")
@@ -261,6 +264,9 @@ class App(object):
     def import_24_data_to_db(self):
         self.text.insert(tk.END, f"开始读取24年数据...\r\n")
         two_four_path = self.two_four_data.get()
+        if not two_four_path:
+            self.text.insert(tk.END, "文件路径不能为空！\r\n")
+            return
         try:
             engine = self.connect_db()
             if not engine:
