@@ -247,11 +247,11 @@ def result_table_one(engine):
         
         -- 8. 最终结果
         SELECT 
-            region,
-            CONCAT(IFNULL(all_sales, 'N/A'), '%') AS all_sales,
-            CONCAT(IFNULL(na_sales, 'N/A'), '%') AS na_sales,
-            CONCAT(IFNULL(smb_sales, 'N/A'), '%') AS smb_sales,
-            CONCAT(IFNULL(smbcore_sales, 'N/A'), '%') AS smbcore_sales
+            region AS grouped_region,
+		    CONCAT(IFNULL(all_sales, 'N/A'), '%') AS `整体业绩`,
+            CONCAT(IFNULL(na_sales, 'N/A'), '%') AS `NA业绩`,
+            CONCAT(IFNULL(smb_sales, 'N/A'), '%') AS `SMB业绩`,
+            CONCAT(IFNULL(smbcore_sales, 'N/A'), '%') AS `SMBcore业绩`
         FROM (
             SELECT * FROM pivot_table
             UNION ALL
@@ -260,7 +260,7 @@ def result_table_one(engine):
         ORDER BY FIELD(region, '北京','广州','深圳','上海','南京','成都','其他','总计');
     '''
     result = [dict(row) for row in conn.execute(text(growth_rate_sql)).mappings().fetchall()]
-    result = {re['region']: re for re in result}
+    result = {re['grouped_region']: re for re in result}
     result_data['同期增长率'] = result
 
     conn.close()
@@ -508,13 +508,12 @@ def result_table_six(engine):
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
                     ELSE customer_name
                 END AS secondary_dealer_re,
-                customer_name,
                 SUM(sales_amount) AS sales_amount
             FROM hw_two_five_data
             WHERE
                 sales_team IN ('中长尾', '电网销')
                 AND is_traffic_product IN ('否','')
-            GROUP BY secondary_dealer_re,customer_name
+            GROUP BY secondary_dealer_re
         ),
         base_data_24 AS(
             SELECT
