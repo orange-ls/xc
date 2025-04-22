@@ -248,7 +248,7 @@ def result_table_one(engine):
         -- 8. 最终结果
         SELECT 
             region,
-                CONCAT(IFNULL(all_sales, 'N/A'), '%') AS all_sales,
+            CONCAT(IFNULL(all_sales, 'N/A'), '%') AS all_sales,
             CONCAT(IFNULL(na_sales, 'N/A'), '%') AS na_sales,
             CONCAT(IFNULL(smb_sales, 'N/A'), '%') AS smb_sales,
             CONCAT(IFNULL(smbcore_sales, 'N/A'), '%') AS smbcore_sales
@@ -371,7 +371,6 @@ def result_table_four(engine):
                 FROM hw_two_four_data
                 WHERE 
                     performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
-                    -- performance_date BETWEEN '2024-01-01' AND '2024-03-31'
                     {where_sql}
                 GROUP BY 区域, month
             )

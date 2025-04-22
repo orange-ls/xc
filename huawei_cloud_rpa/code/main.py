@@ -10,6 +10,8 @@ from sqlalchemy import create_engine, text
 import result_table_processing
 import os
 from python_calamine import CalamineWorkbook
+import openpyxl
+from decimal import Decimal
 
 # 字段映射配置
 column_mapping = {
@@ -125,9 +127,9 @@ class App(object):
             # 基础表 数据入库
             self.common_excel_to_db(engine, product_details_path, customer_cor_path)
 
-            self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
             # 25年业绩表增加BI到BO列
             if two_five_path:
+                self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
                 self.add_bi_to_bo(engine, two_five_path)
 
             self.text.insert(tk.END, "数据第一部分...\r\n")
@@ -149,6 +151,7 @@ class App(object):
             self.text.insert(tk.END, "数据第九部分...\r\n")
             result_nine = result_table_processing.result_table_nine(engine)
             self.text.insert(tk.END, "结果表下载中...\r\n")
+            self.generate_result_table(data_requirements_path, result_one, result_two, result_three, result_four, result_five, result_six, result_seven, result_eight, result_nine)
 
             self.text.insert(tk.END, "处理完成！\r\n")
             engine.dispose()
@@ -399,9 +402,249 @@ class App(object):
         self.text.insert(tk.END, "正在导出25年数据...\r\n")
 
     # 生成结果表
-    # def generate_result_table(self, one, ywo, three, four, five, six, seven, eight, nine):
+    def generate_result_table(self, data_requirements_path, one, two, three, four, five, six, seven, eight, nine):
+        # 加载Excel文件
+        wb = openpyxl.load_workbook(data_requirements_path)
+        try:
+            if '一' in wb.sheetnames:
+                ws1 = wb['一']
+                # Sheet1的填充逻辑
+                row_mapping = {'北京': 3, '广州': 4, '深圳': 5, '上海': 6, '南京': 7, '成都': 8, '其他': 9, '总计': 10}
+                category_columns = {'整体业绩': 2, 'NA业绩': 5, 'SMB业绩': 8, 'SMBcore业绩': 11}
 
+                for category in ['整体业绩', 'NA业绩', 'SMB业绩', 'SMBcore业绩']:
+                    if category not in one: continue
+                    for region, values in one[category].items():
+                        row = row_mapping.get(region)
+                        if not row: continue
+                        start_col = category_columns[category]
+                        ws1.cell(row, start_col, float(values.get('渠道', 0)))
+                        ws1.cell(row, start_col + 1, float(values.get('直客', 0)))
+                        ws1.cell(row, start_col + 2, float(values.get('合计', 0)))
 
+                # 处理同期增长率
+                growth_data = one.get('同期增长率', {})
+                for region, values in growth_data.items():
+                    row = row_mapping.get(region)
+                    if row:
+                        ws1.cell(row, 14, values.get('整体业绩', ''))  # N列
+                        ws1.cell(row, 15, values.get('NA业绩', ''))  # O列
+                        ws1.cell(row, 16, values.get('SMB业绩', ''))  # P列
+                        ws1.cell(row, 17, values.get('SMBcore业绩', ''))
+
+            if '二' in wb.sheetnames:
+                ws2 = wb['二']
+                # Sheet2的列映射（字典字段 -> Excel列字母）
+                column_map = {
+                    '全量业绩': 'B',  # 全国业绩
+                    '全量H1进度': 'D',  # 全国H1进度
+                    '全量全年进度': 'F',  # 全国全年进度
+                    'SMB业绩': 'G',  # SMB业绩
+                    'SMBH1进度': 'I',  # SMBH1进度
+                    'SMB全年进度': 'K'  # SMB全年进度
+                }
+
+                # 遍历Sheet2每一行匹配区域
+                for row in ws2.iter_rows(min_row=2):  # 从第2行开始
+                    region = row[0].value  # A列为区域名
+                    if region in two:
+                        data = two[region]
+                        # 填充每个字段
+                        for field, col in column_map.items():
+                            cell = ws2[f"{col}{row[0].row}"]
+                            value = data.get(field)
+                            cell.value = float(value) if isinstance(value, Decimal) else value
+                        # # 特殊处理"汇总"行加粗
+                        # if region == '汇总':
+                        #     for cell in row:
+                        #         cell.font = Font(bold=True)
+
+            if '三' in wb.sheetnames:
+                ws3 = wb['三']
+                # 列名映射
+                column_map = {
+                    '全量业绩': 'B',
+                    '全量H1进度': 'D',
+                    '全量全年进度': 'F',
+                    'SMB业绩': 'G',
+                    'SMBH1进度': 'I',
+                    'SMB全年进度': 'K'
+                }
+
+                # 遍历Sheet3每一行匹配销售姓名
+                for row in ws3.iter_rows(min_row=2):  # 从第2行开始（跳过标题）
+                    sales_name = row[0].value  # A列为销售姓名
+                    if sales_name in three:
+                        data = three[sales_name]
+                        # 填充每个字段到对应列
+                        for field, col in column_map.items():
+                            cell = ws3[f"{col}{row[0].row}"]
+                            value = data.get(field)
+                            if isinstance(value, Decimal):
+                                cell.value = float(value)
+                            else:
+                                cell.value = value
+
+            if '四' in wb.sheetnames:
+                ws4 = wb['四']
+                # 列名映射（字典字段 -> Excel列字母）
+                column_map = {
+                    '1月': 'B', '2月': 'C', '3月': 'D', '4月': 'E', '5月': 'F', '6月': 'G', '7月': 'H', '8月': 'I',
+                    '9月': 'J', '10月': 'K', '11月': 'L', '12月': 'M', '合计': 'N', '24年同期': 'O', '增长率': 'P'
+                }
+
+                # 填充SMBcore业绩
+                # SMBcore业绩数据范围：标题在行2，数据从行3到行10，汇总在行10
+                smb_start_row = 3
+                smb_regions = ["北京", "广州", "深圳", "上海", "南京", "长春", "其他", "汇总"]
+                smb_row_mapping = {region: smb_start_row + idx for idx, region in enumerate(smb_regions)}
+
+                # 遍历SMBcore业绩数据
+                smb_data = four.get('SMBcore业绩', {})
+                for region, values in smb_data.items():
+                    row = smb_row_mapping.get(region)
+                    if not row:
+                        continue
+                    # 填充月份、合计、24年同期、增长率
+                    for field, col in column_map.items():
+                        cell = ws4[f"{col}{row}"]
+                        value = values.get(field)
+                        if isinstance(value, Decimal):
+                            cell.value = float(value)
+                        else:
+                            cell.value = value
+
+                # 填充NA业绩
+                # NA业绩数据范围：标题在行13，数据从行14到行21，汇总在行21
+                na_start_row = 14
+                na_regions = ["北京", "广州", "深圳", "上海", "南京", "长春", "其他", "汇总"]
+                na_row_mapping = {region: na_start_row + idx for idx, region in enumerate(na_regions)}
+
+                # 遍历NA业绩数据
+                na_data = four.get('NA业绩', {})
+                for region, values in na_data.items():
+                    row = na_row_mapping.get(region)
+                    if not row:
+                        continue
+                    # 填充月份、合计、24年同期、增长率
+                    for field, col in column_map.items():
+                        cell = ws4[f"{col}{row}"]
+                        value = values.get(field)
+                        if isinstance(value, Decimal):
+                            cell.value = float(value)
+                        else:
+                            cell.value = value
+
+            if '五' in wb.sheetnames:
+                ws5 = wb['五']
+                # 列映射（字典字段 -> Excel列字母）
+                column_map = {
+                    '渠道': 'A', '客户': 'B', '1月': 'C', '2月': 'D', '3月': 'E', '4月': 'F', '5月': 'G', '6月': 'H',
+                    '7月': 'I', '8月': 'J', '9月': 'K', '10月': 'L', '11月': 'M', '12月': 'N', '合计': 'O'
+                }
+                # 起始行（数据从第4行开始填充）
+                current_row = 3
+                # 遍历每一条数据
+                for item in five:
+                    # 填充渠道和客户
+                    ws5[f"A{current_row}"] = item.get('渠道', '')
+                    ws5[f"B{current_row}"] = item.get('客户', '')
+
+                    # 填充月份和合计
+                    for field, col in column_map.items():
+                        if field in ['渠道', '客户']:
+                            continue  # 已单独处理
+                        value = item.get(field)
+                        if isinstance(value, Decimal):
+                            ws5[f"{col}{current_row}"] = float(value)
+                        else:
+                            ws5[f"{col}{current_row}"] = value
+                    current_row += 1  # 移动到下一行
+
+            if '六' in wb.sheetnames:
+                ws6 = wb['六']
+                # 列映射
+                column_map = {
+                    '25年截止目前业绩': 'C', '24年同期业绩': 'D', '同期增长率': 'E', '同比24年正负值': 'F'
+                }
+
+                # 动态遍历A列所有行
+                for row in ws6.iter_rows(min_row=2):  # 从第2行开始遍历
+                    company_name = row[0].value  # A列值
+                    if company_name in six:  # 当公司名称存在于数据字典时
+                        data = six[company_name]
+                        # 填充对应列数据
+                        for field, col in column_map.items():
+                            cell = ws6[f"{col}{row[0].row}"]  # 使用当前行号
+                            value = data.get(field)
+                            if isinstance(value, Decimal):
+                                cell.value = float(value)
+                            else:
+                                cell.value = value
+
+            if '七' in wb.sheetnames:
+                ws7 = wb['七']
+                # 定义列映射
+                column_map = {
+                    '25Q1': 'F', '25Q2': 'G', '25Q3': 'H', '25Q4': 'I', '25年目前业绩': 'J', '24年同期业绩': 'K', '同比增长': 'L',
+                }
+
+                # 动态遍历A列所有有效行
+                for row in ws7.iter_rows(min_row=2):  # 从第2行开始
+                    product_cell = row[0]  # A列单元格
+                    product_name = product_cell.value
+
+                    # 严格匹配条件：产品名称存在且在数据字典中
+                    if product_name and product_name in seven:
+                        product_data = seven[product_name]
+
+                        # 验证数据完整性
+                        if all(key in product_data for key in column_map):
+                            for field, col in column_map.items():
+                                cell = ws7[f"{col}{product_cell.row}"]
+                                value = product_data[field]
+                                # 特殊处理数值类型
+                                if field in ['25Q1', '25Q2', '25Q3', '25Q4', '25年目前业绩', '24年同期业绩']:
+                                    cell.value = float(value) if isinstance(value, Decimal) else value
+                                else:
+                                    cell.value = str(value)
+
+            if '八' in wb.sheetnames:
+                ws8 = wb['八']
+                # 动态遍历数据列表，填充到Sheet8
+                for row_idx, data in enumerate(eight, start=2):  # 从第2行开始，假设第1行为标题
+                    # 计算当前行号
+                    current_row = row_idx
+                    # 填充数据到对应的列
+                    ws8.cell(row=current_row, column=1, value=data.get('新增渠道', ''))  # A列
+                    ws8.cell(row=current_row, column=2, value=float(data.get('业绩金额', 0)))  # B列
+                    ws8.cell(row=current_row, column=3, value=float(data.get('NA业绩', 0)))  # C列
+                    ws8.cell(row=current_row, column=4, value=float(data.get('SMB业绩', 0)))  # D列
+                    ws8.cell(row=current_row, column=5, value=float(data.get('SMBcore业绩', 0)))  # E列
+                    ws8.cell(row=current_row, column=6, value=data.get('销售员', ''))  # F列
+
+            if '九' in wb.sheetnames:
+                ws9 = wb['九']
+                # 动态遍历数据列表，填充到Sheet9
+                for row_idx, data in enumerate(nine, start=2):  # 从第2行开始
+                    # 计算当前行号
+                    current_row = row_idx
+                    # 填充数据到对应的列
+                    ws9.cell(row=current_row, column=1, value=data.get('新增客户', ''))  # A列
+                    ws9.cell(row=current_row, column=2, value=data.get('渠道名称', ''))  # B列
+                    ws9.cell(row=current_row, column=3, value=float(data.get('业绩金额', 0)))  # C列
+                    ws9.cell(row=current_row, column=4, value=float(data.get('NA业绩', 0)))  # D列
+                    ws9.cell(row=current_row, column=5, value=float(data.get('SMB业绩', 0)))  # E列
+                    ws9.cell(row=current_row, column=6, value=float(data.get('SMB-CORE', 0)))  # F列
+                    ws9.cell(row=current_row, column=7, value=data.get('销售员', ''))  # G列
+                    ws9.cell(row=current_row, column=8, value=data.get('客户标签', ''))  # H列
+
+            wb.save(f"{data_requirements_path.replace('.xlsx', '')}_result.xlsx")
+            self.text.insert(tk.END, "导出结果表成功\r\n")
+            return True
+        except Exception as e:
+            self.text.insert(tk.END, f"导出结果表失败：{e}\r\n")
+            return False
 
 
 if __name__ == '__main__':
