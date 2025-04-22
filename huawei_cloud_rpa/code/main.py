@@ -16,6 +16,7 @@ column_mapping = {
     '业绩ID': 'performance_id',
     '业绩金额(¥)': 'sales_amount',
     '业绩形成时间': 'performance_date',
+    '特殊返点类型': 'special_rebate_type',
     '二级经销商名称': 'secondary_dealer',
     '客户名称': 'customer_name',
     '产品类型编码': 'product_code',
@@ -130,21 +131,23 @@ class App(object):
                 self.add_bi_to_bo(engine, two_five_path)
 
             self.text.insert(tk.END, "数据第一部分...\r\n")
-            result_table_one = result_table_processing.result_table_one(engine)
+            result_one = result_table_processing.result_table_one(engine)
             self.text.insert(tk.END, "数据第二部分...\r\n")
-            result_table_two = result_table_processing.result_table_two(engine)
+            result_two = result_table_processing.result_table_two(engine)
             self.text.insert(tk.END, "数据第三部分...\r\n")
-            result_table_three = result_table_processing.result_table_three(engine)
+            result_three = result_table_processing.result_table_three(engine)
             self.text.insert(tk.END, "数据第四部分...\r\n")
-            result_table_four = result_table_processing.result_table_four(engine)
+            result_four = result_table_processing.result_table_four(engine)
             self.text.insert(tk.END, "数据第五部分...\r\n")
-            result_table_five = result_table_processing.result_table_five(engine)
+            result_five = result_table_processing.result_table_five(engine)
             self.text.insert(tk.END, "数据第六部分...\r\n")
-            result_table_six = result_table_processing.result_table_six(engine)
+            result_six = result_table_processing.result_table_six(engine)
             self.text.insert(tk.END, "数据第七部分...\r\n")
+            result_seven = result_table_processing.result_table_seven(engine)
             self.text.insert(tk.END, "数据第八部分...\r\n")
+            result_eight = result_table_processing.result_table_eight(engine)
             self.text.insert(tk.END, "数据第九部分...\r\n")
-
+            result_nine = result_table_processing.result_table_nine(engine)
             self.text.insert(tk.END, "结果表下载中...\r\n")
 
             self.text.insert(tk.END, "处理完成！\r\n")
@@ -296,17 +299,17 @@ class App(object):
                 self.text.insert(tk.END, f"开始导入24年SMBcore数据！\r\n")
                 self.big_data_to_db('hw_two_four_data_smbcore', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
-                del df
-                # 获取第三个工作表
-                sheet = wb.get_sheet_by_name('NA')
-                # 读取所有数据（包含标题行）
-                rows = sheet.to_python()
-                selected_indices = [rows[0].index(col) for col in selected_columns]
-                # 转换为DataFrame
-                df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
-                self.text.insert(tk.END, f"开始导入24年NA数据！\r\n")
-                self.big_data_to_db('hw_two_four_data_na', engine, df)
-                self.text.insert(tk.END, "数据导入成功！\r\n")
+                # del df
+                # # 获取第三个工作表
+                # sheet = wb.get_sheet_by_name('NA')
+                # # 读取所有数据（包含标题行）
+                # rows = sheet.to_python()
+                # selected_indices = [rows[0].index(col) for col in selected_columns]
+                # # 转换为DataFrame
+                # df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
+                # self.text.insert(tk.END, f"开始导入24年NA数据！\r\n")
+                # self.big_data_to_db('hw_two_four_data_na', engine, df)
+                # self.text.insert(tk.END, "数据导入成功！\r\n")
                 del df, rows
                 gc.collect()
         except Exception as e:
@@ -369,7 +372,7 @@ class App(object):
         # 3. 数据加工
         try:
             # 服务产品部映射
-            # two_five_df['服务产品部'] = two_five_df['产品类型编码'].map(cloud_services_map).fillna('')
+            two_five_df['服务产品部'] = two_five_df['产品类型编码'].map(cloud_services_map).fillna('')
             # 流量产品标记
             two_five_df['是否流量型产品'] = np.where(two_five_df['产品类型编码'].isin(flow_products), '是', '否')
             # 专线产品映射
@@ -394,6 +397,11 @@ class App(object):
             self.text.insert(tk.END, f"25年数据入库失败: {str(e)}\r\n")
         # 5. 导出25年的数据
         self.text.insert(tk.END, "正在导出25年数据...\r\n")
+
+    # 生成结果表
+    # def generate_result_table(self, one, ywo, three, four, five, six, seven, eight, nine):
+
+
 
 
 if __name__ == '__main__':

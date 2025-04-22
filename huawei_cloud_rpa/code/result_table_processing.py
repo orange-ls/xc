@@ -500,6 +500,7 @@ def result_table_five(engine):
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     return result
 
+
 def result_table_six(engine):
     sql = '''
         WITH 
@@ -545,7 +546,170 @@ def result_table_six(engine):
     result = {re['SMBcore业绩']: re for re in result}
     return result
 
+
 def result_table_seven(engine):
     sql = '''
-    
+        SELECT
+            main.product,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 25Q1,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q2' THEN sales_amount_q ELSE 0 END), 0) AS 25Q2,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q3' THEN sales_amount_q ELSE 0 END), 0) AS 25Q3,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q4' THEN sales_amount_q ELSE 0 END), 0) AS 25Q4,
+            COALESCE(SUM(sales_amount_q), 0) AS `25年目前业绩`,
+            COALESCE(last_year.same_performance_24, 0) AS `24年同期业绩`,
+            CONCAT(ROUND((COALESCE(SUM(sales_amount_q), 0) - COALESCE(last_year.same_performance_24, 0)) 
+                / NULLIF(COALESCE(last_year.same_performance_24, 0), 0) * 100, 2), '%') AS 同比增长
+        FROM (
+            SELECT DISTINCT leased_line_product AS product 
+            FROM hw_two_five_data
+            WHERE leased_line_product IN ('EI', 'PaaS', '安全', '媒体', '数据库', '网络')
+        ) AS main
+        LEFT JOIN (
+            SELECT 
+                leased_line_product,
+                SUM(sales_amount) AS sales_amount_q,
+                        quarter
+            FROM hw_two_five_data
+            WHERE sales_team IN ('中长尾', '电网销')
+            GROUP BY leased_line_product,quarter
+        ) AS current_year ON main.product = current_year.leased_line_product
+        LEFT JOIN (
+            SELECT 
+                leased_line_product,
+                SUM(sales_amount) AS same_performance_24
+            FROM hw_two_four_data
+            WHERE sales_team IN ('中长尾', '电网销')
+                        AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+            GROUP BY leased_line_product
+        ) AS last_year ON main.product = last_year.leased_line_product
+        GROUP BY product, last_year.same_performance_24
+        
+        UNION ALL
+        
+        SELECT 
+            '企业协同' AS product,
+            COALESCE(SUM(CASE WHEN quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 25Q1,
+            COALESCE(SUM(CASE WHEN quarter = 'Q2' THEN sales_amount_q ELSE 0 END), 0) AS 25Q2,
+            COALESCE(SUM(CASE WHEN quarter = 'Q3' THEN sales_amount_q ELSE 0 END), 0) AS 25Q3,
+            COALESCE(SUM(CASE WHEN quarter = 'Q4' THEN sales_amount_q ELSE 0 END), 0) AS 25Q4,
+            COALESCE(SUM(sales_amount_q), 0) AS `25年目前业绩`,
+            COALESCE(same_performance_24, 0) AS `24年同期业绩`,
+            CONCAT(ROUND(
+                (COALESCE(SUM(sales_amount_q), 0) - COALESCE(same_performance_24, 0)) 
+                / NULLIF(COALESCE(same_performance_24, 0), 0) * 100, 2
+            ),'%') AS 同比增长
+        FROM (
+            SELECT 
+                quarter,
+                SUM(sales_amount) AS sales_amount_q
+            FROM hw_two_five_data
+            WHERE 
+                enterprise_coop IS NOT NULL
+                AND special_rebate_type <> '特殊商务'
+            GROUP BY quarter
+        ) AS current_year_coop
+        LEFT JOIN (
+            SELECT 
+                SUM(sales_amount) AS same_performance_24
+            FROM hw_two_four_data
+            WHERE 
+                enterprise_coop IS NOT NULL
+                AND special_rebate_type <> '特殊商务'
+                AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) 
+                AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+        ) AS last_year_coop ON 1=1
+        GROUP BY same_performance_24
+        
+        ORDER BY FIELD(product, 'EI', 'PaaS', '安全', '媒体', '数据库', '网络', '企业协同');
     '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    result = {re['product']: re for re in result}
+    return result
+
+
+def result_table_eight(engine):
+    sql = '''
+        SELECT
+            secondary_dealer AS 新增渠道,
+            SUM(sales_amount) AS 业绩金额,
+            SUM(IF(sales_team = '华为云NA', sales_amount, 0)) AS NA业绩,
+            SUM(IF(sales_team IN ('中长尾', '电网销'), sales_amount, 0)) AS SMB业绩,
+            SUM(IF(sales_team IN ('中长尾', '电网销') 
+                   AND is_traffic_product IN ('否',''), sales_amount, 0)) AS SMBcore业绩,
+            GROUP_CONCAT(DISTINCT salesperson) AS 销售员
+        FROM hw_two_five_data
+        WHERE secondary_dealer NOT IN (
+            SELECT DISTINCT secondary_dealer 
+            FROM hw_two_four_data
+                WHERE secondary_dealer IS NOT NULL
+        )
+        GROUP BY secondary_dealer
+        ORDER BY 业绩金额 DESC
+    '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    return result
+
+
+def result_table_nine(engine):
+    sql = '''
+        WITH new_customers AS (
+            SELECT DISTINCT customer_name
+            FROM hw_two_five_data
+            WHERE customer_name NOT IN (
+                SELECT DISTINCT customer_name 
+                FROM hw_two_four_data
+                        WHERE customer_name IS NOT NULL
+            )
+        ),
+        recent_info AS (
+            SELECT 
+                customer_name,
+                secondary_dealer,
+                customer_tag,
+                salesperson
+            FROM (
+                SELECT 
+                    customer_name,
+                    secondary_dealer,
+                    customer_tag,
+                    salesperson,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY customer_name 
+                        ORDER BY performance_date DESC
+                    ) AS rn
+                FROM 
+                    hw_two_five_data
+                WHERE 
+                    customer_name IN (SELECT customer_name FROM new_customers)
+            ) t
+            WHERE 
+                rn = 1
+        )
+        SELECT
+                five.customer_name AS `新增客户`,
+            ri.secondary_dealer AS `渠道名称`,
+            SUM(five.sales_amount) AS `业绩金额`,
+            SUM(CASE WHEN five.sales_team = '华为云NA' THEN five.sales_amount ELSE 0 END) AS `NA业绩`,
+            SUM(CASE WHEN five.sales_team IN ('中场尾', '电网销') THEN five.sales_amount ELSE 0 END) AS `SMB业绩`,
+            SUM(CASE 
+                    WHEN five.sales_team IN ('中场尾', '电网销') 
+                    AND five.is_traffic_product IN ('否','') 
+                    THEN five.sales_amount ELSE 0 
+                END) AS `SMB-CORE`,
+            ri.salesperson AS `销售员`,
+            ri.customer_tag AS `客户标签`
+        FROM 
+            hw_two_five_data five
+        INNER JOIN 
+            new_customers nc ON five.customer_name = nc.customer_name
+        LEFT JOIN 
+            recent_info ri ON five.customer_name = ri.customer_name
+        GROUP BY 
+            five.customer_name, 
+            ri.secondary_dealer, 
+            ri.salesperson, 
+            ri.customer_tag
+        ORDER BY `业绩金额` DESC
+    '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    return result
