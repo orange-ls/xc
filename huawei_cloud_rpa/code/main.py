@@ -13,6 +13,7 @@ from python_calamine import CalamineWorkbook
 import openpyxl
 from decimal import Decimal
 from tkcalendar import DateEntry
+from urllib.parse import quote_plus
 
 # 字段映射配置
 column_mapping = {
@@ -192,11 +193,18 @@ class App(object):
     def connect_db(self):
         try:
             # 数据库配置
-            DB_HOST = 'localhost'
+            # DB_HOST = 'localhost'
+            # DB_PORT = 3306
+            # DB_USER = 'root'
+            # DB_PASS = '1234'
+            # DB_NAME = 'test_sync'
+
+            DB_HOST = '10.126.64.28'
             DB_PORT = 3306
             DB_USER = 'root'
-            DB_PASS = '1234'
-            DB_NAME = 'test_sync'
+            DB_PASS = 'root^#123'
+            # DB_PASS = quote_plus("Iwfecats1213@")
+            DB_NAME = 'huawei_cloud_rpa'
 
             # 创建数据库连接
             engine = create_engine(f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
@@ -744,31 +752,31 @@ class App(object):
             total_count = session.execute(text(f"SELECT COUNT(*) FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")).scalar()
             self.text.insert(tk.END, f"总数据量：{total_count} 条\r\n")
             current_row = 2
+            if total_count > 0:
+                # 分批读取并写入 Excel
+                for offset in range(0, total_count, batch_size):
+                    # 构建分页查询
+                    batch_query = text(f"SELECT * FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}' LIMIT {batch_size} OFFSET {offset}")
+                    batch_data = [dict(row) for row in session.execute(batch_query).mappings().fetchall()]
 
-            # 分批读取并写入 Excel
-            for offset in range(0, total_count, batch_size):
-                # 构建分页查询
-                batch_query = text(f"SELECT * FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}' LIMIT {batch_size} OFFSET {offset}")
-                batch_data = [dict(row) for row in session.execute(batch_query).mappings().fetchall()]
+                    # 将数据批量写入 Excel
+                    for row in batch_data:
+                        # row_data = [
+                        #     row[0], row[1], row[2], row[3],
+                        #     row[4], row[5], row[6], row[7],
+                        #     row[8], row[9], row[10], row[11],
+                        #     row[12], row[13], row[14], row[15]
+                        # ]
+                        row_data = [row.get(col) for col in column_mapping.values()]
+                        ws.append(row_data)
+                        current_row += 1
 
-                # 将数据批量写入 Excel
-                for row in batch_data:
-                    # row_data = [
-                    #     row[0], row[1], row[2], row[3],
-                    #     row[4], row[5], row[6], row[7],
-                    #     row[8], row[9], row[10], row[11],
-                    #     row[12], row[13], row[14], row[15]
-                    # ]
-                    row_data = [row.get(col) for col in column_mapping.values()]
-                    ws.append(row_data)
-                    current_row += 1
+                    # 定期保存以避免内存占用过多
+                    wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
 
-                # 定期保存以避免内存占用过多
+                # 最终保存文件
                 wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
-
-            # 最终保存文件
-            wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
-            self.text.insert(tk.END, "结果表生成成功\r\n")
+                self.text.insert(tk.END, "结果表生成成功\r\n")
             return True
         except Exception as e:
             self.text.insert(tk.END, f"结果表生成失败：{e}\r\n")
