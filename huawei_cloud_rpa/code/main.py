@@ -7,11 +7,12 @@ import threading
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 import result_table_processing
-import os
 from python_calamine import CalamineWorkbook
 import openpyxl
 from decimal import Decimal
+from tkcalendar import DateEntry
 
 # 字段映射配置
 column_mapping = {
@@ -81,11 +82,39 @@ class App(object):
         btn01 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_four_data))
         btn01.grid(row=5, column=2)
 
-        btn007 = tk.Button(root, text="导入24年数据", command=self.import_24_data_to_db)
-        btn007.grid(row=7, column=0)
+        # 时间选择框
+        self.start_time_var = tk.StringVar()
+        self.end_time_var = tk.StringVar()
+        label06 = tk.Label(root, text="导出时间范围：")
+        label06.grid(row=6, column=0, padx=0)
+        start_cal = DateEntry(
+            root,
+            textvariable=self.start_time_var,
+            date_pattern='yyyy-mm-dd',
+            locale='zh_CN',
+            width=12,
+            borderwidth=2
+        )
+        start_cal.grid(row=6, column=1, padx=(0, 1), sticky='w')
+        tk.Label(root, text="-").grid(row=6, column=1, padx=(1, 1))
+        end_cal = DateEntry(
+            root,
+            textvariable=self.end_time_var,
+            date_pattern='yyyy-mm-dd',
+            locale='zh_CN',
+            width=12,
+            borderwidth=2
+        )
+        end_cal.grid(row=6, column=1, padx=(1, 0), sticky='e')
+
+        btn001 = tk.Button(root, text="导入24年数据", command=self.import_24_data_to_db)
+        btn001.grid(row=8, column=0)
+
+        btn002 = tk.Button(root, text="导出25年数据", command=self.export_25_year_data)
+        btn002.grid(row=8, column=1)
 
         btn005 = tk.Button(root, text="匹配", command=self.start)
-        btn005.grid(row=7, column=2)
+        btn005.grid(row=8, column=2)
 
         # 结果打印框
         self.text = tk.Text(selectbackground="red", insertbackground="blue", spacing2=10, bd=0)
@@ -398,8 +427,33 @@ class App(object):
             self.big_data_to_db('hw_two_five_data', engine, two_five_df)
         except Exception as e:
             self.text.insert(tk.END, f"25年数据入库失败: {str(e)}\r\n")
-        # 5. 导出25年的数据
-        self.text.insert(tk.END, "正在导出25年数据...\r\n")
+        # # 5. 导出25年的数据
+        # self.text.insert(tk.END, "正在导出25年数据...\r\n")
+        # # 直接把two_five_df中的数据导出到Excel文件
+        # try:
+        #     # 优化导出配置
+        #     excel_path = two_five_path.replace(".xlsx", "_processed.xlsx")
+        #     # 使用xlsxwriter引擎并启用优化参数
+        #     with pd.ExcelWriter(
+        #             excel_path,
+        #             engine="xlsxwriter",
+        #             engine_kwargs={
+        #                 "options": {
+        #                     "strings_to_urls": False,  # 禁用超链接检测
+        #                     "constant_memory": True,  # 分段写入模式（核心优化）
+        #                     "use_zip64": True,  # 支持超大文件
+        #                 }
+        #             },
+        #     ) as writer:
+        #         two_five_df.to_excel(
+        #             writer,
+        #             index=False,  # 不写入索引
+        #             header=True,  # 保留标题行
+        #             sheet_name="25年数据",
+        #         )
+        #     self.text.insert(tk.END, f"成功导出至：{excel_path}\r\n")
+        # except Exception as e:
+        #     self.text.insert(tk.END, f"导出失败: {str(e)}\r\n")
 
     # 生成结果表
     def generate_result_table(self, data_requirements_path, one, two, three, four, five, six, seven, eight, nine):
@@ -640,11 +694,98 @@ class App(object):
                     ws9.cell(row=current_row, column=8, value=data.get('客户标签', ''))  # H列
 
             wb.save(f"{data_requirements_path.replace('.xlsx', '')}_result.xlsx")
-            self.text.insert(tk.END, "导出结果表成功\r\n")
+            self.text.insert(tk.END, "结果表生成成功\r\n")
             return True
         except Exception as e:
-            self.text.insert(tk.END, f"导出结果表失败：{e}\r\n")
+            self.text.insert(tk.END, f"结果表生成失败：{e}\r\n")
             return False
+
+    # 导出数据库中的25年数据
+    def export_25_year_data(self):
+        try:
+            self.text.insert(tk.END, "开始导出25年数据...\r\n")
+            start_time = self.start_time_var.get().strip()
+            end_time = self.end_time_var.get().strip()
+            if not start_time or not end_time:
+                self.text.insert(tk.END, "请填写时间范围\r\n")
+                return False
+
+            # 连接数据库
+            engine = self.connect_db()
+            if not engine:
+                raise ConnectionError("数据库连接失败")
+            # 获取当前工作簿和工作表
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "25年数据"
+
+            # 定义每次读取的数据批量大小
+            batch_size = 100000
+
+            # 获取表的字段名称
+            # table_columns = [
+            #     "业绩ID", "业绩金额(¥)", "业绩形成时间", "特殊返点类型", "二级经销商名称",
+            #     "客户名称", "产品类型编码", "客户标签", "销售纵队",
+            #     "服务产品部", "是否流量型产品", "专线产品", "企业协同",
+            #     "销售员", "区域", "季度"
+            # ]
+
+            # 写入表头
+            ws.append(selected_columns)
+
+            # 创建数据库会话
+            Session = sessionmaker(bind=engine)
+            session = Session()
+
+            # 构造查询
+            # query = text(f"SELECT * FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")
+
+            # 获取总数据量
+            total_count = session.execute(text(f"SELECT COUNT(*) FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")).scalar()
+            self.text.insert(tk.END, f"总数据量：{total_count} 条\r\n")
+            current_row = 2
+
+            # 分批读取并写入 Excel
+            for offset in range(0, total_count, batch_size):
+                # 构建分页查询
+                batch_query = text(f"SELECT * FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}' LIMIT {batch_size} OFFSET {offset}")
+                batch_data = [dict(row) for row in session.execute(batch_query).mappings().fetchall()]
+
+                # 将数据批量写入 Excel
+                for row in batch_data:
+                    # row_data = [
+                    #     row[0], row[1], row[2], row[3],
+                    #     row[4], row[5], row[6], row[7],
+                    #     row[8], row[9], row[10], row[11],
+                    #     row[12], row[13], row[14], row[15]
+                    # ]
+                    row_data = [row.get(col) for col in column_mapping.values()]
+                    ws.append(row_data)
+                    current_row += 1
+
+                # 定期保存以避免内存占用过多
+                wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
+
+            # 最终保存文件
+            wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
+            self.text.insert(tk.END, "结果表生成成功\r\n")
+            return True
+        except Exception as e:
+            self.text.insert(tk.END, f"结果表生成失败：{e}\r\n")
+            return False
+        finally:
+            if hasattr(self, 'session'):
+                self.session.expunge_all()  # 清除所有ORM对象缓存
+                self.session.close()
+                del self.session  # 删除会话引用
+
+            if hasattr(self, 'engine'):
+                self.engine.dispose()
+                del self.engine
+
+            # 强制内存回收
+            gc.collect()
+
 
 
 if __name__ == '__main__':
