@@ -41,7 +41,7 @@ def result_table_one(engine):
                         END
                     ) AS grouped_region,
                     ct.customer_type,
-                    COALESCE(SUM(d.sales_amount), 0) AS total_sales
+                    COALESCE(ROUND(SUM(d.sales_amount)/10000, 1), 0) AS total_sales
                 FROM all_regions ar
                 CROSS JOIN customer_types ct
                 LEFT JOIN hw_two_five_data d 
@@ -248,10 +248,10 @@ def result_table_one(engine):
         -- 8. 最终结果
         SELECT 
             region AS grouped_region,
-		    CONCAT(IFNULL(all_sales, 'N/A'), '%') AS `整体业绩`,
-            CONCAT(IFNULL(na_sales, 'N/A'), '%') AS `NA业绩`,
-            CONCAT(IFNULL(smb_sales, 'N/A'), '%') AS `SMB业绩`,
-            CONCAT(IFNULL(smbcore_sales, 'N/A'), '%') AS `SMBcore业绩`
+		    CONCAT(IFNULL(all_sales, '0'), '%') AS `整体业绩`,
+            CONCAT(IFNULL(na_sales, '0'), '%') AS `NA业绩`,
+            CONCAT(IFNULL(smb_sales, '0'), '%') AS `SMB业绩`,
+            CONCAT(IFNULL(smbcore_sales, '0'), '%') AS `SMBcore业绩`
         FROM (
             SELECT * FROM pivot_table
             UNION ALL
@@ -271,12 +271,12 @@ def result_table_two(engine):
     sql = '''
         SELECT 
             IFNULL(classified_region, '汇总') AS 区域,
-            SUM(national_num) AS 全量业绩,
-            SUM(national_num_h1) AS 全量H1进度,
-            SUM(national_year_num) AS 全量全年进度,
-            SUM(smb_sales) AS SMB业绩,
-            SUM(smb_sales_h1) AS SMBH1进度,
-            SUM(smb_sales_year) AS SMB全年进度
+            ROUND(SUM(national_num)/10000, 1) AS 全量业绩,
+            ROUND(SUM(national_num_h1)/10000, 1) AS 全量H1进度,
+            ROUND(SUM(national_year_num)/10000, 1) AS 全量全年进度,
+            ROUND(SUM(smb_sales)/10000, 1) AS SMB业绩,
+            ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH1进度,
+            ROUND(SUM(smb_sales_year)/10000, 1) AS SMB全年进度
         FROM (
             SELECT 
                 CASE 
@@ -314,12 +314,12 @@ def result_table_three(engine):
     sql = '''
         SELECT 
             IFNULL(classified, '汇总') AS 销售,
-            SUM(national_num) AS 全量业绩,
-            SUM(national_num_h1) AS 全量H1进度,
-            SUM(national_year_num) AS 全量全年进度,
-            SUM(smb_sales) AS SMB业绩,
-            SUM(smb_sales_h1) AS SMBH1进度,
-            SUM(smb_sales_year) AS SMB全年进度
+            ROUND(SUM(national_num)/10000, 1) AS 全量业绩,
+            ROUND(SUM(national_num_h1)/10000, 1) AS 全量H1进度,
+            ROUND(SUM(national_year_num)/10000, 1) AS 全量全年进度,
+            ROUND(SUM(smb_sales)/10000, 1) AS SMB业绩,
+            ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH1进度,
+            ROUND(SUM(smb_sales_year)/10000, 1) AS SMB全年进度
         FROM (
             SELECT 
                 salesperson AS classified,
@@ -355,7 +355,7 @@ def result_table_four(engine):
                   SELECT 
                     CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
                     MONTH(performance_date) AS month,
-                    SUM(sales_amount) AS sales_amount
+                    ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
                 FROM hw_two_five_data
                 WHERE 
                     1=1
@@ -366,8 +366,8 @@ def result_table_four(engine):
                 -- 新增2024年同期数据部分
                 SELECT 
                     CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
-                            MONTH(performance_date) AS month,
-                    SUM(sales_amount) AS sales_amount
+                    MONTH(performance_date) AS month,
+                    ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
                 FROM hw_two_four_data
                 WHERE 
                     performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
@@ -468,7 +468,7 @@ def result_table_five(engine):
                 END AS secondary_dealer_re,
                 customer_name,
                 MONTH(performance_date) AS month_re,
-                SUM(sales_amount) AS sales_amount
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_five_data
             WHERE
                 sales_team IN ('中长尾', '电网销')
@@ -508,7 +508,7 @@ def result_table_six(engine):
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
                     ELSE customer_name
                 END AS secondary_dealer_re,
-                SUM(sales_amount) AS sales_amount
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_five_data
             WHERE
                 sales_team IN ('中长尾', '电网销')
@@ -520,7 +520,7 @@ def result_table_six(engine):
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
                     ELSE customer_name
                 END AS secondary_dealer_re,
-                SUM(sales_amount) AS sales_amount
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_four_data_smbcore
             WHERE
                 performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
@@ -565,8 +565,8 @@ def result_table_seven(engine):
         LEFT JOIN (
             SELECT 
                 leased_line_product,
-                SUM(sales_amount) AS sales_amount_q,
-                        quarter
+                ROUND(SUM(sales_amount)/10000, 1) AS sales_amount_q,
+                quarter
             FROM hw_two_five_data
             WHERE sales_team IN ('中长尾', '电网销')
             GROUP BY leased_line_product,quarter
@@ -574,7 +574,7 @@ def result_table_seven(engine):
         LEFT JOIN (
             SELECT 
                 leased_line_product,
-                SUM(sales_amount) AS same_performance_24
+                ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
             FROM hw_two_four_data
             WHERE sales_team IN ('中长尾', '电网销')
                         AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
@@ -599,7 +599,7 @@ def result_table_seven(engine):
         FROM (
             SELECT 
                 quarter,
-                SUM(sales_amount) AS sales_amount_q
+                ROUND(SUM(sales_amount)/10000, 1) AS sales_amount_q
             FROM hw_two_five_data
             WHERE 
                 enterprise_coop IS NOT NULL
@@ -608,7 +608,7 @@ def result_table_seven(engine):
         ) AS current_year_coop
         LEFT JOIN (
             SELECT 
-                SUM(sales_amount) AS same_performance_24
+                ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
             FROM hw_two_four_data
             WHERE 
                 enterprise_coop IS NOT NULL
@@ -629,11 +629,11 @@ def result_table_eight(engine):
     sql = '''
         SELECT
             secondary_dealer AS 新增渠道,
-            SUM(sales_amount) AS 业绩金额,
-            SUM(IF(sales_team = '华为云NA', sales_amount, 0)) AS NA业绩,
-            SUM(IF(sales_team IN ('中长尾', '电网销'), sales_amount, 0)) AS SMB业绩,
-            SUM(IF(sales_team IN ('中长尾', '电网销') 
-                   AND is_traffic_product IN ('否',''), sales_amount, 0)) AS SMBcore业绩,
+            ROUND(SUM(sales_amount)/10000, 1) AS 业绩金额,
+            ROUND(SUM(IF(sales_team = '华为云NA', sales_amount, 0))/10000, 1) AS NA业绩,
+            ROUND(SUM(IF(sales_team IN ('中长尾', '电网销'), sales_amount, 0))/10000, 1) AS SMB业绩,
+            ROUND(SUM(IF(sales_team IN ('中长尾', '电网销') 
+                       AND is_traffic_product IN ('否',''), sales_amount, 0))/10000, 1) AS SMBcore业绩,
             GROUP_CONCAT(DISTINCT salesperson) AS 销售员
         FROM hw_two_five_data
         WHERE secondary_dealer NOT IN (
@@ -684,16 +684,16 @@ def result_table_nine(engine):
                 rn = 1
         )
         SELECT
-                five.customer_name AS `新增客户`,
+            five.customer_name AS `新增客户`,
             ri.secondary_dealer AS `渠道名称`,
-            SUM(five.sales_amount) AS `业绩金额`,
-            SUM(CASE WHEN five.sales_team = '华为云NA' THEN five.sales_amount ELSE 0 END) AS `NA业绩`,
-            SUM(CASE WHEN five.sales_team IN ('中场尾', '电网销') THEN five.sales_amount ELSE 0 END) AS `SMB业绩`,
-            SUM(CASE 
+            ROUND(SUM(five.sales_amount)/10000, 1) AS `业绩金额`,
+            ROUND(SUM(CASE WHEN five.sales_team = '华为云NA' THEN five.sales_amount ELSE 0 END)/10000, 1) AS `NA业绩`,
+            ROUND(SUM(CASE WHEN five.sales_team IN ('中场尾', '电网销') THEN five.sales_amount ELSE 0 END)/10000, 1) AS `SMB业绩`,
+            ROUND(SUM(CASE 
                     WHEN five.sales_team IN ('中场尾', '电网销') 
                     AND five.is_traffic_product IN ('否','') 
                     THEN five.sales_amount ELSE 0 
-                END) AS `SMB-CORE`,
+                END)/10000, 1) AS `SMB-CORE`,
             ri.salesperson AS `销售员`,
             ri.customer_tag AS `客户标签`
         FROM 
