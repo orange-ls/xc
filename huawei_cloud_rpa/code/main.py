@@ -199,18 +199,19 @@ class App(object):
     def connect_db(self):
         try:
             # 数据库配置
-            DB_HOST = 'localhost'
-            DB_PORT = 3306
-            DB_USER = 'root'
-            DB_PASS = '1234'
-            DB_NAME = 'test_sync'
-
-            # DB_HOST = '10.126.64.28'
+            # DB_HOST = 'localhost'
             # DB_PORT = 3306
             # DB_USER = 'root'
-            # DB_PASS = 'root^#123'
-            # # DB_PASS = quote_plus("Iwfecats1213@")
-            # DB_NAME = 'huawei_cloud_rpa'
+            # DB_PASS = '1234'
+            # DB_NAME = 'test_sync'
+
+            # 生产环境
+            DB_HOST = '10.126.64.28'
+            DB_PORT = 3306
+            DB_USER = 'root'
+            DB_PASS = 'root^#123'
+            # DB_PASS = quote_plus("Iwfecats1213@")
+            DB_NAME = 'huawei_cloud_rpa'
 
             # 创建数据库连接
             engine = create_engine(f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
@@ -753,7 +754,7 @@ class App(object):
 
                 # 最终保存文件
                 wb.save(file_path)
-                self.text.insert(tk.END, "结果表生成成功\r\n")
+                self.text.insert(tk.END, f"结果表生成成功:{file_path}\r\n")
             return True
         except Exception as e:
             self.text.insert(tk.END, f"结果表生成失败：{e}\r\n")

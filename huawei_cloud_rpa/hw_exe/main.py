@@ -205,7 +205,7 @@ class App(object):
             # DB_PASS = '1234'
             # DB_NAME = 'test_sync'
 
-            # 生产数据库
+            # 生产环境
             DB_HOST = '10.126.64.28'
             DB_PORT = 3306
             DB_USER = 'root'
@@ -754,7 +754,7 @@ class App(object):
 
                 # 最终保存文件
                 wb.save(file_path)
-                self.text.insert(tk.END, "结果表生成成功\r\n")
+                self.text.insert(tk.END, f"结果表生成成功:{file_path}\r\n")
             return True
         except Exception as e:
             self.text.insert(tk.END, f"结果表生成失败：{e}\r\n")

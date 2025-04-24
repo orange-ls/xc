@@ -225,7 +225,9 @@ def result_table_one(engine, max_date):
             SELECT 
                 '总计' AS region,
                 ROUND(
-                    (SUM(amount_2025) - SUM(amount_2024)) / NULLIF(SUM(amount_2024), 0) * 100, 0
+                    (SUM(CASE WHEN ptype = '整体业绩' THEN amount_2025 END) - 
+                     SUM(CASE WHEN ptype = '整体业绩' THEN amount_2024 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = '整体业绩' THEN amount_2024 END), 0) * 100, 0
                 ) AS all_sales,
                 ROUND(
                     (SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2025 END) - 
