@@ -12,7 +12,7 @@
 from sqlalchemy import text
 
 
-def result_table_one(engine):
+def result_table_one(engine, max_date):
     '''
     第1个结果表
     :param engine: 数据库连接
@@ -102,7 +102,7 @@ def result_table_one(engine):
         result_data[k] = result
 
     # 构建sql，查询“同期增长率”
-    growth_rate_sql = '''
+    growth_rate_sql = f'''
         -- 分表统计24年与25年数据，计算增长率
         WITH 
         -- 1. 定义所有地区
@@ -151,7 +151,7 @@ def result_table_one(engine):
                 ), 0) AS amount_2024
             FROM hw_two_four_data d
             CROSS JOIN performance_types pt
-                WHERE d.performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                WHERE d.performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
             GROUP BY 
                 CASE 
                     WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
@@ -198,7 +198,7 @@ def result_table_one(engine):
                 COALESCE(d25.amount_2025, 0) AS amount_2025,
                 CASE 
                     WHEN COALESCE(d24.amount_2024, 0) = 0 THEN NULL  -- 处理除零
-                    ELSE ROUND((d25.amount_2025 - d24.amount_2024) / d24.amount_2024 * 100, 2)
+                    ELSE ROUND((d25.amount_2025 - d24.amount_2024) / d24.amount_2024 * 100, 0)
                 END AS growth_rate
             FROM all_regions ar
             CROSS JOIN performance_types pt
@@ -225,22 +225,22 @@ def result_table_one(engine):
             SELECT 
                 '总计' AS region,
                 ROUND(
-                    (SUM(amount_2025) - SUM(amount_2024)) / NULLIF(SUM(amount_2024), 0) * 100, 2
+                    (SUM(amount_2025) - SUM(amount_2024)) / NULLIF(SUM(amount_2024), 0) * 100, 0
                 ) AS all_sales,
                 ROUND(
                     (SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2025 END) - 
                      SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END), 0) * 100, 2
+                    NULLIF(SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END), 0) * 100, 0
                 ) AS na_sales,
                 ROUND(
                     (SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2025 END) - 
                      SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END), 0) * 100, 2
+                    NULLIF(SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END), 0) * 100, 0
                 ) AS smb_sales,
                 ROUND(
                     (SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2025 END) - 
                      SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END), 0) * 100, 2
+                    NULLIF(SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END), 0) * 100, 0
                 ) AS smbcore_sales
             FROM combined_data
         )
@@ -274,7 +274,6 @@ def result_table_two(engine):
             ROUND(SUM(national_num)/10000, 1) AS 全量业绩,
             ROUND(SUM(national_num_h1)/10000, 1) AS 全量H1进度,
             ROUND(SUM(national_year_num)/10000, 1) AS 全量全年进度,
-            ROUND(SUM(smb_sales)/10000, 1) AS SMB业绩,
             ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH1进度,
             ROUND(SUM(smb_sales_year)/10000, 1) AS SMB全年进度
         FROM (
@@ -317,7 +316,6 @@ def result_table_three(engine):
             ROUND(SUM(national_num)/10000, 1) AS 全量业绩,
             ROUND(SUM(national_num_h1)/10000, 1) AS 全量H1进度,
             ROUND(SUM(national_year_num)/10000, 1) AS 全量全年进度,
-            ROUND(SUM(smb_sales)/10000, 1) AS SMB业绩,
             ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH1进度,
             ROUND(SUM(smb_sales_year)/10000, 1) AS SMB全年进度
         FROM (
@@ -339,8 +337,8 @@ def result_table_three(engine):
     return result
 
 
-def result_table_four(engine):
-    def select_sql(where_sql):
+def result_table_four(engine, max_date):
+    def select_sql(where_sql, max_date):
         sql = f'''
             WITH regions AS (
                 SELECT '北京' AS 区域
@@ -370,7 +368,7 @@ def result_table_four(engine):
                     ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
                 FROM hw_two_four_data
                 WHERE 
-                    performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+                    performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
                     {where_sql}
                 GROUP BY 区域, month
             )
@@ -446,13 +444,13 @@ def result_table_four(engine):
     conn = engine.connect()
     result_data = {}
     for k, v in select_params.items():
-        result = [dict(row) for row in conn.execute(text(select_sql(v))).mappings().fetchall()]
+        result = [dict(row) for row in conn.execute(text(select_sql(v, max_date))).mappings().fetchall()]
         for re in result:
             re_sum = float(re['合计'])
             re_24 = float(re['24年同期'])
             re['增长率'] = '0'
             if re_sum and re_24:
-                re['增长率'] = f'{round((re_sum - re_24) / re_24 * 100, 2)}%'
+                re['增长率'] = f'{int(round((re_sum - re_24)/re_24*100, 0))}%'
         result = {re['区域']: re for re in result}
         result_data[k] = result
 
@@ -500,8 +498,8 @@ def result_table_five(engine):
     return result
 
 
-def result_table_six(engine):
-    sql = '''
+def result_table_six(engine, max_date):
+    sql = f'''
         WITH 
         base_data_25 AS(
             SELECT
@@ -523,7 +521,7 @@ def result_table_six(engine):
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_four_data_smbcore
             WHERE
-                performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+                performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
             GROUP BY secondary_dealer_re
         )
         
@@ -533,7 +531,7 @@ def result_table_six(engine):
             bd24.sales_amount AS `24年同期业绩`,
             CASE 
                 WHEN bd24.sales_amount IS NULL THEN NULL
-                ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 2), '%')
+                ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 0), '%')
             END AS `同期增长率`,
             bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
         FROM
@@ -545,8 +543,8 @@ def result_table_six(engine):
     return result
 
 
-def result_table_seven(engine):
-    sql = '''
+def result_table_seven(engine, max_date):
+    sql = f'''
         SELECT
             main.product,
             COALESCE(SUM(CASE WHEN current_year.quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 25Q1,
@@ -556,7 +554,7 @@ def result_table_seven(engine):
             COALESCE(SUM(sales_amount_q), 0) AS `25年目前业绩`,
             COALESCE(last_year.same_performance_24, 0) AS `24年同期业绩`,
             CONCAT(ROUND((COALESCE(SUM(sales_amount_q), 0) - COALESCE(last_year.same_performance_24, 0)) 
-                / NULLIF(COALESCE(last_year.same_performance_24, 0), 0) * 100, 2), '%') AS 同比增长
+                / NULLIF(COALESCE(last_year.same_performance_24, 0), 0) * 100, 0), '%') AS 同比增长
         FROM (
             SELECT DISTINCT leased_line_product AS product 
             FROM hw_two_five_data
@@ -577,7 +575,7 @@ def result_table_seven(engine):
                 ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
             FROM hw_two_four_data
             WHERE sales_team IN ('中长尾', '电网销')
-                        AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+                        AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
             GROUP BY leased_line_product
         ) AS last_year ON main.product = last_year.leased_line_product
         GROUP BY product, last_year.same_performance_24
@@ -594,7 +592,7 @@ def result_table_seven(engine):
             COALESCE(same_performance_24, 0) AS `24年同期业绩`,
             CONCAT(ROUND(
                 (COALESCE(SUM(sales_amount_q), 0) - COALESCE(same_performance_24, 0)) 
-                / NULLIF(COALESCE(same_performance_24, 0), 0) * 100, 2
+                / NULLIF(COALESCE(same_performance_24, 0), 0) * 100, 0
             ),'%') AS 同比增长
         FROM (
             SELECT 
@@ -602,7 +600,7 @@ def result_table_seven(engine):
                 ROUND(SUM(sales_amount)/10000, 1) AS sales_amount_q
             FROM hw_two_five_data
             WHERE 
-                enterprise_coop IS NOT NULL
+                enterprise_coop IS NOT NULL AND enterprise_coop <> ''
                 AND special_rebate_type <> '特殊商务'
             GROUP BY quarter
         ) AS current_year_coop
@@ -611,10 +609,10 @@ def result_table_seven(engine):
                 ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
             FROM hw_two_four_data
             WHERE 
-                enterprise_coop IS NOT NULL
+                enterprise_coop IS NOT NULL AND enterprise_coop <> ''
                 AND special_rebate_type <> '特殊商务'
                 AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) 
-                AND DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR)
+                AND '{max_date}'
         ) AS last_year_coop ON 1=1
         GROUP BY same_performance_24
         

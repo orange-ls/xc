@@ -3,7 +3,7 @@ import tkinter as tk
 
 from tkinter import filedialog
 import threading
-
+import os
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -162,20 +162,26 @@ class App(object):
                 self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
                 self.add_bi_to_bo(engine, two_five_path)
 
+            # 24年同期时间
+            max_date = self.get_max_date(engine)
+            if not max_date:
+                raise Exception("找不到25年最晚日期！")
+            self.text.insert(tk.END, f"最晚的‘业绩形成时间’是：{max_date}\r\n")
+            # 开始结果数据处理
             self.text.insert(tk.END, "数据第一部分...\r\n")
-            result_one = result_table_processing.result_table_one(engine)
+            result_one = result_table_processing.result_table_one(engine, max_date)
             self.text.insert(tk.END, "数据第二部分...\r\n")
             result_two = result_table_processing.result_table_two(engine)
             self.text.insert(tk.END, "数据第三部分...\r\n")
             result_three = result_table_processing.result_table_three(engine)
             self.text.insert(tk.END, "数据第四部分...\r\n")
-            result_four = result_table_processing.result_table_four(engine)
+            result_four = result_table_processing.result_table_four(engine, max_date)
             self.text.insert(tk.END, "数据第五部分...\r\n")
             result_five = result_table_processing.result_table_five(engine)
             self.text.insert(tk.END, "数据第六部分...\r\n")
-            result_six = result_table_processing.result_table_six(engine)
+            result_six = result_table_processing.result_table_six(engine, max_date)
             self.text.insert(tk.END, "数据第七部分...\r\n")
-            result_seven = result_table_processing.result_table_seven(engine)
+            result_seven = result_table_processing.result_table_seven(engine, max_date)
             self.text.insert(tk.END, "数据第八部分...\r\n")
             result_eight = result_table_processing.result_table_eight(engine)
             self.text.insert(tk.END, "数据第九部分...\r\n")
@@ -193,18 +199,18 @@ class App(object):
     def connect_db(self):
         try:
             # 数据库配置
-            # DB_HOST = 'localhost'
-            # DB_PORT = 3306
-            # DB_USER = 'root'
-            # DB_PASS = '1234'
-            # DB_NAME = 'test_sync'
-
-            DB_HOST = '10.126.64.28'
+            DB_HOST = 'localhost'
             DB_PORT = 3306
             DB_USER = 'root'
-            DB_PASS = 'root^#123'
-            # DB_PASS = quote_plus("Iwfecats1213@")
-            DB_NAME = 'huawei_cloud_rpa'
+            DB_PASS = '1234'
+            DB_NAME = 'test_sync'
+
+            # DB_HOST = '10.126.64.28'
+            # DB_PORT = 3306
+            # DB_USER = 'root'
+            # DB_PASS = 'root^#123'
+            # # DB_PASS = quote_plus("Iwfecats1213@")
+            # DB_NAME = 'huawei_cloud_rpa'
 
             # 创建数据库连接
             engine = create_engine(f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
@@ -360,36 +366,22 @@ class App(object):
     # 25年业绩表增加BI到BO列，含导出25年数据
     def add_bi_to_bo(self, engine, two_five_path):
         # 1. Excel读取优化 使用calamine引擎读取数据
+        sel_columns_25 = ['业绩ID', '业绩金额(¥)', '业绩形成时间', '特殊返点类型', '二级经销商名称', '客户名称', '产品类型编码', '客户标签', '销售纵队']
         try:
             wb = CalamineWorkbook.from_path(two_five_path)
             # 获取第一个工作表
             sheet = wb.get_sheet_by_index(0)
             # 读取所有数据（包含标题行）
             rows = sheet.to_python()
-            selected_indices = [rows[0].index(col) for col in selected_columns]
+            selected_indices = [rows[0].index(col) for col in sel_columns_25]
             # 转换为DataFrame
-            two_five_df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
+            two_five_df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=sel_columns_25)
             wb.close()
         except Exception as e:
             raise ValueError(f"25年数据读取失败: {str(e)}")
 
         # 2. 数据库查询
         with engine.connect() as conn:
-            # 批量获取所有字典数据
-            # query = """
-            #         SELECT cloud_services_code, service_department
-            #         FROM two_five_details_cloud_services;
-            #         SELECT product_code, product_type
-            #         FROM two_five_details_flow;
-            #         SELECT product_code, product_name
-            #         FROM two_five_details_special;
-            #         SELECT cloud_services_code, cloud_services_name
-            #         FROM two_five_details_collaborate;
-            #         SELECT customer_name, salesperson, region
-            #         FROM customer_correspondence;
-            #     """
-            # # 使用pandas多查询读取（比原生驱动快3-5倍）
-            # dfs = pd.read_sql_query(query, conn, chunksize=None)
             sql_list = ['SELECT cloud_services_code, service_department FROM two_five_details_cloud_services;',
                         'SELECT product_code, product_type FROM two_five_details_flow',
                         'SELECT product_code, product_name FROM two_five_details_special',
@@ -463,6 +455,12 @@ class App(object):
         # except Exception as e:
         #     self.text.insert(tk.END, f"导出失败: {str(e)}\r\n")
 
+    # 找出24年同期时间
+    def get_max_date(self, engine):
+        sql_select = "SELECT DATE_SUB(MAX(performance_date), INTERVAL 1 YEAR) FROM hw_two_five_data"
+        max_data = engine.connect().execute(text(sql_select)).fetchone()[0]
+        return max_data
+
     # 生成结果表
     def generate_result_table(self, data_requirements_path, one, two, three, four, five, six, seven, eight, nine):
         # 加载Excel文件
@@ -501,9 +499,8 @@ class App(object):
                     '全量业绩': 'B',  # 全国业绩
                     '全量H1进度': 'D',  # 全国H1进度
                     '全量全年进度': 'F',  # 全国全年进度
-                    'SMB业绩': 'G',  # SMB业绩
-                    'SMBH1进度': 'I',  # SMBH1进度
-                    'SMB全年进度': 'K'  # SMB全年进度
+                    'SMBH1进度': 'H',  # SMBH1进度
+                    'SMB全年进度': 'J'  # SMB全年进度
                 }
 
                 # 遍历Sheet2每一行匹配区域
@@ -516,10 +513,6 @@ class App(object):
                             cell = ws2[f"{col}{row[0].row}"]
                             value = data.get(field)
                             cell.value = float(value) if isinstance(value, Decimal) else value
-                        # # 特殊处理"汇总"行加粗
-                        # if region == '汇总':
-                        #     for cell in row:
-                        #         cell.font = Font(bold=True)
 
             if '三' in wb.sheetnames:
                 ws3 = wb['三']
@@ -528,9 +521,8 @@ class App(object):
                     '全量业绩': 'B',
                     '全量H1进度': 'D',
                     '全量全年进度': 'F',
-                    'SMB业绩': 'G',
-                    'SMBH1进度': 'I',
-                    'SMB全年进度': 'K'
+                    'SMBH1进度': 'H',
+                    'SMB全年进度': 'J'
                 }
 
                 # 遍历Sheet3每一行匹配销售姓名
@@ -710,6 +702,8 @@ class App(object):
 
     # 导出数据库中的25年数据
     def export_25_year_data(self):
+        desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+        file_path = os.path.join(desktop_path, "25年数据_result.xlsx")
         try:
             self.text.insert(tk.END, "开始导出25年数据...\r\n")
             start_time = self.start_time_var.get().strip()
@@ -730,23 +724,12 @@ class App(object):
             # 定义每次读取的数据批量大小
             batch_size = 100000
 
-            # 获取表的字段名称
-            # table_columns = [
-            #     "业绩ID", "业绩金额(¥)", "业绩形成时间", "特殊返点类型", "二级经销商名称",
-            #     "客户名称", "产品类型编码", "客户标签", "销售纵队",
-            #     "服务产品部", "是否流量型产品", "专线产品", "企业协同",
-            #     "销售员", "区域", "季度"
-            # ]
-
             # 写入表头
             ws.append(selected_columns)
 
             # 创建数据库会话
             Session = sessionmaker(bind=engine)
             session = Session()
-
-            # 构造查询
-            # query = text(f"SELECT * FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")
 
             # 获取总数据量
             total_count = session.execute(text(f"SELECT COUNT(*) FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")).scalar()
@@ -761,21 +744,15 @@ class App(object):
 
                     # 将数据批量写入 Excel
                     for row in batch_data:
-                        # row_data = [
-                        #     row[0], row[1], row[2], row[3],
-                        #     row[4], row[5], row[6], row[7],
-                        #     row[8], row[9], row[10], row[11],
-                        #     row[12], row[13], row[14], row[15]
-                        # ]
                         row_data = [row.get(col) for col in column_mapping.values()]
                         ws.append(row_data)
                         current_row += 1
 
                     # 定期保存以避免内存占用过多
-                    wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
+                    wb.save(file_path)
 
                 # 最终保存文件
-                wb.save("C:\\Users\\user\\Desktop\\25年数据_result.xlsx")
+                wb.save(file_path)
                 self.text.insert(tk.END, "结果表生成成功\r\n")
             return True
         except Exception as e:
