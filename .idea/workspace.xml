@@ -8,17 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/main.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/warn-main.txt" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/warn-main.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/xref-main.html" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/xref-main.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/dist/华为云RPA.exe" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/dist/华为云RPA.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/result_table_processing.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +279,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745476115737</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="可执行文件">
+      <option name="closed" value="true" />
+      <created>1745483372815</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1745483372815</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -398,17 +395,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>711</line>
+          <line>715</line>
           <option name="timeStamp" value="104" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>757</line>
+          <line>761</line>
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>759</line>
+          <line>763</line>
           <option name="timeStamp" value="107" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -418,12 +415,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>755</line>
+          <line>759</line>
           <option name="timeStamp" value="112" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
-          <line>706</line>
+          <line>710</line>
           <option name="timeStamp" value="118" />
         </line-breakpoint>
       </breakpoints>

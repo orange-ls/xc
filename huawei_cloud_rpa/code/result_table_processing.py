@@ -265,6 +265,100 @@ def result_table_one(engine, max_date):
     result = {re['grouped_region']: re for re in result}
     result_data['同期增长率'] = result
 
+    # 构建sql，查询“24年同期数据”
+    data_24_sql = '''
+        WITH 
+        -- 1. 定义所有地区
+        all_regions AS (
+            SELECT '北京' AS region UNION ALL
+            SELECT '广州' UNION ALL SELECT '深圳' UNION ALL
+            SELECT '上海' UNION ALL SELECT '南京' UNION ALL
+            SELECT '成都' UNION ALL SELECT '其他'
+        ),
+        
+        -- 2. 定义业绩类型及对应条件
+        performance_types AS (
+            SELECT '整体业绩' AS ptype UNION ALL
+            SELECT 'NA业绩' UNION ALL
+            SELECT 'SMB业绩' UNION ALL
+            SELECT 'SMBcore业绩'
+        ),
+        
+        -- 3. 计算24年各维度数据
+        data_2024 AS (
+            SELECT 
+                ar.region AS grouped_region,
+                pt.ptype,
+                COALESCE(ROUND(
+                        SUM(
+                    CASE
+                        WHEN pt.ptype = '整体业绩' THEN d.sales_amount
+                        WHEN pt.ptype = 'NA业绩' AND d.sales_team = '华为云NA' THEN d.sales_amount
+                        WHEN pt.ptype = 'SMB业绩' AND d.sales_team IN ('中长尾','电网销') THEN d.sales_amount
+                        WHEN pt.ptype = 'SMBcore业绩' AND d.sales_team IN ('中长尾','电网销') AND COALESCE(d.is_traffic_product, '') IN ('否', '') THEN d.sales_amount
+                    END
+                )/10000,1), 0) AS amount
+            FROM all_regions ar
+            CROSS JOIN performance_types pt
+            LEFT JOIN hw_two_four_data d 
+                ON ar.region = CASE 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    THEN d.region 
+                    ELSE '其他' 
+                END
+                AND d.performance_date BETWEEN '2024-01-01' AND '2024-04-20' -- 按需调整日期范围
+            GROUP BY ar.region, pt.ptype
+        ),
+        
+        -- 4. 转换为宽表格式
+        wide_data AS (
+            SELECT 
+                grouped_region,
+                SUM(CASE WHEN ptype = '整体业绩' THEN amount ELSE 0 END) AS 整体业绩,
+                SUM(CASE WHEN ptype = 'NA业绩' THEN amount ELSE 0 END) AS NA业绩,
+                SUM(CASE WHEN ptype = 'SMB业绩' THEN amount ELSE 0 END) AS SMB业绩,
+                SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount ELSE 0 END) AS SMBcore业绩
+            FROM data_2024
+            GROUP BY grouped_region
+        ),
+        
+        -- 5. 添加总计行
+        final_data AS (
+            SELECT * FROM wide_data
+            UNION ALL
+            SELECT 
+                '总计' AS grouped_region,
+                SUM(整体业绩),
+                SUM(NA业绩),
+                SUM(SMB业绩),
+                SUM(SMBcore业绩)
+            FROM wide_data
+        )
+        
+        -- 6. 按指定顺序排序
+        SELECT 
+            grouped_region,
+            整体业绩,
+            NA业绩,
+            SMB业绩,
+            SMBcore业绩
+        FROM final_data
+        ORDER BY 
+            CASE grouped_region
+                WHEN '北京' THEN 1
+                WHEN '广州' THEN 2
+                WHEN '深圳' THEN 3
+                WHEN '上海' THEN 4
+                WHEN '南京' THEN 5
+                WHEN '成都' THEN 6
+                WHEN '其他' THEN 7
+                WHEN '总计' THEN 8
+            END;
+    '''
+    result_24 = [dict(row) for row in conn.execute(text(data_24_sql)).mappings().fetchall()]
+    result_24 = {re['grouped_region']: re for re in result_24}
+    result_data['24年同期数据'] = result_24
+
     conn.close()
     return result_data
 

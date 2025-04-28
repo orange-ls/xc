@@ -493,6 +493,17 @@ class App(object):
                         ws1.cell(row, 16, values.get('SMB业绩', ''))  # P列
                         ws1.cell(row, 17, values.get('SMBcore业绩', ''))
 
+                # 24年同期数据
+                data_24 = one.get('24年同期数据', {})
+                for region, values in data_24.items():
+                    row = row_mapping.get(region)
+                    if row:
+                        ws1.cell(row, 18, values.get('整体业绩', ''))
+                        ws1.cell(row, 19, values.get('NA业绩', ''))
+                        ws1.cell(row, 20, values.get('SMB业绩', ''))
+                        ws1.cell(row, 21, values.get('SMBcore业绩', ''))
+
+
             if '二' in wb.sheetnames:
                 ws2 = wb['二']
                 # Sheet2的列映射（字典字段 -> Excel列字母）
