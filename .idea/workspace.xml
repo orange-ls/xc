@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="更新exe文件" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="RPA" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,24 +30,26 @@
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="2uU8KvxlsMKju2rh1NSIgVnYWkd" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.222.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.result_table_processing.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/huawei_cloud_rpa/files&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.222.executor": "Run",
+    "Python.main.executor": "Debug",
+    "Python.result_table_processing.executor": "Debug",
+    "Python.test_1.executor": "Debug",
+    "Python.test_2.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "D:/github code/xc",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Workspace\xc\RPA\func_file\hw_mlfx_xsmx" />
       <recent name="D:\Workspace\xc\huawei_cloud_rpa\files" />
     </key>
   </component>
@@ -299,7 +301,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745821064527</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="RPA">
+      <option name="closed" value="true" />
+      <created>1745825985136</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1745825985136</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -326,6 +336,9 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/RPA" />
+    </ignored-roots>
     <MESSAGE value="抓取DB页面数据" />
     <MESSAGE value="测试" />
     <MESSAGE value="华为云 界面开发" />
@@ -347,7 +360,8 @@
     <MESSAGE value="可执行文件" />
     <MESSAGE value="结果表一，增加24年同期数据" />
     <MESSAGE value="更新exe文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="更新exe文件" />
+    <MESSAGE value="RPA" />
+    <option name="LAST_COMMIT_MESSAGE" value="RPA" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
