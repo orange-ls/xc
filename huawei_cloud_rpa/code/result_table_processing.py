@@ -266,7 +266,7 @@ def result_table_one(engine, max_date):
     result_data['同期增长率'] = result
 
     # 构建sql，查询“24年同期数据”
-    data_24_sql = '''
+    data_24_sql = f'''
         WITH 
         -- 1. 定义所有地区
         all_regions AS (
@@ -306,7 +306,7 @@ def result_table_one(engine, max_date):
                     THEN d.region 
                     ELSE '其他' 
                 END
-                AND d.performance_date BETWEEN '2024-01-01' AND '2024-04-20' -- 按需调整日期范围
+                AND d.performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
             GROUP BY ar.region, pt.ptype
         ),
         
