@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="结果表一，增加24年同期数据">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/main.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/dist/华为云RPA.exe" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/dist/华为云RPA.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/result_table_processing.py" afterDir="false" />
-    </list>
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="更新exe文件" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -303,7 +291,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745819816523</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="更新exe文件">
+      <option name="closed" value="true" />
+      <created>1745821064527</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1745821064527</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -350,7 +346,8 @@
     <MESSAGE value="bug修改" />
     <MESSAGE value="可执行文件" />
     <MESSAGE value="结果表一，增加24年同期数据" />
-    <option name="LAST_COMMIT_MESSAGE" value="结果表一，增加24年同期数据" />
+    <MESSAGE value="更新exe文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="更新exe文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
