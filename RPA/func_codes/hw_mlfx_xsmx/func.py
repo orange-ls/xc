@@ -348,8 +348,8 @@ def match_validData(filepath, excludeCode: list, delPath):
     # 筛选出"备注"列不为"已销未提"或"部分已销未提"的数据
     df = df.query("备注 not in ['已销未提', '部分已销未提']")
 
-    # 筛选数据需要的列
-    df = df[usedCol]
+    # 筛选数据需要的列 --20250429 增加“项目注释”列，用于填充”价外费用“（后面删除这一列）
+    df = df[usedCol+['项目注释']]
 
     # 获取排除不参与计算的销售员编码后的数据
     df = df.query("销售员编码 not in @excludeCode")
@@ -804,7 +804,7 @@ def matchProject1(series):
     """
 
     if "价外费用" in series["物料名称"]:
-        if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596"]:
+        if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596", "600-217668"]:
             return pd.Series(data=["罚息", "", ""], index=matchCol)
         elif series["物料号"] in ["600-072585", "600-072589", "600-072593", "600-072597"]:
             return pd.Series(data=["物流费", "", ""], index=matchCol)
@@ -1101,9 +1101,43 @@ def matchCGLX(series):
     else:
         return "原厂下单"
 
+# 匹配"采购类型-二级分类"
+def matchCGLX_2(series):
+    """
+    :param series: DataFrame行series
+    :return: 返回"采购类型"
+    """
+    series = series.copy().fillna("")
+    if series["下单合同号"] == "外购":
+        return "外购"
+    elif "价外费用" in series["物料名称"]:
+        if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596", "600-217668"]:
+            return "罚息"
+        elif series["物料号"] in ["600-072585", "600-072589", "600-072593", "600-072597"]:
+            return "物流费"
+        elif series["物料号"] in ["600-072586", "600-072590", "600-072594", "600-072598"]:
+            return "诉讼费&律师费"
+        elif series["物料号"] in ["600-072587", "600-072591", "600-072595", "600-072599"]:
+            return "折旧费"
+        else:
+            return "价外费用"
+    elif series["采购类型"] == "渠道分销":
+        return "借转销"
+    elif series["下单合同号"] == "折让":
+        return "折让"
+    elif series["下单合同号"] and not series["下单合同号"].startswith("CY") and not series["下单合同号"].startswith(
+            "1Y") and not '\u4e00' <= series["下单合同号"][0] <= '\u9fa5':
+        return "鲲泰"
+    elif series["下单合同号"].startswith("CY"):
+        return "超聚变"
+    elif "公有云" in series["项目名称"]:
+        return "公有云"
+    else:
+        return "原厂下单"
+
 
 # 匹配“运输方式”
-def matchYSFS(series, BoTransDict, HWOrderDict, KTOrderDict):
+def matchYSFS(series, BoTransDict, HWOrderDict):
     """
     :param series: DataFrame行series
     :param BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
@@ -1114,7 +1148,13 @@ def matchYSFS(series, BoTransDict, HWOrderDict, KTOrderDict):
     purchaseType = series["采购类型"]
     orderNum = series["下单合同号"]
     if purchaseType == "鲲泰":
-        return KTOrderDict.get(orderNum, "鲲泰外挂表未匹配到")
+        # return KTOrderDict.get(orderNum, "鲲泰外挂表未匹配到")
+        # --20250429 参考"库存地"字段最后两个字符判断
+        stock_last2 = series["库存地"][-2:]
+        if stock_last2 == "99":
+            return "汽运"
+        elif stock_last2 == "01" or stock_last2 == "XN":
+            return "自提"
     elif purchaseType in ["公有云", "服务", "服务预提", "渠道分销", "外购", "价外费用", "折让"]:
         return "自提"
     if purchaseType == "超聚变":
@@ -1226,6 +1266,11 @@ def calDataStep2(df, BO_file):
     # df.loc[df["下单合同号"] == '', matchCol] = df['批次'].apply(matchProject2, args=(matchDict, matchCol,))
     df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(
         lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
+
+    # --20250429 新增”价外费用“的填充，然后替换”价外费用“，并删除”项目注释“列
+    df.loc[df["下单合同号"] == '价外费用', ["项目名称", "评审二代"]] = df.loc[df["下单合同号"] == '价外费用', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
+    df.loc[df["下单合同号"] == '价外费用', ["下单合同号"]] = df.loc[df["下单合同号"] == '价外费用', "项目注释"].apply(lambda x: str(x)[:14] if pd.notna(x) else "")
+    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
     """生成{下单合同号：运输方式}字典"""
     dfBo_copy["发货方式"] = dfBo_copy["发货方式"].map(lambda x: BoDeliveryDict.get(x, ""))
@@ -1346,17 +1391,19 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
 
 
 # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
-def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
+def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList):
     """
     :param df: 需要处理的df
     :param BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     :param HWOrderPathList: 华为订单表路径列表
-    :param KTconfigPath: 鲲泰跟踪表路径，用于匹配鲲泰运输方式
     :return: 处理后的df
     """
     # 匹配采购类型
     # df["采购类型"] = df.apply(matchCGLX, axis=1)
     df.loc[df["采购类型"] == '', "采购类型"] = df.loc[df["采购类型"] == ''].apply(matchCGLX, axis=1)
+    # 在"采购类型"后增加一列"采购类型-二级分类"，取值规则为matchCGLX_2
+    col_position = df.columns.get_loc("采购类型") + 1
+    df.insert(col_position, "采购类型-二级分类", df.apply(matchCGLX_2, axis=1))
 
     '''
     # 匹配销售类型
@@ -1417,6 +1464,10 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
                 df.loc[(df["下单合同号"] == num) & (df["出具发票日"] == date), "销售类型"] = "退货"
             else:
                 df.loc[(df["下单合同号"] == num) & (df["出具发票日"] == date), "销售类型"] = "正常销售"
+    # 新增一列“销售类型-二级分类”，值复制"销售类型"列
+    col_pos = df.columns.get_loc("销售类型") + 1
+    # 在指定位置插入新列
+    df.insert(col_pos, "销售类型-二级分类", df["销售类型"])
 
     # 匹配运输方式
     df_HWOrder = pd.DataFrame()
@@ -1424,10 +1475,11 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
         orderTempDf = pd.read_excel(path, dtype=str).fillna("")
         df_HWOrder = df_HWOrder.append(orderTempDf)
     HWOrderDict = dict(zip(df_HWOrder["华为订单号"], df_HWOrder["运输方式"]))
-    df_KT = pd.read_excel(KTconfigPath, dtype=str)
-    df_KT.rename(columns={"供货方编号": "下单合同号"}, inplace=True)
-    KTOrderDict = dict(zip(df_KT["下单合同号"].fillna(""), df_KT["运输方式"].fillna("鲲泰外挂表运输方式为空")))
-    df["运输方式"] = df.apply(matchYSFS, args=(BoTransDict, HWOrderDict, KTOrderDict), axis=1)
+    # df_KT = pd.read_excel(KTconfigPath, dtype=str)
+    # df_KT.rename(columns={"供货方编号": "下单合同号"}, inplace=True)
+    # KTOrderDict = dict(zip(df_KT["下单合同号"].fillna(""), df_KT["运输方式"].fillna("鲲泰外挂表运输方式为空")))
+    # df["运输方式"] = df.apply(matchYSFS, args=(BoTransDict, HWOrderDict, KTOrderDict), axis=1)
+    df["运输方式"] = df.apply(matchYSFS, args=(BoTransDict, HWOrderDict), axis=1)
 
     # 匹配是否直发
     df["是否直发"] = df["运输方式"].apply(lambda x: "否" if x == "自提" else ("是" if x in ["汽运", "空运"] else ""))
