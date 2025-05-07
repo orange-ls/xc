@@ -186,8 +186,14 @@ def getNoticeFileContent(noticeFile, templatePath, saveDir, relationPath):
         if sheetName in ["合同清单表【模板】"]:
             ws.range("Q3").value = msgDict["进货总金额："]
             ws.range("R3").value = msgDict["出货指导价："]
-            ws.range("S3").value = msgDict["现金折扣:"]
-            ws.range("T3").value = float(msgDict["运费:"]) * -1
+            try:
+                ws.range("S3").value = msgDict["现金折扣:"]
+            except:
+                ws.range("S3").value = msgDict["现金折扣："]
+            try:
+                ws.range("T3").value = float(msgDict["运费:"]) * -1
+            except:
+                ws.range("T3").value = float(msgDict["运费："]) * -1
             ws.range("B3").value = inputArray
             # Step1 对辅助列【成本单价】<1的数据，需要计算【成本总价 /（1-（评审出货总金额-评审进货总金额）/评审出货总金额）/数量】，生成销售单价，
             # 用 ROUND 函数 取值（保留2位小数），并以 数值形式 写入到【单价调整】对应的单元格处；
@@ -343,7 +349,7 @@ cols = ["PO", "物料编码", "物料型号", "物料描述", "数量", "成交�
 
 if __name__ == "__main__":
     getNoticeFileContent(
-        r"D:\xc_files\商务通知单\1Y05102306180K.xlsm",
+        r"D:\xc_files\商务通知单\商务通知单(进供货)20250507160525.xlsm",
         r"D:\xc_files\商务通知单\【模板】- 合同清单 - V4.0.xlsx",
         r"D:\xc_files\商务通知单\result",
         r"D:\xc_files\商务通知单\服务物料【厂商物料编码】对应关系表.xlsx")
