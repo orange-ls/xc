@@ -782,9 +782,9 @@ def result_table_nine(engine):
             ri.secondary_dealer AS `渠道名称`,
             ROUND(SUM(five.sales_amount)/10000, 1) AS `业绩金额`,
             ROUND(SUM(CASE WHEN five.sales_team = '华为云NA' THEN five.sales_amount ELSE 0 END)/10000, 1) AS `NA业绩`,
-            ROUND(SUM(CASE WHEN five.sales_team IN ('中场尾', '电网销') THEN five.sales_amount ELSE 0 END)/10000, 1) AS `SMB业绩`,
+            ROUND(SUM(CASE WHEN five.sales_team IN ('中长尾', '电网销') THEN five.sales_amount ELSE 0 END)/10000, 1) AS `SMB业绩`,
             ROUND(SUM(CASE 
-                    WHEN five.sales_team IN ('中场尾', '电网销') 
+                    WHEN five.sales_team IN ('中长尾', '电网销') 
                     AND five.is_traffic_product IN ('否','') 
                     THEN five.sales_amount ELSE 0 
                 END)/10000, 1) AS `SMB-CORE`,
