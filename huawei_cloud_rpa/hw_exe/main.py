@@ -198,7 +198,7 @@ class App(object):
     # 配置数据库连接
     def connect_db(self):
         try:
-            # 数据库配置
+            # # 数据库配置
             # DB_HOST = 'localhost'
             # DB_PORT = 3306
             # DB_USER = 'root'
