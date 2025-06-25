@@ -109,9 +109,9 @@ class App(object):
         q1.add_experimental_option('detach', True)
 
         # driver = webdriver.Chrome(service=Service('chromedriver_v137.exe'), options=q1)
-        driver = webdriver.Chrome(service=Service(r'D:\Workspace\xc\expense_reimburse_rpa\chromedriver_v137.exe'), options=q1)  # todo 需要替换成自己的chromedriver路径
-        # driver_path = self.get_chromedriver_path()
-        # driver = webdriver.Chrome(service=Service(driver_path), options=q1)
+        # driver = webdriver.Chrome(service=Service(r'D:\Workspace\xc\expense_reimburse_rpa\chromedriver_v137.exe'), options=q1)  # todo 需要替换成自己的chromedriver路径
+        driver_path = self.get_chromedriver_path()
+        driver = webdriver.Chrome(service=Service(driver_path), options=q1)
         # 隐性等待30秒
         driver.implicitly_wait(30)
         return driver
@@ -143,6 +143,21 @@ class App(object):
         driver.switch_to.window(driver.window_handles[-1])
         return driver
 
+    def search_basic_infor(self, driver, but_address, tr_address):
+        for i in range(10):
+            time.sleep(1)
+            # 判断是否正在加载
+            rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+            if len(rows) > 0:
+                time.sleep(2)
+                continue
+            # 如果搜索结果不是一个，重新点击搜索按钮
+            rows = driver.find_elements(By.XPATH, tr_address)
+            if len(rows) != 1:
+                driver.find_element(By.XPATH, but_address).click()
+                continue
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, tr_address))).click()
+            break
 
     def create_expense_reimbursement(self, driver, datas):
         '''
@@ -152,15 +167,103 @@ class App(object):
         :return:
         '''
         reimburse_handels = driver.current_window_handle    # 财务报销系统 标签页的句柄
-        driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div').click()
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
         driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[11]/div/div').click()
-
         time.sleep(3)
         driver.switch_to.window(driver.window_handles[-1])
-        # todo 填写基本信息
-        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[1]').send_keys('231090301')
+
+        # 进入创建报销单页面
+        # 检查页面是否加载完成
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
+        WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
+        time.sleep(3)
+        # 填写基本信息
+        # 申请人
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+        driver.find_element(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('00072593')
+        but_address = '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button'
+        tr_address = '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/ul/li'
+        driver.find_element(By.XPATH, but_address).click()
+        self.search_basic_infor(driver, but_address, tr_address)
+        time.sleep(1)
+
+        # 费用成本中心
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[6]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+        driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('MHQH0003')
+        but_address = '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button'
+        tr_address = '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'
+        driver.find_element(By.XPATH, but_address).click()
+        self.search_basic_infor(driver, but_address, tr_address)
+        time.sleep(1)
+
+        # 平台
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[7]/td[5]/div/div/div/div/div[2]/button').click()
+        driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('北京')
+        but_address = '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button'
+        tr_address = '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'
+        driver.find_element(By.XPATH, but_address).click()
+        self.search_basic_infor(driver, but_address, tr_address)
+        time.sleep(1)
+
+        # 费用是由
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+        driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('231090301')
+        but_address = '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button'
+        tr_address = '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'
+        driver.find_element(By.XPATH, but_address).click()
+        self.search_basic_infor(driver, but_address, tr_address)
+        time.sleep(1)
+
+        # 结算方式
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[9]/td[5]/div/div/div/div/div[2]/button').click()
+        driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('电汇')
+        but_address = '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button'
+        tr_address = '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'
+        driver.find_element(By.XPATH, but_address).click()
+        self.search_basic_infor(driver, but_address, tr_address)
+        time.sleep(1)
+
+        # 汇入省
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[8]/div/div/div/div/div[2]/button').click()
+        driver.find_element(By.XPATH, '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('北京市')
+        but_address = '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button'
+        tr_address = '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'
+        driver.find_element(By.XPATH, but_address).click()
+        self.search_basic_infor(driver, but_address, tr_address)
+        time.sleep(1)
+
+        # 收款单位
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[11]/td[5]/div/div/input').send_keys('北京神州光大科技有限公司')
+        # 判断是否有confirm确认框弹出
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').click()
+        try:
+            alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+            alert.dismiss()
+        except:
+            print("no alert")
+        # 收款单位开户行
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').send_keys('123456789')
+        # 收款账号
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[5]/div/div/input').send_keys('123456789')
+        # 是否冲借款
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[16]/td[5]/div/div/div/label[1]/span[1]/input').click()
+        # 用途说明/备注
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[18]/td[5]/div/div/input').send_keys('FY25 X月份ASP委托统计费用结算')
+        # 汇入市
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[8]/div/div/input').send_keys('北京市')
+
+        # 合同信息
+        # 技术外包类型
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[29]/td[5]/div/div/div/div/span').click()
+        driver.find_element(By.XPATH, '/html/body/div[13]/div/div/div/ul/li[7]').click()
+        # 采购合同号
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[30]/td[5]/div/div/input').send_keys('CGKJ-20250227-0003')
+        # 销售合同号
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('11223344')
+
 
         # 填写 项目明细
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input').click()
         for i in range(3):  # 尝试填写3次
             i = 4
             for data in datas:
@@ -204,6 +307,7 @@ class App(object):
 
 
             break
+
 
 
         # todo 点击保存
