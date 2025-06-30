@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="华为云 第九个表修改-打包">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="费用报销 填写基础信息部分">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,20 +64,47 @@
     &quot;Python.test.executor&quot;: &quot;Debug&quot;,
     &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
     &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/miniconda3/envs/expense_re_rpa&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/expense_reimburse_rpa/code&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
       <recent name="D:\Workspace\xc\expense_reimburse_rpa" />
       <recent name="D:\Workspace\xc\RPA\func_file\hw_mlfx_xsmx" />
       <recent name="D:\Workspace\xc\huawei_cloud_rpa\files" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.test">
+    <configuration name="筛选不重复的数据" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/筛选不重复的数据.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -126,6 +153,7 @@
       <list>
         <item itemvalue="Python.test" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.筛选不重复的数据" />
       </list>
     </recent_temporary>
   </component>
@@ -385,7 +413,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749547437003</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="费用报销">
+      <option name="closed" value="true" />
+      <created>1750729597049</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1750729597049</updated>
+    </task>
+    <task id="LOCAL-00032" summary="费用报销 填写基础信息部分">
+      <option name="closed" value="true" />
+      <created>1750818495970</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1750818495970</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -415,8 +459,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="测试" />
-    <MESSAGE value="华为云 界面开发" />
     <MESSAGE value="华为云 需求文档" />
     <MESSAGE value="创建数据库表" />
     <MESSAGE value="数据入库" />
@@ -440,7 +482,9 @@
     <MESSAGE value="商务通知单" />
     <MESSAGE value="华为云 第九个表修改" />
     <MESSAGE value="华为云 第九个表修改-打包" />
-    <option name="LAST_COMMIT_MESSAGE" value="华为云 第九个表修改-打包" />
+    <MESSAGE value="费用报销" />
+    <MESSAGE value="费用报销 填写基础信息部分" />
+    <option name="LAST_COMMIT_MESSAGE" value="费用报销 填写基础信息部分" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -561,24 +605,44 @@
           <option name="timeStamp" value="146" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="159" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>81</line>
-          <option name="timeStamp" value="169" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
-          <line>238</line>
+          <line>387</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>113</line>
+          <option name="timeStamp" value="203" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>109</line>
+          <option name="timeStamp" value="205" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>117</line>
+          <option name="timeStamp" value="206" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
+          <line>69</line>
+          <option name="timeStamp" value="207" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>70</line>
+          <option name="timeStamp" value="211" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
-          <line>235</line>
-          <option name="timeStamp" value="176" />
+          <line>76</line>
+          <option name="timeStamp" value="213" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="216" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
