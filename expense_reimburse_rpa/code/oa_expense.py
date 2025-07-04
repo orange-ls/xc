@@ -8,15 +8,15 @@ import time
 
 
 # class oaexpense():
-def login_oa(driver):
+def login_oa(driver, config_dict):
     # 登录OA，跳转到财务报销系统
     driver.get('https://newportal.digitalchina.com')
 
     # 登录
-    driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys('lishuaiae')
+    driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys(config_dict['OA账号'])
     time.sleep(1)
     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[1]').click()
-    driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[2]').send_keys('Mm2002902L.')
+    driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[2]').send_keys(config_dict['OA密码'])
     time.sleep(1)
     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[5]/td/img').click()
 
@@ -35,6 +35,12 @@ def login_oa(driver):
     return driver
 
 def search_basic_infor(driver, but_address, tr_address):
+    '''
+    基本信息部分：搜索并选择
+    :param driver:
+    :param but_address: 搜索按钮
+    :param tr_address: 搜索结果
+    '''
     for i in range(10):
         time.sleep(1)
         # 判断是否正在加载
@@ -50,7 +56,7 @@ def search_basic_infor(driver, but_address, tr_address):
         WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, tr_address))).click()
         break
 
-def create_expense_reimbursement(driver, datas):
+def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     '''
     跳转到技服外包报销，创建技服费用报销单
     :param driver: 浏览器对象
@@ -118,7 +124,7 @@ def create_expense_reimbursement(driver, datas):
 
     # 汇入省
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[8]/div/div/div/div/div[2]/button').click()
-    driver.find_element(By.XPATH, '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('北京市')
+    driver.find_element(By.XPATH, '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys(service_cor_dict['省份'])
     but_address = '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button'
     tr_address = '/html/body/div[12]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'
     driver.find_element(By.XPATH, but_address).click()
@@ -126,7 +132,7 @@ def create_expense_reimbursement(driver, datas):
     time.sleep(1)
 
     # 收款单位
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[11]/td[5]/div/div/input').send_keys('北京神州光大科技有限公司')
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[11]/td[5]/div/div/input').send_keys(service_cor_dict['服务商名称'])
     # 判断是否有confirm确认框弹出
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').click()
     try:
@@ -135,24 +141,27 @@ def create_expense_reimbursement(driver, datas):
     except:
         print("no alert")
     # 收款单位开户行
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').send_keys('123456789')
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').send_keys(service_cor_dict['收款单位开户行'])
     # 收款账号
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[5]/div/div/input').send_keys('123456789')
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[5]/div/div/input').send_keys(service_cor_dict['收款账号'])
     # 是否冲借款
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[16]/td[5]/div/div/div/label[1]/span[1]/input').click()
     # 用途说明/备注
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[18]/td[5]/div/div/input').send_keys('FY25 X月份ASP委托统计费用结算')
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[18]/td[5]/div/div/input').send_keys(config_dict['asp表名称'])
     # 汇入市
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[8]/div/div/input').send_keys('北京市')
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[8]/div/div/input').send_keys(service_cor_dict['城市'])
 
     # 合同信息
     # 技术外包类型
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[29]/td[5]/div/div/div/div/span').click()
     driver.find_element(By.XPATH, '/html/body/div[13]/div/div/div/ul/li[7]').click()
     # 采购合同号
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[30]/td[5]/div/div/input').send_keys('CGKJ-20250227-0003')
-    # 销售合同号
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[30]/td[5]/div/div/input').send_keys(service_cor_dict['采购合同号'])
+    # todo  销售合同号
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('11223344')
+
+    # todo 上传发票
+    driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').send_keys(config_dict['发票路径'])
 
     # 填写 项目明细
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input').click()
@@ -199,6 +208,8 @@ def create_expense_reimbursement(driver, datas):
 
         break
 
+    # todo 上传发票、附件
+    # todo 审批信息
     # todo 点击保存
     # 关闭新建标签页，切换到财务报销系统标签页
     driver.close()
