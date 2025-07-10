@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import os
 
 
 # class oaexpense():
@@ -73,15 +74,22 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
 
     # 进入创建报销单页面
     # 检查页面是否加载完成
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
-    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
-    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[6]")))
+    for i in range(3):
+        try:
+            time.sleep(3)
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[6]")))
+        except:
+            driver.refresh()
+            continue
 
-    time.sleep(3)
+    time.sleep(1)
     # 填写基本信息
     # 申请人
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
     driver.find_element(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('00072593')    # 陈月青
+    # driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span/input").send_keys('00072593')    # 陈月青
     but_address = '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button'
     tr_address = '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/ul/li'
     driver.find_element(By.XPATH, but_address).click()
@@ -162,8 +170,34 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     # todo  销售合同号
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('11223344')
 
-    # todo 上传发票
-    # driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').send_keys(config_dict['发票路径'])
+    # 上传发票
+    # todo 修改发票名称
+    invoice_name = f"{service_cor_dict['服务商名称']}-{config_dict['月份']}.pdf"
+    # invoice_name = f"{config_dict['asp表名称']}-{config_dict['月份']}-{config_dict['金额']}.pdf"
+    invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
+    # 点击"选择发票"按钮
+    driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
+    iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
+    driver.switch_to.frame(iframe)
+    # 点击"发票录入"按钮
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
+    # driver.find_element(By.XPATH, "//*[@class='el-button-group']/button[1]").click()
+    # 上传发票文件
+    driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
+    # 点击"开始识别"按钮
+    driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+    time.sleep(3)
+    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[4]")))
+    # 点击"确认"按钮
+    driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+    # 等待"发票录入"按钮出现
+    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='el-button-group']/button[1]")))
+    time.sleep(3)
+    # 点击"确认"按钮
+    driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+    # 切换回主文档
+    driver.switch_to.default_content()
+    time.sleep(1)
 
     # 填写 项目明细
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input').click()
@@ -201,13 +235,13 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
             except:
                 driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[1]/table/tbody/tr[3]/td[1]/span/label/span/input').click()
                 driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[1]/table/tbody/tr[2]/td[1]/div/div/i[2]').click()
-            # 点击弹窗确定按钮
             time.sleep(1)
-            # todo 点击确认按钮存在问题，替换成class_name来实现ant-confirm-btns/button[1]
-            driver.find_element(By.XPATH, '/html/body/div[15]/div/div[2]/div/div[1]/div/div/div[2]/button[1]').click()
+            # 点击弹窗确定按钮
+            driver.find_element(By.XPATH, "//*[@class='ant-confirm-btns']/button[1]").click()
             continue
-        # 如果有弹窗提示没有填写完整，则需要重新填写某一行
+        # 点击查询
         driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[6]/div/input').click()
+        # 如果有弹窗提示没有填写完整，则需要重新填写
         try:
             alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
             alert.dismiss()
@@ -220,7 +254,7 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
                 driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[1]/table/tbody/tr[2]/td[1]/div/div/i[2]').click()
             # 点击弹窗确定按钮
             time.sleep(1)
-            driver.find_element(By.XPATH, '/html/body/div[15]/div/div[2]/div/div[1]/div/div/div[2]/button[1]').click()
+            driver.find_element(By.XPATH, "//*[@class='ant-confirm-btns']/button[1]").click()
             continue
         except:
             print("项目明细填写完整")

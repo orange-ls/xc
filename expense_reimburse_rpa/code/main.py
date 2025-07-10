@@ -47,6 +47,7 @@ class App(object):
         btn03.grid(row=2, column=2)
 
         self.config_file = tk.StringVar()
+        # todo 调整为客户指定路径
         self.config_file.set(r"C:\Users\user\Desktop\费用报销rpa配置表.xlsx")
         label03 = tk.Label(root, text="配置文件表：")
         label03.grid(row=3, column=0)
@@ -55,13 +56,16 @@ class App(object):
         btn03 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.config_file))
         btn03.grid(row=3, column=2)
 
-
         btn005 = tk.Button(root, text="执行", command=self.start)
         btn005.grid(row=8, column=2)
 
         # 结果打印框
         self.text = tk.Text(selectbackground="red", insertbackground="blue", spacing2=10, bd=0)
         self.text.grid(row=9, column=0, columnspan=10)
+
+        # todo 增加发票名称模板、工单号表名称模板、ASP表名称模板
+        self.text.insert(tk.END, "ASP表表名规则：数字年月+月+ASP，例：2501月ASP.xlsx \r\n")
+
 
     def start(self):
         self.T = threading.Thread(target=self.data_handling)
@@ -79,9 +83,9 @@ class App(object):
             asp_table_path = self.asp_table.get()
             config_file_path = self.config_file.get()
 
-            if not os.path.exists(order_num_path) or not os.path.exists(asp_table_path) or not os.path.exists(config_file_path):
-                self.text.insert(tk.END, "文件路径错误！\r\n")
-                return
+            # if not os.path.exists(order_num_path) or not os.path.exists(asp_table_path) or not os.path.exists(config_file_path):
+            #     self.text.insert(tk.END, "文件路径错误！\r\n")
+            #     return
             # 读取配置文件为字典
             config_df = pd.read_excel(config_file_path, sheet_name='流程配置')[['名称', '值']]
             config_dict = {row['名称']: row['值'] for i, row in config_df.iterrows()}
@@ -94,29 +98,32 @@ class App(object):
             config_dict['asp表名称'] = asp_table_name
 
             # 获取文件的月份
-            month = re.search(r'(?:^|.*?)(\d+月|[一二三四五六七八九十]{1,3}月)', os.path.basename(order_num_path)).group(1)
+            month = re.search(r'(?:^|.*?)(\d+月)', os.path.basename(asp_table_name)).group(1)
+            month = month[2:].replace('0', '')
+            config_dict['月份'] = month
+            # todo config_dict中增加税前金额 config_dict['金额']
 
-            # 读取工单号表
-            all_sheets = pd.ExcelFile(order_num_path).sheet_names
-            sheet_names = [s for s in all_sheets if '例外服务' in s]
-            driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
-            # 登录CRM系统，跳转到工单搜索界面
-            crm_download.login_crm(driver, config_dict)
-
-            for sheet_name in sheet_names:
-                order_num_table = pd.read_excel(order_num_path, sheet_name=sheet_name)[['工单号/项目交付单号', 'ASP名称', 'ASP金额']]
-                # 删除工单号为空的行
-                order_num_table = order_num_table.dropna(subset=['工单号/项目交付单号'])
-                order_num_list = order_num_table['工单号/项目交付单号'].tolist()
-                asp_name = order_num_table['ASP名称'].tolist()[0]
-                asp_amount = sum(order_num_table['ASP金额'].tolist())
-                file_name = f"{month}_{asp_name}_{asp_amount}"      # 压缩包名：2月_北京神州光大科技有限公司_金额总和
-
-                # 搜索工单，下载文件
-                # 压缩包文件保存位置 使用配置文件管理
-                crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['CRM文件保存路径'], file_name)
-
-            driver.quit()
+            # # 读取工单号表
+            # all_sheets = pd.ExcelFile(order_num_path).sheet_names
+            # sheet_names = [s for s in all_sheets if '例外服务' in s]
+            # driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+            # # 登录CRM系统，跳转到工单搜索界面
+            # crm_download.login_crm(driver, config_dict)
+            #
+            # for sheet_name in sheet_names:
+            #     order_num_table = pd.read_excel(order_num_path, sheet_name=sheet_name)[['工单号/项目交付单号', 'ASP名称', 'ASP金额']]
+            #     # 删除工单号为空的行
+            #     order_num_table = order_num_table.dropna(subset=['工单号/项目交付单号'])
+            #     order_num_list = order_num_table['工单号/项目交付单号'].tolist()
+            #     asp_name = order_num_table['ASP名称'].tolist()[0]
+            #     asp_amount = sum(order_num_table['ASP金额'].tolist())
+            #     file_name = f"{month}_{asp_name}_{asp_amount}"      # 压缩包名：2月_北京神州光大科技有限公司_金额总和
+            #
+            #     # 搜索工单，下载文件
+            #     # 压缩包文件保存位置 使用配置文件管理
+            #     crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['CRM文件保存路径'], file_name)
+            #
+            # driver.quit()
 
             # 读取asp表
             asp_table = pd.read_excel(asp_table_path, sheet_name='Sheet1')[['项目编号', '技服预提金额', '外包供应商名称', '业务范围', '项目总收入']].sort_values(by='外包供应商名称')

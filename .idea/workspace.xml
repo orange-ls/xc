@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="crm下载">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="oa修改">
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -470,7 +467,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751618181988</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="oa修改">
+      <option name="closed" value="true" />
+      <created>1752112322011</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1752112322011</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -500,7 +505,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="数据入库" />
     <MESSAGE value="24年25年数据入库" />
     <MESSAGE value="第一个结果表" />
     <MESSAGE value="第一个结果表 完成" />
@@ -525,7 +529,8 @@
     <MESSAGE value="费用报销 填写基础信息部分" />
     <MESSAGE value="费用报销 oa填写基础信息部分" />
     <MESSAGE value="crm下载" />
-    <option name="LAST_COMMIT_MESSAGE" value="crm下载" />
+    <MESSAGE value="oa修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="oa修改" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
