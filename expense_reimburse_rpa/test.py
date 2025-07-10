@@ -211,53 +211,48 @@ def create_browser():
 # print(is_email_visible)
 
 #
-# def login_oa():
-#     # 登录OA，跳转到财务报销系统
-#     driver = create_browser()
-#     driver.get('https://newportal.digitalchina.com')
-#
-#     # 登录
-#     driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys('lishuaiae')
-#     time.sleep(1)
-#     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[1]').click()
-#     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[2]').send_keys('Mm2002902L.')
-#     time.sleep(1)
-#     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[5]/td/img').click()
-#
-#     try:
-#         # 跳转到财务报销系统
-#         WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[2]/div/div[1]/div/div[1]/ul/li[5]/div/span/span'))).click()
-#         # 点击“报销和借款”按钮
-#         driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[3]/div[1]/div/div/div/div[1]/div/div/table/tbody/tr[3]/td[1]/div/div/div[3]/div[1]/div/div/div/div/div[3]/div[2]/div/div/div[1]/div/div[2]/div[1]').click()
-#     except:
-#         time.sleep(1)
-#         driver.refresh()
-#         WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[2]/div/div[1]/div/div[1]/ul/li[5]/div/span/span'))).click()
-#         driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[3]/div[1]/div/div/div/div[1]/div/div/table/tbody/tr[3]/td[1]/div/div/div[3]/div[1]/div/div/div/div/div[3]/div[2]/div/div/div[1]/div/div[2]/div[1]').click()
-#     time.sleep(3)
-#     driver.switch_to.window(driver.window_handles[-1])
-#     return driver
-#
-# driver = login_oa()
-#
-# reimburse_handels = driver.current_window_handle    # 财务报销系统 标签页的句柄
-# # driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div').click()
-# WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[11]/div/div').click()
-#
-# time.sleep(3)
-# driver.switch_to.window(driver.window_handles[-1])
-#
-# # todo 填写基本信息
-# # element = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div')
-# # ActionChains(driver).move_to_element_with_offset(element, 10, 0).click().perform()
-# # element = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div').click()
-# # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div').send_keys('MHQH0003')
-#
-# WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
-# WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
-# time.sleep(3)
-#
+def login_oa():
+    # 登录OA，跳转到财务报销系统
+    driver = create_browser()
+    driver.get('https://newportal.digitalchina.com')
+
+    # 登录
+    driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys('lishuaiae')
+    time.sleep(1)
+    driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[1]').click()
+    driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[2]').send_keys('Mm2002902L.')
+    time.sleep(1)
+    driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[5]/td/img').click()
+
+    try:
+        # 跳转到财务报销系统
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[2]/div/div[1]/div/div[1]/ul/li[5]/div/span/span'))).click()
+        # 点击“报销和借款”按钮
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[3]/div[1]/div/div/div/div[1]/div/div/table/tbody/tr[3]/td[1]/div/div/div[3]/div[1]/div/div/div/div/div[3]/div[2]/div/div/div[1]/div/div[2]/div[1]').click()
+    except:
+        time.sleep(1)
+        driver.refresh()
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[2]/div/div[1]/div/div[1]/ul/li[5]/div/span/span'))).click()
+        driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[4]/div[3]/div[1]/div/div/div/div[1]/div/div/table/tbody/tr[3]/td[1]/div/div/div[3]/div[1]/div/div/div/div/div[3]/div[2]/div/div/div[1]/div/div[2]/div[1]').click()
+    time.sleep(3)
+    driver.switch_to.window(driver.window_handles[-1])
+    return driver
+
+driver = login_oa()
+
+reimburse_handels = driver.current_window_handle    # 财务报销系统 标签页的句柄
+# driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div').click()
+WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
+driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[11]/div/div').click()
+
+time.sleep(3)
+driver.switch_to.window(driver.window_handles[-1])
+
+# todo 填写基本信息
+WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
+WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
+time.sleep(3)
+
 # # 填写基本信息
 # # 申请人
 # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
@@ -308,35 +303,35 @@ def create_browser():
 #         continue
 #     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
 #     break
-# time.sleep(1)
-#
-# # 费用是由
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-# driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('231090301')
-# driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
-# for i in range(10):
-#     time.sleep(1)
-#     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
-#     if len(rows) > 0:
-#         time.sleep(2)
-#         continue
-#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
-#     break
-# time.sleep(1)
-#
-# # 结算方式
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[9]/td[5]/div/div/div/div/div[2]/button').click()
-# driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('电汇')
-# driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
-# for i in range(10):
-#     time.sleep(1)
-#     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
-#     if len(rows) > 0:
-#         time.sleep(2)
-#         continue
-#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
-#     break
-# time.sleep(1)
+time.sleep(1)
+
+# 费用是由
+driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('231090301')
+driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
+for i in range(10):
+    time.sleep(1)
+    rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+    if len(rows) > 0:
+        time.sleep(2)
+        continue
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
+    break
+time.sleep(1)
+
+# 结算方式
+driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[9]/td[5]/div/div/div/div/div[2]/button').click()
+driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('电汇')
+driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
+for i in range(10):
+    time.sleep(1)
+    rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+    if len(rows) > 0:
+        time.sleep(2)
+        continue
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
+    break
+time.sleep(1)
 #
 # # 汇入省
 # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[8]/div/div/div/div/div[2]/button').click()
@@ -381,136 +376,132 @@ def create_browser():
 # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[30]/td[5]/div/div/input').send_keys('CGKJ-20250227-0003')
 # # 销售合同号
 # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('11223344')
-#
-#
-# print("aaaa")
+
+# 查询按钮
+driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[6]/div/input').click()
+try:
+    alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+    alert.dismiss()
+except:
+    print("no alert")
+
+
+print("aaaa")
 
 # def login_crm(driver):
-def crm_download_file(driver):
-    # 登录crm，跳转到工单搜索界面
+# def crm_download_file(driver):
+#     # 登录crm，跳转到工单搜索界面
+#
+#     order_num_list = ['202407300009','202403250006','202401030021','202405060013','LWFW20250207003','20250218027887','20250220027975','20241212026287','20241217026447','20250210027718']
+#     driver.get('https://www.fxiaoke.com/proj/page/login')
+#
+#     # 登录
+#     WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/ul/li[2]'))).click()
+#     time.sleep(1)
+#     driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[1]/input').send_keys('18518277323')
+#     driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[2]/input').send_keys('chen0503')
+#     # 勾选同意
+#     driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[2]/span[1]').click()
+#     # 点击登录
+#     driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[6]').click()
+#     time.sleep(1)
+#     driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[3]/ul/li[3]').click()
+#
+#     time.sleep(2)
+#
+#     # 点击服务通、工单管理、服务报告
+#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-portal"]/header/div/div[1]/div[2]/div[1]/div/ul/li[2]'))).click()
+#     for i in range(3):
+#         try:
+#             driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[1]/div/div/div/div[3]/div/div/div[1]/ul[1]/li[6]').click()
+#             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div/div[2]/div[1]/div/div/div/div[3]/div/div/div[1]/ul[1]/li[6]/div/div/ul/li[4]'))).click()
+#             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input')))
+#         except:
+#             time.sleep(1)
+#             driver.refresh()
+#             continue
+#         break
+#
+#     # 开始按工单号搜索
+#     # 将搜索字段修改为“工单”
+#     WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[1]/div/div/div[3]'))).click()
+#     element = driver.find_element(By.CSS_SELECTOR, '.crm-w-select.crm-widget.crm-w-panel.bl')
+#     element.find_element(By.XPATH, 'div/ul/li[4]').click()
+#
+#     for order_num in order_num_list:
+#         # 输入工单号，点击搜索
+#         driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input').clear()
+#         driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input').send_keys(order_num)
+#         driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/span').click()
+#
+#         # 等待搜索结果
+#         for i in range(10):
+#             is_exist = driver.find_element(By.CSS_SELECTOR, '.dt-loading.b-g-hide.lg').is_displayed()
+#             if not is_exist:
+#                 break
+#             time.sleep(1)
+#         # 获取搜索结果
+#         rows = driver.find_elements(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[5]/div[3]/div[2]/table/tbody/tr')
+#         row_text = rows[0].text.strip()
+#         if not row_text:
+#             print(f'跳过工单号：{order_num}')
+#             continue
+#         for row in rows:
+#             name = row.find_element(By.XPATH, 'td[2]').text
+#             if '02_' in name or '05_' in name:
+#                 row.find_element(By.XPATH, 'td[4]/div/div/div/div/a').click()
+#                 break
+#
+#         # 下载完成后，进入保存文件的文件夹，将文件打包成压缩包
+#
+#     print('done')
+#
+#
+# def create_zip(source_dir, output_dir, file_name):
+#     """
+#     智能创建ZIP压缩包
+#     :param source_dir: 需要压缩的源目录路径
+#     :param output_dir: 压缩文件输出目录路径
+#     :param file_name: 压缩文件名
+#     """
+#     # 生成带时间戳的压缩文件名
+#     zip_name = os.path.join(output_dir, f"{file_name}.zip")
+#     total_size = 0
+#
+#     with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+#         for root, dirs, files in os.walk(source_dir):
+#             for file in files:
+#                 file_path = os.path.join(root, file)
+#
+#                 # 计算相对路径
+#                 arc_path = os.path.relpath(file_path, start=source_dir)
+#                 # 添加文件到压缩包
+#                 zipf.write(file_path, arc_path)
+#
+#                 # 更新总大小
+#                 total_size += os.path.getsize(file_path)
+#
+#     total_size = round(total_size / (1024 * 1024), 2)
+#     if total_size >= 50:
+#         print(f"超过50MB，压缩文件大小：{total_size}MB")
+#
+#     # 删除源目录中的文件
+#     for root, dirs, files in os.walk(source_dir):
+#         for file in files:
+#             file_path = os.path.join(root, file)
+#             try:
+#                 os.remove(file_path)
+#             except Exception as e:
+#                 print(f"删除失败：{file_path} - {str(e)}")
 
-    order_num_list = ['202407300009','202403250006','202401030021','202405060013','LWFW20250207003','20250218027887','20250220027975','20241212026287','20241217026447','20250210027718']
-    driver.get('https://www.fxiaoke.com/proj/page/login')
 
-    # 登录
-    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/ul/li[2]'))).click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[1]/input').send_keys('18518277323')
-    driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[2]/input').send_keys('chen0503')
-    # 勾选同意
-    driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[2]/span[1]').click()
-    # 点击登录
-    driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[6]').click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[3]/ul/li[3]').click()
-
-    time.sleep(2)
-
-    # 点击服务通、工单管理、服务报告
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-portal"]/header/div/div[1]/div[2]/div[1]/div/ul/li[2]'))).click()
-    for i in range(3):
-        try:
-            driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[1]/div/div/div/div[3]/div/div/div[1]/ul[1]/li[6]').click()
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div/div[2]/div[1]/div/div/div/div[3]/div/div/div[1]/ul[1]/li[6]/div/div/ul/li[4]'))).click()
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input')))
-        except:
-            time.sleep(1)
-            driver.refresh()
-            continue
-        break
-
-    # 开始按工单号搜索
-    # 将搜索字段修改为“工单”
-    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[1]/div/div/div[3]'))).click()
-    element = driver.find_element(By.CSS_SELECTOR, '.crm-w-select.crm-widget.crm-w-panel.bl')
-    element.find_element(By.XPATH, 'div/ul/li[4]').click()
-
-    for order_num in order_num_list:
-        # 输入工单号，点击搜索
-        driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input').clear()
-        driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input').send_keys(order_num)
-        driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/span').click()
-
-        # 等待搜索结果
-        for i in range(10):
-            is_exist = driver.find_element(By.CSS_SELECTOR, '.dt-loading.b-g-hide.lg').is_displayed()
-            if not is_exist:
-                break
-            time.sleep(1)
-        # 获取搜索结果
-        rows = driver.find_elements(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[5]/div[3]/div[2]/table/tbody/tr')
-        row_text = rows[0].text.strip()
-        if not row_text:
-            print(f'跳过工单号：{order_num}')
-            continue
-        for row in rows:
-            name = row.find_element(By.XPATH, 'td[2]').text
-            if '02_' in name or '05_' in name:
-                row.find_element(By.XPATH, 'td[4]/div/div/div/div/a').click()
-                break
-
-        # 下载完成后，进入保存文件的文件夹，将文件打包成压缩包
-
-    print('done')
-
-
-def create_zip(source_dir, output_dir, file_name):
-    """
-    智能创建ZIP压缩包
-    :param source_dir: 需要压缩的源目录路径
-    :param output_dir: 压缩文件输出目录路径
-    :param file_name: 压缩文件名
-    """
-    # 生成带时间戳的压缩文件名
-    zip_name = os.path.join(output_dir, f"{file_name}.zip")
-    total_size = 0
-
-    with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(source_dir):
-            for file in files:
-                file_path = os.path.join(root, file)
-
-                # 计算相对路径
-                arc_path = os.path.relpath(file_path, start=source_dir)
-                # 添加文件到压缩包
-                zipf.write(file_path, arc_path)
-
-                # 更新总大小
-                total_size += os.path.getsize(file_path)
-
-    total_size = round(total_size / (1024 * 1024), 2)
-    if total_size >= 50:
-        print(f"超过50MB，压缩文件大小：{total_size}MB")
-
-    # 删除源目录中的文件
-    for root, dirs, files in os.walk(source_dir):
-        for file in files:
-            file_path = os.path.join(root, file)
-            try:
-                os.remove(file_path)
-            except Exception as e:
-                print(f"删除失败：{file_path} - {str(e)}")
-
-
-if __name__ == '__main__':
-    # driver = create_browser()
-    # crm_download_file(driver)
-    # target_dir = r"D:\Google\test"
-    # output_dir = r"D:\Google"
-    # file_name = "Google_Backup"
-    # create_zip(target_dir, output_dir, file_name)
-
-    # aaa = 'C:/Users/user/Desktop/十二月份ASP上门派单记录-神州光大.xlsx'
-    # aaa = os.path.basename(aaa)
-    # month = re.search(r'(?:^|.*?)(\d+月份|[一二三四五六七八九十]{1,3}月份)', aaa)
-    # month = month.group(1)
-    # print(month)
-
-    config_file_path = r"C:\Users\user\Desktop\费用报销rpa配置表.xlsx"
-    # config_df = pd.read_excel(config_file_path, sheet_name='流程配置')[['名称', '值']]
-    # config_dict = {row['名称']: row['值'] for i, row in config_df.iterrows()}
-    service_cor_df = pd.read_excel(config_file_path, sheet_name='服务商对应表')
-    service_cor_list = service_cor_df.to_dict(orient='records')
-    service_cor_dict = {row['服务商名称']: row for row in service_cor_list}
-
-    print(service_cor_dict)
+# if __name__ == '__main__':
+#     # driver = create_browser()
+#     # crm_download_file(driver)
+#     # target_dir = r"D:\Google\test"
+#     # output_dir = r"D:\Google"
+#     # file_name = "Google_Backup"
+#     # create_zip(target_dir, output_dir, file_name)
+#
+#
+#     print('aaaa')

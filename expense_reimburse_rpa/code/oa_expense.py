@@ -48,6 +48,7 @@ def search_basic_infor(driver, but_address, tr_address):
         if len(rows) > 0:
             time.sleep(2)
             continue
+        time.sleep(1)
         # 如果搜索结果不是一个，重新点击搜索按钮
         rows = driver.find_elements(By.XPATH, tr_address)
         if len(rows) != 1:
@@ -61,7 +62,8 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     跳转到技服外包报销，创建技服费用报销单
     :param driver: 浏览器对象
     :param datas: [{}, {}...]
-    :return:
+    :param config_dict: 配置文件
+    :param service_cor_dict: 服务商信息字典
     '''
     reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
@@ -161,11 +163,11 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('11223344')
 
     # todo 上传发票
-    driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').send_keys(config_dict['发票路径'])
+    # driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').send_keys(config_dict['发票路径'])
 
     # 填写 项目明细
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input').click()
-    for i in range(3):  # 尝试填写3次
+    for n in range(5):  # 尝试填写5次
         i = 4
         for data in datas:
             # 点击加号
@@ -201,14 +203,30 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
                 driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[1]/table/tbody/tr[2]/td[1]/div/div/i[2]').click()
             # 点击弹窗确定按钮
             time.sleep(1)
-            driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div/div/div[2]/button[1]').click()
+            # todo 点击确认按钮存在问题，替换成class_name来实现ant-confirm-btns/button[1]
+            driver.find_element(By.XPATH, '/html/body/div[15]/div/div[2]/div/div[1]/div/div/div[2]/button[1]').click()
             continue
-        # todo 如果有弹窗提示没有填写完整，则需要重新填写某一行
+        # 如果有弹窗提示没有填写完整，则需要重新填写某一行
         driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[6]/div/input').click()
+        try:
+            alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+            alert.dismiss()
+            # 如果不完整，删除全部行，重新填写
+            try:
+                driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[2]/table/tbody/tr[3]/td[1]/span/label/span/input').click()
+                driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[2]/table/tbody/tr[2]/td[1]/div/div/i[2]').click()
+            except:
+                driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[1]/table/tbody/tr[3]/td[1]/span/label/span/input').click()
+                driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[45]/td[4]/div/div/div/div/div[1]/table/tbody/tr[2]/td[1]/div/div/i[2]').click()
+            # 点击弹窗确定按钮
+            time.sleep(1)
+            driver.find_element(By.XPATH, '/html/body/div[15]/div/div[2]/div/div[1]/div/div/div[2]/button[1]').click()
+            continue
+        except:
+            print("项目明细填写完整")
+            break
 
-        break
-
-    # todo 上传发票、附件
+    # todo 上传附件
     # todo 审批信息
     # todo 点击保存
     # 关闭新建标签页，切换到财务报销系统标签页
