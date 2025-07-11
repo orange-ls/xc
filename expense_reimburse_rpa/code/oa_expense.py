@@ -77,9 +77,8 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     for i in range(3):
         try:
             time.sleep(3)
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[6]")))
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+            break
         except:
             driver.refresh()
             continue
@@ -87,7 +86,7 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     time.sleep(1)
     # 填写基本信息
     # 申请人
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+    driver.find_element(By.XPATH, '//*[@id="field353734span"]/div[2]/button').click()
     driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('00072593')    # 陈月青
     but_address = "//*[@class='wea-search-tab']/div/div/button"
     tr_address = "//*[@class='wea-crm-list']/ul/li"
@@ -263,6 +262,8 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     file_name = f"{config_dict['月份']}-{service_cor_dict['服务商名称']}-{datas[0].get('税前金额')}.pdf"
     file_path = os.path.join(config_dict['CRM文件保存路径'], file_name)
     driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[56]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_path)
+    # todo 上传其他文件
+
 
     # todo 审批信息
     driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
@@ -279,6 +280,7 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
 
 
     # todo 点击保存
+
     # 关闭新建标签页，切换到财务报销系统标签页
     driver.close()
     driver.switch_to.window(reimburse_handels)

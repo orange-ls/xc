@@ -238,100 +238,124 @@ def login_oa():
     driver.switch_to.window(driver.window_handles[-1])
     return driver
 
-driver = login_oa()
+def search_basic_infor(driver, but_address, tr_address):
+    '''
+    基本信息部分：搜索并选择
+    :param driver:
+    :param but_address: 搜索按钮
+    :param tr_address: 搜索结果
+    '''
+    for i in range(10):
+        time.sleep(1)
+        # 判断是否正在加载
+        rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+        if len(rows) > 0:
+            time.sleep(2)
+            continue
+        time.sleep(1)
+        # 如果搜索结果不是一个，重新点击搜索按钮
+        rows = driver.find_elements(By.XPATH, tr_address)
+        if len(rows) != 1:
+            driver.find_element(By.XPATH, but_address).click()
+            continue
+        WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, tr_address))).click()
+        break
 
-reimburse_handels = driver.current_window_handle    # 财务报销系统 标签页的句柄
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div').click()
-WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
-driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[11]/div/div').click()
 
-time.sleep(3)
-driver.switch_to.window(driver.window_handles[-1])
-
-# todo 填写基本信息
-WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
-WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
-time.sleep(3)
-
-# # 填写基本信息
-# # 申请人
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-# driver.find_element(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('00072593')
-# driver.find_element(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
+# driver = login_oa()
+#
+# reimburse_handels = driver.current_window_handle    # 财务报销系统 标签页的句柄
+# # driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div').click()
+# WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
+# driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[11]/div/div').click()
+#
+# time.sleep(3)
+# driver.switch_to.window(driver.window_handles[-1])
+#
+# # todo 填写基本信息
+# WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
+# WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "ascrail2000")))
+# time.sleep(3)
+#
+# # # 填写基本信息
+# # # 申请人
+# # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+# # driver.find_element(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('00072593')
+# # driver.find_element(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
+# # for i in range(10):
+# #     time.sleep(1)
+# #     # rows = driver.find_elements(By.CSS_SELECTOR, '.ant-spin-dot.ant-spin-dot-spin')
+# #     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+# #     if len(rows) > 0:
+# #         time.sleep(2)
+# #         continue
+# #     # rows = driver.find_elements(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/ul/li')
+# #     # if len(rows) != 1:
+# #     #     continue
+# #     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/ul/li'))).click()
+# #     break
+# # time.sleep(1)
+# #
+# # # 费用成本中心
+# # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[6]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+# # driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('MHQH0003')
+# # driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
+# # for i in range(10):
+# #     time.sleep(1)
+# #     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+# #     if len(rows) > 0:
+# #         time.sleep(2)
+# #         continue
+# #     rows = driver.find_elements(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr')
+# #     if len(rows) != 1:
+# #         driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
+# #         continue
+# #     time.sleep(1)
+# #     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
+# #     break
+# # time.sleep(1)
+# #
+# # # 平台
+# # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[7]/td[5]/div/div/div/div/div[2]/button').click()
+# # driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('北京')
+# # driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
+# # for i in range(10):
+# #     time.sleep(1)
+# #     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
+# #     if len(rows) > 0:
+# #         time.sleep(2)
+# #         continue
+# #     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
+# #     break
+# time.sleep(1)
+#
+# # 费用是由
+# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
+# driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('231090301')
+# driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
 # for i in range(10):
 #     time.sleep(1)
-#     # rows = driver.find_elements(By.CSS_SELECTOR, '.ant-spin-dot.ant-spin-dot-spin')
 #     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
 #     if len(rows) > 0:
 #         time.sleep(2)
 #         continue
-#     # rows = driver.find_elements(By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/ul/li')
-#     # if len(rows) != 1:
-#     #     continue
-#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/ul/li'))).click()
+#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
 #     break
 # time.sleep(1)
 #
-# # 费用成本中心
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[6]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-# driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('MHQH0003')
-# driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
+# # 结算方式
+# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[9]/td[5]/div/div/div/div/div[2]/button').click()
+# driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('电汇')
+# driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
 # for i in range(10):
 #     time.sleep(1)
 #     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
 #     if len(rows) > 0:
 #         time.sleep(2)
 #         continue
-#     rows = driver.find_elements(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr')
-#     if len(rows) != 1:
-#         driver.find_element(By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
-#         continue
-#     time.sleep(1)
-#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[8]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
+#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
 #     break
 # time.sleep(1)
-#
-# # 平台
-# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[7]/td[5]/div/div/div/div/div[2]/button').click()
-# driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('北京')
-# driver.find_element(By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
-# for i in range(10):
-#     time.sleep(1)
-#     rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
-#     if len(rows) > 0:
-#         time.sleep(2)
-#         continue
-#     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[9]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
-#     break
-time.sleep(1)
-
-# 费用是由
-driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input').send_keys('231090301')
-driver.find_element(By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/span/button').click()
-for i in range(10):
-    time.sleep(1)
-    rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
-    if len(rows) > 0:
-        time.sleep(2)
-        continue
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[10]/div/div[2]/div/div[1]/div[2]/div/div[3]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
-    break
-time.sleep(1)
-
-# 结算方式
-driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[9]/td[5]/div/div/div/div/div[2]/button').click()
-driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/span[1]/input').send_keys('电汇')
-driver.find_element(By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[1]/div[1]/div[2]/div/div/div/button').click()
-for i in range(10):
-    time.sleep(1)
-    rows = driver.execute_script('return document.getElementsByClassName("ant-spin-dot ant-spin-dot-spin");')
-    if len(rows) > 0:
-        time.sleep(2)
-        continue
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[11]/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/div/div/div/div/div/div/span/div[2]/table/tbody/tr'))).click()
-    break
-time.sleep(1)
 #
 # # 汇入省
 # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[8]/div/div/div/div/div[2]/button').click()
@@ -377,16 +401,16 @@ time.sleep(1)
 # # 销售合同号
 # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('11223344')
 
-# 查询按钮
-driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[6]/div/input').click()
-try:
-    alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
-    alert.dismiss()
-except:
-    print("no alert")
-
-
-print("aaaa")
+# # 查询按钮
+# driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[6]/div/input').click()
+# try:
+#     alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+#     alert.dismiss()
+# except:
+#     print("no alert")
+#
+#
+# print("aaaa")
 
 # def login_crm(driver):
 # def crm_download_file(driver):
@@ -495,13 +519,91 @@ print("aaaa")
 #                 print(f"删除失败：{file_path} - {str(e)}")
 
 
-# if __name__ == '__main__':
-#     # driver = create_browser()
-#     # crm_download_file(driver)
-#     # target_dir = r"D:\Google\test"
-#     # output_dir = r"D:\Google"
-#     # file_name = "Google_Backup"
-#     # create_zip(target_dir, output_dir, file_name)
-#
-#
-#     print('aaaa')
+def create_general_reimbursement(driver):
+    '''
+    跳转到技服外包报销，创建技服费用报销单
+    :param driver: 浏览器对象
+    :param datas: [{}, {}...]
+    :param config_dict: 配置文件
+    :param service_cor_dict: 服务商信息字典
+    '''
+    reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[10]/div/div').click()
+    time.sleep(3)
+    driver.switch_to.window(driver.window_handles[-1])
+
+    # 进入创建报销单页面
+    # 检查页面是否加载完成
+    for i in range(3):
+        try:
+            time.sleep(3)
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
+            break
+        except:
+            driver.refresh()
+            continue
+
+    time.sleep(1)
+    # 填写基本信息
+    # 申请人
+    driver.find_element(By.XPATH, '//*[@id="field353734span"]/div[2]/button').click()
+    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('00072593')  # 陈月青
+    but_address = "//*[@class='wea-search-tab']/div/div/button"
+    tr_address = "//*[@class='wea-crm-list']/ul/li"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+    time.sleep(1)
+
+    # 费用成本中心
+    driver.find_element(By.XPATH, '//*[@id="field353738span"]/div[2]/button').click()
+    driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys('MH480002')
+    but_address = "//*[@class='wea-search-tab']/span/button"
+    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+    time.sleep(1)
+
+    # 平台
+    driver.find_element(By.XPATH, '//*[@id="field353772span"]/div[2]/button').click()
+    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('北京')
+    but_address = "//*[@class='wea-search-tab']/div/div/button"
+    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+    time.sleep(1)
+
+    # 费用是由
+    driver.find_element(By.XPATH, '//*[@id="field353788span"]/div[2]/button').click()
+    driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys('407100101')
+    but_address = "//*[@class='wea-search-tab']/span/button"
+    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+    time.sleep(1)
+
+    # 结算方式
+    driver.find_element(By.XPATH, '//*[@id="field353773span"]/div[2]/button').click()
+    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('电汇')
+    but_address = "//*[@class='wea-search-tab']/div/div/button"
+    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+    time.sleep(1)
+
+    # 汇入省
+    driver.find_element(By.XPATH, '//*[@id="field353785span"]/div[2]/button').click()
+    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('北京')
+    but_address = "//*[@class='wea-search-tab']/div/div/button"
+    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+    time.sleep(1)
+
+
+if __name__ == '__main__':
+    driver = login_oa()
+    create_general_reimbursement(driver)
+
+
+    print('aaaa')
