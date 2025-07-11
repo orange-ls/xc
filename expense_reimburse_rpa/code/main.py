@@ -101,7 +101,6 @@ class App(object):
             month = re.search(r'(?:^|.*?)(\d+月)', os.path.basename(asp_table_name)).group(1)
             month = month[2:].replace('0', '')
             config_dict['月份'] = month
-            # todo config_dict中增加税前金额 config_dict['金额']
 
             # # 读取工单号表
             # all_sheets = pd.ExcelFile(order_num_path).sheet_names
@@ -109,6 +108,7 @@ class App(object):
             # driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             # # 登录CRM系统，跳转到工单搜索界面
             # crm_download.login_crm(driver, config_dict)
+            # todo config_dict中增加税前金额 config_dict['ASP名称-MU01'] = 金额，如果asp表不能抓取出金额，则使用这个值
             #
             # for sheet_name in sheet_names:
             #     order_num_table = pd.read_excel(order_num_path, sheet_name=sheet_name)[['工单号/项目交付单号', 'ASP名称', 'ASP金额']]
@@ -143,6 +143,12 @@ class App(object):
                 if key not in asp_dict:
                     asp_dict[key] = []
                 asp_dict[key].append(value)
+
+            # todo 增加税前金额
+            for key, value in asp_dict.items():
+                sum_amount = sum([v['技服预提金额'] for v in value])
+                for v in value:
+                    v['税前金额'] = sum_amount
 
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             oa_expense.login_oa(driver, config_dict)

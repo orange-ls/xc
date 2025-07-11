@@ -180,7 +180,6 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     driver.switch_to.frame(iframe)
     # 点击"发票录入"按钮
     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
-    # driver.find_element(By.XPATH, "//*[@class='el-button-group']/button[1]").click()
     # 上传发票文件
     driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
     # 点击"开始识别"按钮
@@ -259,8 +258,26 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
             print("项目明细填写完整")
             break
 
-    # todo 上传附件
+    # 上传附件
+    # todo 按实际规则调整文件名
+    file_name = f"{config_dict['月份']}-{service_cor_dict['服务商名称']}-{datas[0].get('税前金额')}.pdf"
+    file_path = os.path.join(config_dict['CRM文件保存路径'], file_name)
+    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[56]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_path)
+
     # todo 审批信息
+    driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
+    driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys('02001270')    # lipengaaj
+    # driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button").click()
+    but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
+    tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
+    driver.find_element(By.XPATH, but_address).click()
+    search_basic_infor(driver, but_address, tr_address)
+
+    driver.find_element(By.XPATH, "//*[@class='wea-transfer-opration']/div/button[1]").click()
+    driver.find_element(By.XPATH, '/html/body/div[15]/div/div[2]/div/div[1]/div[3]/button[1]').click()
+
+
+
     # todo 点击保存
     # 关闭新建标签页，切换到财务报销系统标签页
     driver.close()

@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="oa修改">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,25 +53,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.222.executor": "Run",
-    "Python.crm_download.executor": "Debug",
-    "Python.func (1).executor": "Debug",
-    "Python.func.executor": "Debug",
-    "Python.main (1).executor": "Debug",
-    "Python.main.executor": "Debug",
-    "Python.result_table_processing.executor": "Debug",
-    "Python.test.executor": "Debug",
-    "Python.test_1.executor": "Debug",
-    "Python.test_2.executor": "Debug",
-    "Python.筛选不重复的数据.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/Workspace/xc/expense_reimburse_rpa/code",
-    "settings.editor.selected.configurable": "vcs.Git"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.222.executor&quot;: &quot;Run&quot;,
+    &quot;Python.crm_download.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.func (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.func.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.result_table_processing.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/expense_reimburse_rpa/code&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
@@ -652,17 +654,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>145</line>
-          <option name="timeStamp" value="203" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>141</line>
-          <option name="timeStamp" value="205" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>148</line>
+          <line>154</line>
           <option name="timeStamp" value="206" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -712,18 +704,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
-          <line>209</line>
-          <option name="timeStamp" value="280" />
+          <line>283</line>
+          <option name="timeStamp" value="288" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
-          <line>232</line>
-          <option name="timeStamp" value="281" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
-          <line>195</line>
-          <option name="timeStamp" value="282" />
+          <line>267</line>
+          <option name="timeStamp" value="292" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
