@@ -103,27 +103,27 @@ class App(object):
             month = month[2:].replace('0', '')
             config_dict['月份'] = month
 
-            # 读取工单号表
-            all_sheets = pd.ExcelFile(order_num_path).sheet_names
-            sheet_names = [s for s in all_sheets if '例外服务' in s]
-            driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
-            # 登录CRM系统，跳转到工单搜索界面
-            crm_download.login_crm(driver, config_dict)
-            # todo config_dict中增加税前金额 config_dict['ASP名称-MU01'] = 金额，如果asp表不能抓取出金额，则使用这个值
-
-            for sheet_name in sheet_names:
-                order_num_table = pd.read_excel(order_num_path, sheet_name=sheet_name)[['工单号/项目交付单号', 'ASP名称', 'ASP金额']]
-                # 删除工单号为空的行
-                order_num_table = order_num_table.dropna(subset=['工单号/项目交付单号'])
-                order_num_list = order_num_table['工单号/项目交付单号'].tolist()
-                asp_name = order_num_table['ASP名称'].tolist()[0]
-                asp_amount = sum(order_num_table['ASP金额'].tolist())
-                file_name = f"{month}_{asp_name}_{sheet_name}_{asp_amount}"      # 压缩包名：2月_北京神州光大科技有限公司_金额总和
-
-                # 搜索工单，下载文件
-                # 压缩包文件保存位置 使用配置文件管理
-                crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['CRM文件保存路径'], file_name)
-            driver.quit()
+            # # 读取工单号表
+            # all_sheets = pd.ExcelFile(order_num_path).sheet_names
+            # sheet_names = [s for s in all_sheets if '例外服务' in s]
+            # driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+            # # 登录CRM系统，跳转到工单搜索界面
+            # crm_download.login_crm(driver, config_dict)
+            # # todo config_dict中增加税前金额 config_dict['ASP名称-MU01'] = 金额，如果asp表不能抓取出金额，则使用这个值
+            #
+            # for sheet_name in sheet_names:
+            #     order_num_table = pd.read_excel(order_num_path, sheet_name=sheet_name)[['工单号/项目交付单号', 'ASP名称', 'ASP金额']]
+            #     # 删除工单号为空的行
+            #     order_num_table = order_num_table.dropna(subset=['工单号/项目交付单号'])
+            #     order_num_list = order_num_table['工单号/项目交付单号'].tolist()
+            #     asp_name = order_num_table['ASP名称'].tolist()[0]
+            #     asp_amount = sum(order_num_table['ASP金额'].tolist())
+            #     file_name = f"{month}_{asp_name}_{sheet_name}_{asp_amount}"      # 压缩包名：2月_北京神州光大科技有限公司_金额总和
+            #
+            #     # 搜索工单，下载文件
+            #     # 压缩包文件保存位置 使用配置文件管理
+            #     crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['CRM文件保存路径'], file_name)
+            # driver.quit()
 
             # 读取asp表
             asp_table = pd.read_excel(asp_table_path, sheet_name='Sheet1')[['项目编号', '技服预提金额', '外包供应商名称', '业务范围', '项目总收入']].sort_values(by='外包供应商名称')
@@ -151,9 +151,25 @@ class App(object):
                     v['税前金额'] = sum_amount
 
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+            # 登录OA系统，跳转到报销系统界面
             oa_expense.login_oa(driver, config_dict)
+            # 进入技服外包报销
             for key, value in asp_dict.items():
+                # for i in range(3):
+                #     try:
+                #         driver, reimburse_handels = self.go_reimbursement(driver, '技服外包报销')
+                #         break
+                #     except:
+                #         driver.refresh()
+                #         time.sleep(3)
+                #         if i == 2:
+                #             self.text.insert(tk.END, "打开报销系统失败！\r\n")
+                #             return
+                #         continue
                 oa_expense.create_expense_reimbursement(driver, value, config_dict, service_cor_dict.get(value[0]['外包供应商名称']))
+                # # 关闭新建标签页，切换到财务报销系统标签页
+                # driver.close()
+                # driver.switch_to.window(reimburse_handels)
 
             driver.quit()
             self.text.insert(tk.END, "执行完毕！\r\n")
@@ -185,6 +201,20 @@ class App(object):
         # 隐性等待30秒
         driver.implicitly_wait(30)
         return driver
+
+    def go_reimbursement(self, driver, flag):
+        reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
+        if flag == '技服外包报销':
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
+            driver.find_element(By.XPATH, "//div[text()='技服外包报销']").click()
+            time.sleep(3)
+            driver.switch_to.window(driver.window_handles[-1])
+        else:
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
+            driver.find_element(By.XPATH, "//div[text()='其他通用报销']").click()
+            time.sleep(3)
+            driver.switch_to.window(driver.window_handles[-1])
+        return driver, reimburse_handels
 
 
 if __name__ == '__main__':
