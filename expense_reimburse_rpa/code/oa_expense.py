@@ -14,7 +14,8 @@ def login_oa(driver, config_dict):
     driver.get('https://newportal.digitalchina.com')
 
     # 登录
-    driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys(config_dict['OA账号'])
+    # driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys(config_dict['OA账号'])
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="usernameInput"]'))).send_keys(config_dict['OA账号'])
     time.sleep(1)
     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[1]').click()
     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[2]').send_keys(config_dict['OA密码'])
@@ -59,6 +60,7 @@ def search_basic_infor(driver, but_address, tr_address):
         break
 
 def go_reimbursement(driver):
+    # 进入技服外包报销界面
     for i in range(3):
         try:
             reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
@@ -83,23 +85,17 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
     :param config_dict: 配置文件
     :param service_cor_dict: 服务商信息字典
     '''
+    # 进入技服外包报销界面
     driver, reimburse_handels = go_reimbursement(driver)
-    for index in range(3):
+    for index in range(5):
         try:
-            # reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
-            # # WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
-            # # driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[11]/div/div').click()
-            # WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
-            # driver.find_element(By.XPATH, "//div[text()='技服外包报销']").click()
-            # time.sleep(3)
-            # driver.switch_to.window(driver.window_handles[-1])
-
             # 进入创建报销单页面
             # 检查页面是否加载完成
             for i in range(3):
                 try:
                     time.sleep(3)
-                    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
                     break
                 except:
                     driver.refresh()
@@ -279,15 +275,17 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
                     print("项目明细填写完整")
                     break
 
+            # 附件信息
             # 上传附件
             # todo 按实际规则调整文件名
             file_name = f"{config_dict['月份']}-{service_cor_dict['服务商名称']}-{datas[0].get('税前金额')}.pdf"
             file_path = os.path.join(config_dict['CRM文件保存路径'], file_name)
             driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[56]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_path)
-            # todo 上传其他文件
+            # todo 上传验收文件、纳税文件
+            # 是否纳税
+            driver.find_element(By.XPATH, '//*[@id="weaSelect_5"]/div/label[2]/span[1]/input').click()
 
-
-            # todo 审批信息
+            # 审批信息
             # 搜索部门预审
             driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
             driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys(config_dict['部门预审'])    # lipengaaj
@@ -304,36 +302,32 @@ def create_expense_reimbursement(driver, datas, config_dict, service_cor_dict):
             # 部门一级审批
             driver.find_element(By.XPATH, '//*[@id="field353753_sel"]/div/div/div/div/span').click()
             element = driver.find_element(By.XPATH, '/html/body/div[16]/div/div/div/ul')
-            # element.find_element(By.XPATH, f"//li[contains(.,'{config_dict['部门一级审批']}')]").click()
-            element.find_element(By.XPATH, "//li[contains(.,'张帆')]").click()
-            # WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, ".//li[contains(normalize-space(),'张帆')]"))).click()
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门一级审批']}')]").click()
 
             # 部门二级审批
             driver.find_element(By.XPATH, '//*[@id="field353754_sel"]/div/div/div/div/span').click()
             element = driver.find_element(By.XPATH, '/html/body/div[17]/div/div/div/ul')
-            # element.find_element(By.XPATH, f"//li[contains(.,'陶然')]").click()
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, ".//li[contains(normalize-space(),'陶然')]"))).click()
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门二级审批']}')]").click()
 
             # 部门终审
             driver.find_element(By.XPATH, '//*[@id="field353757_sel"]/div/div/div/div/span').click()
             element = driver.find_element(By.XPATH, '/html/body/div[18]/div/div/div/ul')
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, ".//li[contains(normalize-space(),'陶然')]"))).click()
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门终审']}')]").click()
 
             # 业务单元一级加签
             driver.find_element(By.XPATH, '//*[@id="field353758_sel"]/div/div/div/div/span').click()
             element = driver.find_element(By.XPATH, '/html/body/div[19]/div/div/div/ul')
-            # element.find_element(By.XPATH, f"//li[contains(.,'{config_dict['业务单元一级加签']}')]").click()
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, ".//li[contains(normalize-space(),'王贺')]"))).click()
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['业务单元一级加签']}')]").click()
 
             # todo 点击保存
-            # driver.find_element(By.XPATH, '//*[@class="wea-new-top-req-wapper "]/div[1]/div/div[3]/div/div[2]/div/span[2]/button').click()
+            driver.find_element(By.XPATH, '//*[@class="wea-new-top-req-wapper "]/div[1]/div/div[3]/div/div[2]/div/span[2]/button').click()
             # 关闭新建标签页，切换到财务报销系统标签页
             driver.close()
             driver.switch_to.window(reimburse_handels)
             break
         except Exception as e:
             driver.refresh()
-            if index == 2:
+            if index == 4:
                 raise Exception(f"技服外包报销失败：{e}")
             continue
 

@@ -31,7 +31,25 @@ def search_basic_infor(driver, but_address, tr_address):
         WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, tr_address))).click()
         break
 
-def create_general_reimbursement(driver, datas, config_dict, service_cor_dict):
+def go_reimbursement(driver):
+    # 进入技服外包报销界面
+    for i in range(3):
+        try:
+            reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
+            driver.find_element(By.XPATH, "//div[text()='其他通用报销']").click()
+            time.sleep(3)
+            driver.switch_to.window(driver.window_handles[-1])
+            break
+        except:
+            driver.refresh()
+            time.sleep(3)
+            if i == 2:
+                raise Exception("打开报销系统失败！")
+            continue
+    return driver, reimburse_handels
+
+def create_general_reimbursement(driver, config_dict, service_cor_dict):
     '''
     跳转到技服外包报销，创建技服费用报销单
     :param driver: 浏览器对象
@@ -39,77 +57,166 @@ def create_general_reimbursement(driver, datas, config_dict, service_cor_dict):
     :param config_dict: 配置文件
     :param service_cor_dict: 服务商信息字典
     '''
-    reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/div/div/div'))).click()
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[2]/div[1]/div/div/div[1]/ul/li[8]/ul/li[10]/div/div').click()
-    time.sleep(3)
-    driver.switch_to.window(driver.window_handles[-1])
-
-    # 进入创建报销单页面
-    # 检查页面是否加载完成
-    for i in range(3):
+    # 进入技服外包报销界面
+    driver, reimburse_handels = go_reimbursement(driver)
+    for index in range(5):
         try:
+            for i in range(3):
+                # 进入创建报销单页面
+                # 检查页面是否加载完成
+                try:
+                    time.sleep(3)
+                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
+                    break
+                except:
+                    driver.refresh()
+                    continue
+
+            time.sleep(1)
+            # 填写基本信息
+            # 申请人
+            driver.find_element(By.XPATH, '//*[@id="field353734span"]/div[2]/button').click()
+            driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('00072593')  # 陈月青
+            but_address = "//*[@class='wea-search-tab']/div/div/button"
+            tr_address = "//*[@class='wea-crm-list']/ul/li"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            time.sleep(1)
+
+            # 费用成本中心
+            driver.find_element(By.XPATH, '//*[@id="field353738span"]/div[2]/button').click()
+            driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys('MH480002')
+            but_address = "//*[@class='wea-search-tab']/span/button"
+            tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            time.sleep(1)
+
+            # 平台
+            driver.find_element(By.XPATH, '//*[@id="field353772span"]/div[2]/button').click()
+            driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('北京')
+            but_address = "//*[@class='wea-search-tab']/div/div/button"
+            tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            time.sleep(1)
+
+            # todo 费用是由
+            driver.find_element(By.XPATH, '//*[@id="field353788span"]/div[2]/button').click()
+            driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys('407100201')
+            but_address = "//*[@class='wea-search-tab']/span/button"
+            tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            time.sleep(1)
+
+            # 结算方式
+            driver.find_element(By.XPATH, '//*[@id="field353773span"]/div[2]/button').click()
+            driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('电汇')
+            but_address = "//*[@class='wea-search-tab']/div/div/button"
+            tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            time.sleep(1)
+
+            # 汇入省
+            driver.find_element(By.XPATH, '//*[@id="field353785span"]/div[2]/button').click()
+            driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys(service_cor_dict['省份'])
+            but_address = "//*[@class='wea-search-tab']/div/div/button"
+            tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            time.sleep(1)
+
+            # 收款单位
+            driver.find_element(By.XPATH, '//*[@id="field353782"]').send_keys(service_cor_dict['服务商名称'])
+            # 判断是否有confirm确认框弹出
+            driver.find_element(By.XPATH, '//*[@id="field353783"]').click()
+            try:
+                alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
+                alert.dismiss()
+            except:
+                print("no alert")
+            # 收款单位开户行
+            driver.find_element(By.XPATH, '//*[@id="field353783"]').send_keys(service_cor_dict['收款单位开户行'])
+            # 收款账号
+            driver.find_element(By.XPATH, '//*[@id="field353784"]').send_keys(service_cor_dict['收款账号'])
+            # 是否冲借款
+            driver.find_element(By.XPATH, '//*[@id="weaSelect_5"]/div/label[1]/span[1]/input').click()
+            # 用途说明/备注
+            driver.find_element(By.XPATH, '//*[@id="field353777"]').send_keys(config_dict['asp表名称'])
+            # 汇入市
+            driver.find_element(By.XPATH, '//*[@id="field353786"]').send_keys(service_cor_dict['城市'])
+
+            # 上传发票
+            # todo 修改发票名称
+            invoice_name = f"{service_cor_dict['服务商名称']}-{config_dict['月份']}.pdf"
+            # invoice_name = f"{service_cor_dict['服务商名称']}-{config_dict['月份']}-{config_dict['金额']}.pdf"
+            invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
+            # 点击"选择发票"按钮
+            driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
+            iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
+            driver.switch_to.frame(iframe)
+            # 点击"发票录入"按钮
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
+            # 上传发票文件
+            driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
+            # 点击"开始识别"按钮
+            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
             time.sleep(3)
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button')))
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[4]")))
+            # 点击"确认"按钮
+            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # 等待"发票录入"按钮出现
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='el-button-group']/button[1]")))
+            time.sleep(3)
+            # 点击"确认"按钮
+            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # 切换回主文档
+            driver.switch_to.default_content()
+            time.sleep(1)
+
+            # todo 附件
+
+
+            # 审批信息
+            # 搜索部门预审
+            driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
+            driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys(config_dict['部门预审'])  # lipengaaj
+            but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
+            tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
+            driver.find_element(By.XPATH, but_address).click()
+            search_basic_infor(driver, but_address, tr_address)
+            # 确认部门预审
+            time.sleep(1)
+            driver.find_element(By.XPATH, "//*[@class='wea-transfer-opration']/div/button[3]").click()
+            time.sleep(1)
+            driver.find_element(By.XPATH, '/html/body/div[14]/div/div[2]/div/div[1]/div[3]/button[1]').click()
+
+            # 部门一级审批
+            driver.find_element(By.XPATH, '//*[@id="field353753_sel"]/div/div/div/div/span').click()
+            element = driver.find_element(By.XPATH, '/html/body/div[15]/div/div/div/ul')
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门一级审批']}')]").click()
+
+            # 部门终审
+            driver.find_element(By.XPATH, '//*[@id="field353757_sel"]/div/div/div/div/span').click()
+            element = driver.find_element(By.XPATH, '/html/body/div[16]/div/div/div/ul')
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门终审']}')]").click()
+
+            # 业务单元一级加签
+            driver.find_element(By.XPATH, '//*[@id="field353758_sel"]/div/div/div/div/span').click()
+            element = driver.find_element(By.XPATH, '/html/body/div[17]/div/div/div/ul')
+            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['业务单元一级加签']}')]").click()
+
+            # todo 点击保存
+            # driver.find_element(By.XPATH, '//*[@class="wea-new-top-req-wapper "]/div[1]/div/div[3]/div/div[2]/div/span[2]/button').click()
+            # 关闭新建标签页，切换到财务报销系统标签页
+            driver.close()
+            driver.switch_to.window(reimburse_handels)
             break
-        except:
+        except Exception as e:
             driver.refresh()
+            if index == 4:
+                raise Exception(f"技服外包报销失败：{e}")
             continue
-
-    time.sleep(1)
-    # 填写基本信息
-    # 申请人
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[5]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('00072593')  # 陈月青
-    but_address = "//*[@class='wea-search-tab']/div/div/button"
-    tr_address = "//*[@class='wea-crm-list']/ul/li"
-    driver.find_element(By.XPATH, but_address).click()
-    search_basic_infor(driver, but_address, tr_address)
-    time.sleep(1)
-
-    # # 费用成本中心
-    # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[6]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-    # driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys(datas[0].get('业务范围'))
-    # but_address = "//*[@class='wea-search-tab']/span/button"
-    # tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
-    # driver.find_element(By.XPATH, but_address).click()
-    # search_basic_infor(driver, but_address, tr_address)
-    # time.sleep(1)
-
-    # 平台
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[7]/td[5]/div/div/div/div/div[2]/button').click()
-    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('北京')
-    but_address = "//*[@class='wea-search-tab']/div/div/button"
-    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
-    driver.find_element(By.XPATH, but_address).click()
-    search_basic_infor(driver, but_address, tr_address)
-    time.sleep(1)
-
-    # 费用是由
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[8]/td[5]/div/div/span[1]/div/div/div/div[2]/button').click()
-    driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys('231090301')
-    but_address = "//*[@class='wea-search-tab']/span/button"
-    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
-    driver.find_element(By.XPATH, but_address).click()
-    search_basic_infor(driver, but_address, tr_address)
-    time.sleep(1)
-
-    # 结算方式
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[9]/td[5]/div/div/div/div/div[2]/button').click()
-    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys('电汇')
-    but_address = "//*[@class='wea-search-tab']/div/div/button"
-    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
-    driver.find_element(By.XPATH, but_address).click()
-    search_basic_infor(driver, but_address, tr_address)
-    time.sleep(1)
-
-    # 汇入省
-    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[8]/div/div/div/div/div[2]/button').click()
-    driver.find_element(By.XPATH, "//*[@class='wea-search-tab']/div/div/span[1]/input").send_keys(service_cor_dict['省份'])
-    but_address = "//*[@class='wea-search-tab']/div/div/button"
-    tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
-    driver.find_element(By.XPATH, but_address).click()
-    search_basic_infor(driver, but_address, tr_address)
-    time.sleep(1)
-
-
