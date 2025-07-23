@@ -49,14 +49,18 @@ def go_reimbursement(driver):
             continue
     return driver, reimburse_handels
 
-def create_general_reimbursement(driver, config_dict, service_cor_dict):
+def create_general_reimbursement(driver, config_dict, service_cor_dict, general_path):
     '''
     跳转到技服外包报销，创建技服费用报销单
     :param driver: 浏览器对象
     :param datas: [{}, {}...]
     :param config_dict: 配置文件
     :param service_cor_dict: 服务商信息字典
+    :param general_path: 通用报销 工单号表路径
     '''
+    type = '标准服务' if '标准服务' in general_path else '高级服务'
+    service_provider_name = service_cor_dict['服务商名称']
+    config_amount_name = f"{service_provider_name}-{type}"  # 配置文件 对应未税金额的键
     # 进入技服外包报销界面
     driver, reimburse_handels = go_reimbursement(driver)
     for index in range(5):
@@ -102,9 +106,10 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict):
             search_basic_infor(driver, but_address, tr_address)
             time.sleep(1)
 
-            # todo 费用是由
+            # 费用是由
+            num = '407100101' if '标准服务' in general_path else '407100201'
             driver.find_element(By.XPATH, '//*[@id="field353788span"]/div[2]/button').click()
-            driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys('407100201')
+            driver.find_element(By.XPATH, "//*[@class='wea-tab-outer-SearchAd']/div/div/div[1]/form/div/div/div[1]/div[2]/div/div/div/span/input").send_keys(num)
             but_address = "//*[@class='wea-search-tab']/span/button"
             tr_address = "//*[@class='ant-table-body']/table/tbody/tr"
             driver.find_element(By.XPATH, but_address).click()
@@ -145,15 +150,15 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict):
             # 是否冲借款
             driver.find_element(By.XPATH, '//*[@id="weaSelect_5"]/div/label[1]/span[1]/input').click()
             # 用途说明/备注
-            driver.find_element(By.XPATH, '//*[@id="field353777"]').send_keys(config_dict['asp表名称'])
+            driver.find_element(By.XPATH, '//*[@id="field353777"]').send_keys(f"FY{config_dict['年份']} {config_dict['asp表名称']}委托统计费用结算")
             # 汇入市
             driver.find_element(By.XPATH, '//*[@id="field353786"]').send_keys(service_cor_dict['城市'])
 
             # 上传发票
-            # todo 修改发票名称
-            invoice_name = f"{service_cor_dict['服务商名称']}-{config_dict['月份']}.pdf"
-            # invoice_name = f"{service_cor_dict['服务商名称']}-{config_dict['月份']}-{config_dict['金额']}.pdf"
+            invoice_name = f"{config_dict['月份']}-{service_provider_name}-{config_dict[config_amount_name]}.pdf"
             invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
+            if not os.path.exists(invoice_path):
+                raise FileNotFoundError(f"文件路径不存在:{invoice_path}")
             # 点击"选择发票"按钮
             driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
             iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
@@ -177,8 +182,32 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict):
             driver.switch_to.default_content()
             time.sleep(1)
 
-            # todo 附件
-
+            # 附件
+            # 派单记录表
+            driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(general_path)
+            # 完税证明
+            file_path = os.path.join(config_dict['纳税文件'], service_provider_name)
+            file_name = sorted(os.listdir(file_path), reverse=True)
+            if not file_name:
+                raise FileNotFoundError(f"文件路径不存在:{file_path}")
+            file_name = os.path.join(file_path, file_name[0])
+            driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_name)
+            # ASP框架服务合同
+            file_name = []
+            for name in os.listdir(config_dict['ASP框架服务合同']):
+                if f'ASP框架协议-{service_provider_name}' in name and '脱敏版' not in name and '.pdf' in name:
+                    file_name.append(name)
+            if not file_name:
+                raise FileNotFoundError(f"文件路径不存在:{config_dict['ASP框架服务合同']}\\ASP框架协议-{service_provider_name}")
+            file_name = sorted(file_name, reverse=True)[0]
+            file_path = os.path.join(config_dict['ASP框架服务合同'], file_name)
+            driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_path)
+            # 验收文件
+            file_name = f"{config_dict['月份']}-{config_amount_name}-{config_dict[config_amount_name]}.zip"
+            file_name = os.path.join(config_dict['验收文件保存路径'], file_name)
+            if not os.path.exists(file_name):
+                raise FileNotFoundError(f"文件路径不存在:{file_name}")
+            driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_name)
 
             # 审批信息
             # 搜索部门预审
@@ -196,26 +225,34 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict):
 
             # 部门一级审批
             driver.find_element(By.XPATH, '//*[@id="field353753_sel"]/div/div/div/div/span').click()
+            time.sleep(0.5)
             element = driver.find_element(By.XPATH, '/html/body/div[15]/div/div/div/ul')
             element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门一级审批']}')]").click()
 
             # 部门终审
             driver.find_element(By.XPATH, '//*[@id="field353757_sel"]/div/div/div/div/span').click()
+            time.sleep(0.5)
             element = driver.find_element(By.XPATH, '/html/body/div[16]/div/div/div/ul')
             element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门终审']}')]").click()
 
             # 业务单元一级加签
             driver.find_element(By.XPATH, '//*[@id="field353758_sel"]/div/div/div/div/span').click()
+            time.sleep(0.5)
             element = driver.find_element(By.XPATH, '/html/body/div[17]/div/div/div/ul')
             element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['业务单元一级加签']}')]").click()
 
-            # todo 点击保存
-            # driver.find_element(By.XPATH, '//*[@class="wea-new-top-req-wapper "]/div[1]/div/div[3]/div/div[2]/div/span[2]/button').click()
+            # 等待上传附件完成
+            WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[1]/div[4]')))
+
+            # 点击保存
+            driver.find_element(By.XPATH, '//*[@class="wea-new-top-req-wapper "]/div[1]/div/div[3]/div/div[2]/div/span[2]/button').click()
             # 关闭新建标签页，切换到财务报销系统标签页
             driver.close()
             driver.switch_to.window(reimburse_handels)
             break
         except Exception as e:
+            if '文件路径不存在' in str(e):
+                raise Exception(e)
             driver.refresh()
             if index == 4:
                 raise Exception(f"技服外包报销失败：{e}")

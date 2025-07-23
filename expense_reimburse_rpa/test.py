@@ -605,37 +605,16 @@ if __name__ == '__main__':
     # driver = login_oa()
     # create_general_reimbursement(driver)
 
-    asp_table_path = r'C:\Users\user\Desktop\2504月ASP.xlsx'
-    # 读取asp表
-    asp_table = pd.read_excel(asp_table_path, sheet_name='Sheet1')[['项目编号', '技服预提金额', '外包供应商名称', '业务范围', '项目总收入']].sort_values(by='外包供应商名称')
+    config_dict = {'ASP框架服务合同': r'D:\Google\ASP框架服务合同\2025'}
+    service_provider_name = '北京神州光大科技有限公司'
+    file_name = []
+    # for name in os.listdir(config_dict['ASP框架服务合同']):
+    #     if f'ASP框架协议-{service_provider_name}' in name and '脱敏版' not in name and '.pdf' in name:
+    #         file_name.append(name)
+    if not file_name:
+        print(f"文件路径不存在:{config_dict['ASP框架服务合同']}\\ASP框架协议-{service_provider_name}")
+    file_name = sorted(file_name, reverse=True)[0]
+    file_path = os.path.join(config_dict['ASP框架服务合同'], file_name)
 
-    # 按'外包供应商名称', '业务范围'为键，其他字段为值的字典
-    asp_dict = {}
-    for i, row in asp_table.iterrows():
-        key = (row['外包供应商名称'], row['业务范围'])
-        # 转换业务范围 MU01 -> MHMU0002
-        value = {
-            '外包供应商名称': row['外包供应商名称'],
-            '业务范围': row['业务范围'],
-            '项目编号': row['项目编号'],
-            '技服预提金额': row['技服预提金额'],
-            '项目总收入': row['项目总收入'],
-        }
-        if key not in asp_dict:
-            asp_dict[key] = []
-        asp_dict[key].append(value)
-
-    # todo 增加税前金额
-    for key, value in asp_dict.items():
-        sum_amount = sum([v['技服预提金额'] for v in value])
-        for v in value:
-            v['税前金额'] = sum_amount
-
-    # 拼接出订单表的路径
-    asp_suppliers = list({key[0] for key in asp_dict.keys()})
-    config_dict = r'D:\Google\工单号表'
-    month = '2月'
-    year = '2025'
-    order_num_paths = [os.path.join(config_dict, f"{supplier}\{year}\{month}份ASP上门派单记录-{supplier}.xlsx") for supplier in asp_suppliers]
 
     print('aaaa')

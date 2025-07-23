@@ -30,7 +30,7 @@ class App(object):
         self.filePath = {}
 
         root.title("费用报销")
-        root.geometry('500x500')
+        root.geometry('565x500')
 
         # self.order_num_table = tk.StringVar()
         # label02 = tk.Label(root, text="工单号表：")
@@ -43,7 +43,7 @@ class App(object):
         self.asp_table = tk.StringVar()
         label03 = tk.Label(root, text="25**ASP表：")
         label03.grid(row=2, column=0)
-        entry03 = tk.Entry(root, textvariable=self.asp_table, width=40)
+        entry03 = tk.Entry(root, textvariable=self.asp_table, width=55)
         entry03.grid(row=2, column=1)
         btn03 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.asp_table))
         btn03.grid(row=2, column=2)
@@ -53,7 +53,7 @@ class App(object):
         self.config_file.set(r"C:\Users\user\Desktop\费用报销rpa配置表.xlsx")
         label03 = tk.Label(root, text="配置文件表：")
         label03.grid(row=3, column=0)
-        entry03 = tk.Entry(root, textvariable=self.config_file, width=40)
+        entry03 = tk.Entry(root, textvariable=self.config_file, width=55)
         entry03.grid(row=3, column=1)
         btn03 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.config_file))
         btn03.grid(row=3, column=2)
@@ -65,8 +65,12 @@ class App(object):
         self.text = tk.Text(selectbackground="red", insertbackground="blue", spacing2=10, bd=0)
         self.text.grid(row=9, column=0, columnspan=10)
 
-        # todo 增加发票名称模板、工单号表名称模板、ASP表名称模板
-        self.text.insert(tk.END, "ASP表表名规则：数字年月+月+ASP，例：2501月ASP.xlsx \r\n")
+        self.text.insert(tk.END, "--------------------------------------------------------------------------------\r\n")
+        self.text.insert(tk.END, "1、ASP表名规则：数字年月+月+ASP，例：2501月ASP.xlsx \r\n\n")
+        self.text.insert(tk.END, "2、派单记录表名规则：数字月+月份ASP上门派单记录-公司名-服务种类，例：1月份ASP上门派单记录-北京神州光大科技有限公司-例外服务-MU01.xlsx \r\n\n")
+        self.text.insert(tk.END, "3、路径和表格中涉及到公司名，请使用全称，如北京神州光大科技有限公司\r\n\n")
+        self.text.insert(tk.END, "4、发票命名规则：月份-公司名-税前金额，例：1月-北京神州光大科技有限公司-1000.pdf\r\n")
+        self.text.insert(tk.END, "--------------------------------------------------------------------------------\r\n\n")
 
 
     def start(self):
@@ -102,6 +106,7 @@ class App(object):
             month = date[2:].replace('0', '')
             config_dict['月份'] = month   # 2月
             year = f"20{date[:2]}"   # 2025
+            config_dict['年份'] = year
 
             # 读取asp表
             asp_table = pd.read_excel(asp_table_path, sheet_name='Sheet1')[['项目编号', '技服预提金额', '外包供应商名称', '业务范围', '项目总收入']].sort_values(by='外包供应商名称')
@@ -122,15 +127,9 @@ class App(object):
                     asp_dict[key] = []
                 asp_dict[key].append(value)
 
-            # # todo 增加税前金额
-            # for key, value in asp_dict.items():
-            #     sum_amount = sum([v['技服预提金额'] for v in value])
-            #     for v in value:
-            #         v['税前金额'] = sum_amount
-
             # 拼接出订单表的路径
             asp_suppliers = list({key[0] for key in asp_dict.keys()})
-            order_num_paths = [os.path.join(config_dict['工单号表路径'], f"{supplier}\{year}\{month}份ASP上门派单记录-{supplier}.xlsx") for supplier in asp_suppliers]
+            order_num_paths = [os.path.join(config_dict['派单记录表路径'], f"{supplier}\{year}\{month}份ASP上门派单记录-{supplier}.xlsx") for supplier in asp_suppliers]
             # 判断文件是否存在，不存在就报错提示
             for path in order_num_paths:
                 if not os.path.exists(path):
@@ -140,17 +139,16 @@ class App(object):
 
             # 判断通用报销文件是否存在
             general_path_list = []
-            list_server_path = []
             list_server = ['标准服务', '高级服务']
-            for server in list_server:
-                list_server_path.extend([os.path.join(config_dict['工单号表路径'], f"{supplier}\{year}\{month}份ASP上门派单记录-{supplier}-{server}.xlsx") for supplier in asp_suppliers])
-            for path in list_server_path:
-                if os.path.exists(path):
-                    general_path_list.append(path)
+            for supplier in asp_suppliers:
+                for server in list_server:
+                    path = os.path.join(config_dict['派单记录表路径'], f"{supplier}\{year}\{month}份ASP上门派单记录-{supplier}-{server}.xlsx")
+                    if os.path.exists(path):
+                        general_path_list.append(path)
 
             # 登录CRM系统，跳转到工单搜索界面
-            driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
-            driver = crm_download.login_crm(driver, config_dict)
+            # driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+            # driver = crm_download.login_crm(driver, config_dict)
 
             for order_num_path in order_num_paths:
                 # 读取工单号表
@@ -164,73 +162,38 @@ class App(object):
                     order_num_list = order_num_table['工单号/项目交付单号'].tolist()
                     asp_name = order_num_table['ASP名称'].tolist()[0]
                     asp_amount = sum(order_num_table['ASP金额'].tolist())
+
+                    # config_dict中增加税前金额 config_dict['ASP名称-例外服务-MU01'] = 金额，如果asp表不能抓取出金额，则使用这个值
+                    config_dict[f'{asp_name}-{sheet_name}'] = asp_amount
+
                     file_name = f"{month}-{asp_name}-{sheet_name}-{asp_amount}"      # 压缩包名：2月-北京神州光大科技有限公司-例外服务-MU01-金额总和
-                    zip_name = os.path.join(config_dict['CRM文件保存路径'], f"{file_name}.zip")
+                    zip_name = os.path.join(config_dict['验收文件保存路径'], f"{file_name}.zip")
                     if os.path.exists(zip_name):
                         # 判断压缩包是否存在，存在就跳过
                         self.text.insert(tk.END, f"{zip_name} 文件已存在！\r\n")
                         continue
 
-                    # todo config_dict中增加税前金额 config_dict['ASP名称-例外服务-MU01'] = 金额，如果asp表不能抓取出金额，则使用这个值
-                    config_dict[f'{asp_name}-{sheet_name}'] = asp_amount
 
                     # 搜索工单，下载文件。 压缩包文件保存位置 使用配置文件管理
-                    crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['CRM文件保存路径'], file_name)
-            driver.quit()
-
-            # # 读取asp表
-            # asp_table = pd.read_excel(asp_table_path, sheet_name='Sheet1')[['项目编号', '技服预提金额', '外包供应商名称', '业务范围', '项目总收入']].sort_values(by='外包供应商名称')
-            #
-            # # 按'外包供应商名称', '业务范围'为键，其他字段为值的字典
-            # asp_dict = {}
-            # for i, row in asp_table.iterrows():
-            #     key = (row['外包供应商名称'], row['业务范围'])
-            #     # 转换业务范围 MU01 -> MHMU0002
-            #     value = {
-            #         '外包供应商名称': row['外包供应商名称'],
-            #         '业务范围': business_scope_dict.get(row['业务范围'], row['业务范围']),
-            #         '项目编号': row['项目编号'],
-            #         '技服预提金额': row['技服预提金额'],
-            #         '项目总收入': row['项目总收入'],
-            #     }
-            #     if key not in asp_dict:
-            #         asp_dict[key] = []
-            #     asp_dict[key].append(value)
-            #
-            # # todo 增加税前金额
-            # for key, value in asp_dict.items():
-            #     sum_amount = sum([v['技服预提金额'] for v in value])
-            #     for v in value:
-            #         v['税前金额'] = sum_amount
+                    # crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['验收文件保存路径'], file_name)
+            # driver.quit()
 
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             # 登录OA系统，跳转到报销系统界面
             oa_expense.login_oa(driver, config_dict)
             # 进入技服外包报销
-            for key, value in asp_dict.items():
-                oa_expense.create_expense_reimbursement(driver, value, config_dict, service_cor_dict.get(value[0]['外包供应商名称']))
+            # for key, value in asp_dict.items():
+            #     oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_dict.get(value[0]['外包供应商名称']))
 
             # 开始通用报销处理
-            general_path_list = []
-            list_server = ['标准服务', '高级服务']
-            for order_num_path in order_num_paths:
-                # 定位到父路径
-                parent_path = os.path.dirname(order_num_path)
-                for server in list_server:
-                    general_path = os.path.join(parent_path, server)
-                    if os.path.exists(general_path):
-                        general_path_list.append(general_path)
-
-
-
-
-                oa_general.create_general_reimbursement(driver, config_dict, service_cor_dict.get('北京神州光大科技有限公司'))
+            for general_path in general_path_list:
+                oa_general.create_general_reimbursement(driver, config_dict, service_cor_dict.get('北京神州光大科技有限公司'), general_path)
 
 
             driver.quit()
             self.text.insert(tk.END, "执行完毕！\r\n")
         except Exception as e:
-            self.text.insert(tk.END, "发生错误！\r\n")
+            self.text.insert(tk.END, "\n发生错误！\r\n")
             self.text.insert(tk.END, e)
 
     def get_chromedriver_path(self):
