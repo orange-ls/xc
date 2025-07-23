@@ -32,14 +32,6 @@ class App(object):
         root.title("费用报销")
         root.geometry('565x500')
 
-        # self.order_num_table = tk.StringVar()
-        # label02 = tk.Label(root, text="工单号表：")
-        # label02.grid(row=1, column=0)
-        # entry02 = tk.Entry(root, textvariable=self.order_num_table, width=40)
-        # entry02.grid(row=1, column=1)
-        # btn02 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.order_num_table))
-        # btn02.grid(row=1, column=2)
-
         self.asp_table = tk.StringVar()
         label03 = tk.Label(root, text="25**ASP表：")
         label03.grid(row=2, column=0)
@@ -147,8 +139,8 @@ class App(object):
                         general_path_list.append(path)
 
             # 登录CRM系统，跳转到工单搜索界面
-            # driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
-            # driver = crm_download.login_crm(driver, config_dict)
+            driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+            driver = crm_download.login_crm(driver, config_dict)
 
             for order_num_path in order_num_paths:
                 # 读取工单号表
@@ -173,22 +165,20 @@ class App(object):
                         self.text.insert(tk.END, f"{zip_name} 文件已存在！\r\n")
                         continue
 
-
                     # 搜索工单，下载文件。 压缩包文件保存位置 使用配置文件管理
-                    # crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['验收文件保存路径'], file_name)
-            # driver.quit()
+                    crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['验收文件保存路径'], file_name)
+            driver.quit()
 
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             # 登录OA系统，跳转到报销系统界面
             oa_expense.login_oa(driver, config_dict)
             # 进入技服外包报销
-            # for key, value in asp_dict.items():
-            #     oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_dict.get(value[0]['外包供应商名称']))
+            for key, value in asp_dict.items():
+                oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_dict.get(value[0]['外包供应商名称']))
 
             # 开始通用报销处理
             for general_path in general_path_list:
                 oa_general.create_general_reimbursement(driver, config_dict, service_cor_dict.get('北京神州光大科技有限公司'), general_path)
-
 
             driver.quit()
             self.text.insert(tk.END, "执行完毕！\r\n")

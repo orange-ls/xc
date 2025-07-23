@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['main.py'],
+    ['main.py','crm_download.py','oa_expense.py','oa_general.py'],
     pathex=[],
     binaries=[],
-    datas=[('chromedriver_v137.exe', '.')],
+    datas=[('chromedriver_v138.exe', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

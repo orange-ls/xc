@@ -36,7 +36,12 @@ def go_reimbursement(driver):
     for i in range(3):
         try:
             reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']")))
+            # 通过js快速定位元素
+            service_claim_js = """return document.evaluate("//div[text()='其他通用报销']", document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;"""
+            element_count = driver.execute_script(service_claim_js)
+            if element_count == 0:
+                WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
             driver.find_element(By.XPATH, "//div[text()='其他通用报销']").click()
             time.sleep(3)
             driver.switch_to.window(driver.window_handles[-1])
@@ -150,7 +155,7 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             # 是否冲借款
             driver.find_element(By.XPATH, '//*[@id="weaSelect_5"]/div/label[1]/span[1]/input').click()
             # 用途说明/备注
-            driver.find_element(By.XPATH, '//*[@id="field353777"]').send_keys(f"FY{config_dict['年份']} {config_dict['asp表名称']}委托统计费用结算")
+            driver.find_element(By.XPATH, '//*[@id="field353777"]').send_keys(f"FY{config_dict['asp表名称']}委托统计费用结算")
             # 汇入市
             driver.find_element(By.XPATH, '//*[@id="field353786"]').send_keys(service_cor_dict['城市'])
 
@@ -181,6 +186,7 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             # 切换回主文档
             driver.switch_to.default_content()
             time.sleep(1)
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button')))
 
             # 附件
             # 派单记录表
@@ -212,7 +218,8 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             # 审批信息
             # 搜索部门预审
             driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
-            driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys(config_dict['部门预审'])  # lipengaaj
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input"))).send_keys(config_dict['部门预审'])
+            # driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys(config_dict['部门预审'])  # lipengaaj
             but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
             tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
             driver.find_element(By.XPATH, but_address).click()
@@ -246,6 +253,7 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
 
             # 点击保存
             driver.find_element(By.XPATH, '//*[@class="wea-new-top-req-wapper "]/div[1]/div/div[3]/div/div[2]/div/span[2]/button').click()
+            time.sleep(3)
             # 关闭新建标签页，切换到财务报销系统标签页
             driver.close()
             driver.switch_to.window(reimburse_handels)
