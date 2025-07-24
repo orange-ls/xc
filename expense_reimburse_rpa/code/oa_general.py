@@ -185,7 +185,9 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             time.sleep(3)
             # 点击"确认"按钮
             driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            time.sleep(1)
+            # 等待"确认"按钮消失
+            # WebDriverWait(driver, 60).until(EC.invisibility_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[2]")))
+            time.sleep(3)
             # 切换回主文档
             driver.switch_to.default_content()
             time.sleep(1)

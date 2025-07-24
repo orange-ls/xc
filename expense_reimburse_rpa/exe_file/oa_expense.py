@@ -14,7 +14,6 @@ def login_oa(driver, config_dict):
     driver.get('https://newportal.digitalchina.com')
 
     # 登录
-    # driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys(config_dict['OA账号'])
     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="usernameInput"]'))).send_keys(config_dict['OA账号'])
     time.sleep(1)
     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[1]').click()
@@ -222,7 +221,9 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
             time.sleep(3)
             # 点击"确认"按钮
             driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            time.sleep(1)
+            # 等待"确认"按钮消失
+            # WebDriverWait(driver, 60).until(EC.invisibility_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[2]")))
+            time.sleep(3)
             # 切换回主文档
             driver.switch_to.default_content()
             time.sleep(1)
