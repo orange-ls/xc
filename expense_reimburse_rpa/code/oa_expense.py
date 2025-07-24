@@ -14,7 +14,6 @@ def login_oa(driver, config_dict):
     driver.get('https://newportal.digitalchina.com')
 
     # 登录
-    # driver.find_element(By.XPATH, '//*[@id="usernameInput"]').send_keys(config_dict['OA账号'])
     WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="usernameInput"]'))).send_keys(config_dict['OA账号'])
     time.sleep(1)
     driver.find_element(By.XPATH, '/html/body/div[3]/table/tbody/tr[3]/td/input[1]').click()
@@ -95,6 +94,8 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
     '''
     service_provider_name = service_cor_dict['服务商名称']
     config_amount_name = f"{service_provider_name}-例外服务-{key}"  # 配置文件 对应未税金额的键
+    if config_amount_name not in config_dict:
+        raise FileNotFoundError(f"文件路径不存在:{config_amount_name}")
     # 进入技服外包报销界面
     driver, reimburse_handels = go_reimbursement(driver)
     for index in range(5):
@@ -104,8 +105,8 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
             for i in range(3):
                 try:
                     time.sleep(3)
-                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
-                    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
+                    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
                     break
                 except:
                     driver.refresh()
@@ -220,14 +221,14 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
             time.sleep(3)
             # 点击"确认"按钮
             driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            time.sleep(1)
             # 切换回主文档
             driver.switch_to.default_content()
             time.sleep(1)
             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button')))
 
             # 填写 项目明细
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input')))
-            # driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input').click()
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input'))).click()
             for n in range(5):  # 尝试填写5次
                 i = 4
                 for data in datas:
@@ -318,7 +319,6 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
             # 搜索部门预审
             driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input"))).send_keys(config_dict['部门预审'])
-            # driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys(config_dict['部门预审'])    # lipengaaj
             but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
             tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
             driver.find_element(By.XPATH, but_address).click()

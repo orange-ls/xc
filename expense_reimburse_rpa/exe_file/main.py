@@ -138,9 +138,9 @@ class App(object):
                     if os.path.exists(path):
                         general_path_list.append(path)
 
-            # 登录CRM系统，跳转到工单搜索界面
-            driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
-            driver = crm_download.login_crm(driver, config_dict)
+            # # 登录CRM系统，跳转到工单搜索界面
+            # driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+            # driver = crm_download.login_crm(driver, config_dict)
 
             for order_num_path in order_num_paths:
                 # 读取工单号表
@@ -166,8 +166,8 @@ class App(object):
                         continue
 
                     # 搜索工单，下载文件。 压缩包文件保存位置 使用配置文件管理
-                    crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['验收文件保存路径'], file_name)
-            driver.quit()
+            #         crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['验收文件保存路径'], file_name)
+            # driver.quit()
 
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             # 登录OA系统，跳转到报销系统界面

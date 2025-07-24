@@ -66,6 +66,8 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
     type = '标准服务' if '标准服务' in general_path else '高级服务'
     service_provider_name = service_cor_dict['服务商名称']
     config_amount_name = f"{service_provider_name}-{type}"  # 配置文件 对应未税金额的键
+    if config_amount_name not in config_dict:
+        raise FileNotFoundError(f"文件路径不存在:{config_amount_name}")
     # 进入技服外包报销界面
     driver, reimburse_handels = go_reimbursement(driver)
     for index in range(5):
@@ -75,8 +77,8 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
                 # 检查页面是否加载完成
                 try:
                     time.sleep(3)
-                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
-                    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
+                    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
                     break
                 except:
                     driver.refresh()
@@ -183,6 +185,7 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             time.sleep(3)
             # 点击"确认"按钮
             driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            time.sleep(1)
             # 切换回主文档
             driver.switch_to.default_content()
             time.sleep(1)
@@ -219,7 +222,6 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             # 搜索部门预审
             driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input"))).send_keys(config_dict['部门预审'])
-            # driver.find_element(By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input").send_keys(config_dict['部门预审'])  # lipengaaj
             but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
             tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
             driver.find_element(By.XPATH, but_address).click()

@@ -138,7 +138,7 @@ class App(object):
                     if os.path.exists(path):
                         general_path_list.append(path)
 
-            # 登录CRM系统，跳转到工单搜索界面
+            # # 登录CRM系统，跳转到工单搜索界面
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             driver = crm_download.login_crm(driver, config_dict)
 
@@ -174,17 +174,27 @@ class App(object):
             oa_expense.login_oa(driver, config_dict)
             # 进入技服外包报销
             for key, value in asp_dict.items():
-                oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_dict.get(value[0]['外包供应商名称']))
+                service_cor_data = service_cor_dict.get(value[0]['外包供应商名称'])
+                if not service_cor_data:
+                    self.text.insert(tk.END, f"配置表中没有找到{value[0]['外包供应商名称']}的配置信息！\r\n")
+                    continue
+                oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
 
             # 开始通用报销处理
             for general_path in general_path_list:
-                oa_general.create_general_reimbursement(driver, config_dict, service_cor_dict.get('北京神州光大科技有限公司'), general_path)
+                asp_name = os.path.basename(general_path).split('-')[1]
+                service_cor_data = service_cor_dict.get(asp_name)
+                if not service_cor_data:
+                    self.text.insert(tk.END, f"配置表中没有找到{asp_name}的配置信息！\r\n")
+                    continue
+                oa_general.create_general_reimbursement(driver, config_dict, service_cor_data, general_path)
 
             driver.quit()
             self.text.insert(tk.END, "执行完毕！\r\n")
         except Exception as e:
             self.text.insert(tk.END, "\n发生错误！\r\n")
             self.text.insert(tk.END, e)
+            self.text.insert(tk.END, '\n')
 
     def get_chromedriver_path(self):
         # 开发环境路径
