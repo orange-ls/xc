@@ -63,6 +63,7 @@ def login_crm(driver, config_dict):
         break
     return driver
 
+
 def crm_download_file(driver, order_num_list, source_dir, output_dir, file_name):
     # 处理文件路径
     output_dir = os.path.normpath(output_dir)
@@ -154,6 +155,7 @@ def create_zip(source_dir, output_dir, file_name):
         print(f"超过50MB，压缩文件大小：{total_size}MB")
 
     clean_source_file(source_dir)
+
 
 def clean_source_file(source_dir):
     # 删除源目录中的文件

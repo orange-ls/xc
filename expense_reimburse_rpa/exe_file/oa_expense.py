@@ -8,7 +8,6 @@ import time
 import os
 
 
-# class oaexpense():
 def login_oa(driver, config_dict):
     # 登录OA，跳转到财务报销系统
     driver.get('https://newportal.digitalchina.com')
@@ -37,6 +36,7 @@ def login_oa(driver, config_dict):
     driver.switch_to.window(driver.window_handles[-1])
     return driver
 
+
 def search_basic_infor(driver, but_address, tr_address):
     '''
     基本信息部分：搜索并选择
@@ -60,6 +60,7 @@ def search_basic_infor(driver, but_address, tr_address):
         WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, tr_address))).click()
         break
 
+
 def go_reimbursement(driver):
     # 进入技服外包报销界面
     for i in range(3):
@@ -82,6 +83,7 @@ def go_reimbursement(driver):
                 raise Exception("打开报销系统失败！")
             continue
     return driver, reimburse_handels
+
 
 def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_dict):
     '''

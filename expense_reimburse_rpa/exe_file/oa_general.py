@@ -31,6 +31,7 @@ def search_basic_infor(driver, but_address, tr_address):
         WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, tr_address))).click()
         break
 
+
 def go_reimbursement(driver):
     # 进入技服外包报销界面
     for i in range(3):
@@ -53,6 +54,7 @@ def go_reimbursement(driver):
                 raise Exception("打开报销系统失败！")
             continue
     return driver, reimburse_handels
+
 
 def create_general_reimbursement(driver, config_dict, service_cor_dict, general_path):
     '''
