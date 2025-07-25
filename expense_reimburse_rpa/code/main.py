@@ -23,7 +23,6 @@ business_scope_dict = {
     'QH01': 'MHQH0003',
     'MU01': 'MHMU0002',
 }
-file_download_path = r"D:\Google\test"
 
 class App(object):
     def __init__(self, root):
@@ -219,20 +218,6 @@ class App(object):
         # 隐性等待30秒
         driver.implicitly_wait(30)
         return driver
-
-    def go_reimbursement(self, driver, flag):
-        reimburse_handels = driver.current_window_handle  # 财务报销系统 标签页的句柄
-        if flag == '技服外包报销':
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
-            driver.find_element(By.XPATH, "//div[text()='技服外包报销']").click()
-            time.sleep(3)
-            driver.switch_to.window(driver.window_handles[-1])
-        else:
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='报销申请']"))).click()
-            driver.find_element(By.XPATH, "//div[text()='其他通用报销']").click()
-            time.sleep(3)
-            driver.switch_to.window(driver.window_handles[-1])
-        return driver, reimburse_handels
 
 
 if __name__ == '__main__':
