@@ -40,8 +40,9 @@ class App(object):
         btn03.grid(row=2, column=2)
 
         self.config_file = tk.StringVar()
-        # todo 调整为客户指定路径
-        self.config_file.set(r"C:\Users\user\Desktop\费用报销rpa配置表.xlsx")
+        # 自动获取配置文件路径
+        excel_path = self.get_excel_path('费用报销rpa配置表.xlsx')
+        self.config_file.set(excel_path)
         label03 = tk.Label(root, text="配置文件表：")
         label03.grid(row=3, column=0)
         entry03 = tk.Entry(root, textvariable=self.config_file, width=55)
@@ -200,6 +201,18 @@ class App(object):
         base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
         driver_path = os.path.join(base_path, "chromedriver_v138.exe")
         return driver_path
+
+    def get_excel_path(self, name):
+        # 获取exe文件所在目录
+        if getattr(sys, 'frozen', False):
+            # 如果程序是打包后的exe
+            exe_dir = os.path.dirname(sys.executable)
+        else:
+            # 如果程序是直接运行的Python脚本
+            exe_dir = os.path.dirname(os.path.abspath(__file__))
+        # 拼接Excel文件路径
+        excel_path = os.path.join(exe_dir, name)
+        return excel_path
 
     def create_browser(self, download_path):
         # 创建设置浏览器对象

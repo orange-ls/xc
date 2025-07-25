@@ -6,19 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="bug修改">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/main.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/warn-main.txt" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/warn-main.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/xref-main.html" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/xref-main.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/crm_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/crm_download.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_v1.0.exe" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_v1.0.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_expense.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_expense.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_general.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_general.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -599,7 +587,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753407789078</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="bug修改">
+      <option name="closed" value="true" />
+      <created>1753409811868</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1753409811868</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -816,17 +812,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>182</line>
+          <line>183</line>
           <option name="timeStamp" value="370" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>193</line>
+          <line>194</line>
           <option name="timeStamp" value="372" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>174</line>
+          <line>175</line>
           <option name="timeStamp" value="378" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -858,6 +854,11 @@
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
           <line>230</line>
           <option name="timeStamp" value="410" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>43</line>
+          <option name="timeStamp" value="412" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
