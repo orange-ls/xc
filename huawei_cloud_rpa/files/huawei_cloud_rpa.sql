@@ -64,26 +64,26 @@ CREATE TABLE IF NOT EXISTS hw_two_four_data_smbcore (
 COMMENT='24年业绩表SMBcore';
 
 
--- CREATE TABLE IF NOT EXISTS hw_two_four_data_na (
---     performance_id VARCHAR(255) NOT NULL COMMENT '业绩ID',
---     sales_amount DECIMAL(16,2) COMMENT '业绩金额(¥)',
---     performance_date DATE COMMENT '业绩形成时间',
--- 		special_rebate_type VARCHAR(255) COMMENT '特殊返点类型',
---     secondary_dealer VARCHAR(255) COMMENT '二级经销商名称',
--- 		customer_name VARCHAR(100) COMMENT '客户名称',
---     product_code VARCHAR(50) COMMENT '产品类型编码',
---     customer_tag VARCHAR(20) COMMENT '客户标签',
---     sales_team VARCHAR(100) COMMENT '销售纵队',
---     service_department VARCHAR(100) COMMENT '服务产品部',
---     is_traffic_product VARCHAR(10) COMMENT '是否流量型产品（是/否）',
---     leased_line_product VARCHAR(20) COMMENT '专线产品',
---     enterprise_coop VARCHAR(100) COMMENT '企业协同',
---     salesperson VARCHAR(50) COMMENT '销售员',
---     region VARCHAR(50) COMMENT '区域',
---     quarter VARCHAR(15) COMMENT '季度',
---     PRIMARY KEY (performance_id)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
--- COMMENT='24年业绩表NA';
+ CREATE TABLE IF NOT EXISTS hw_two_four_data_na (
+     performance_id VARCHAR(255) NOT NULL COMMENT '业绩ID',
+     sales_amount DECIMAL(16,2) COMMENT '业绩金额(¥)',
+     performance_date DATE COMMENT '业绩形成时间',
+ 		special_rebate_type VARCHAR(255) COMMENT '特殊返点类型',
+     secondary_dealer VARCHAR(255) COMMENT '二级经销商名称',
+ 		customer_name VARCHAR(100) COMMENT '客户名称',
+     product_code VARCHAR(50) COMMENT '产品类型编码',
+     customer_tag VARCHAR(20) COMMENT '客户标签',
+     sales_team VARCHAR(100) COMMENT '销售纵队',
+     service_department VARCHAR(100) COMMENT '服务产品部',
+     is_traffic_product VARCHAR(10) COMMENT '是否流量型产品（是/否）',
+     leased_line_product VARCHAR(20) COMMENT '专线产品',
+     enterprise_coop VARCHAR(100) COMMENT '企业协同',
+     salesperson VARCHAR(50) COMMENT '销售员',
+     region VARCHAR(50) COMMENT '区域',
+     quarter VARCHAR(15) COMMENT '季度',
+     PRIMARY KEY (performance_id)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+ COMMENT='24年业绩表NA';
 
 
 CREATE TABLE IF NOT EXISTS customer_correspondence (

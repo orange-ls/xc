@@ -186,8 +186,12 @@ class App(object):
             result_eight = result_table_processing.result_table_eight(engine)
             self.text.insert(tk.END, "数据第九部分...\r\n")
             result_nine = result_table_processing.result_table_nine(engine)
+            self.text.insert(tk.END, "数据第十部分...\r\n")
+            result_ten = result_table_processing.result_table_ten(engine)
+            self.text.insert(tk.END, "数据第十一部分...\r\n")
+            result_eleven = result_table_processing.result_table_eleven(engine, max_date)
             self.text.insert(tk.END, "结果表下载中...\r\n")
-            self.generate_result_table(data_requirements_path, result_one, result_two, result_three, result_four, result_five, result_six, result_seven, result_eight, result_nine)
+            self.generate_result_table(data_requirements_path, result_one, result_two, result_three, result_four, result_five, result_six, result_seven, result_eight, result_nine, result_ten, result_eleven)
 
             self.text.insert(tk.END, "处理完成！\r\n")
             engine.dispose()
@@ -198,20 +202,20 @@ class App(object):
     # 配置数据库连接
     def connect_db(self):
         try:
-            # 数据库配置
-            DB_HOST = 'localhost'
-            DB_PORT = 3306
-            DB_USER = 'root'
-            DB_PASS = '1234'
-            DB_NAME = 'test_sync'
-
-            # 生产环境
-            # DB_HOST = '10.126.64.28'
+            # # 数据库配置
+            # DB_HOST = 'localhost'
             # DB_PORT = 3306
             # DB_USER = 'root'
-            # DB_PASS = 'root^#123'
-            # # DB_PASS = quote_plus("Iwfecats1213@")
-            # DB_NAME = 'huawei_cloud_rpa'
+            # DB_PASS = '1234'
+            # DB_NAME = 'test_sync'
+
+            # 生产环境
+            DB_HOST = '10.126.64.28'
+            DB_PORT = 3306
+            DB_USER = 'root'
+            DB_PASS = 'root^#123'
+            # DB_PASS = quote_plus("Iwfecats1213@")
+            DB_NAME = 'huawei_cloud_rpa'
 
             # 创建数据库连接
             engine = create_engine(f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
@@ -346,17 +350,17 @@ class App(object):
                 self.text.insert(tk.END, f"开始导入24年SMBcore数据！\r\n")
                 self.big_data_to_db('hw_two_four_data_smbcore', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
-                # del df
-                # # 获取第三个工作表
-                # sheet = wb.get_sheet_by_name('NA')
-                # # 读取所有数据（包含标题行）
-                # rows = sheet.to_python()
-                # selected_indices = [rows[0].index(col) for col in selected_columns]
-                # # 转换为DataFrame
-                # df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
-                # self.text.insert(tk.END, f"开始导入24年NA数据！\r\n")
-                # self.big_data_to_db('hw_two_four_data_na', engine, df)
-                # self.text.insert(tk.END, "数据导入成功！\r\n")
+                del df
+                # 获取第三个工作表
+                sheet = wb.get_sheet_by_name('NA')
+                # 读取所有数据（包含标题行）
+                rows = sheet.to_python()
+                selected_indices = [rows[0].index(col) for col in selected_columns]
+                # 转换为DataFrame
+                df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
+                self.text.insert(tk.END, f"开始导入24年NA数据！\r\n")
+                self.big_data_to_db('hw_two_four_data_na', engine, df)
+                self.text.insert(tk.END, "数据导入成功！\r\n")
                 del df, rows
                 gc.collect()
         except Exception as e:
@@ -463,7 +467,7 @@ class App(object):
         return max_data
 
     # 生成结果表
-    def generate_result_table(self, data_requirements_path, one, two, three, four, five, six, seven, eight, nine):
+    def generate_result_table(self, data_requirements_path, one, two, three, four, five, six, seven, eight, nine, ten, eleven):
         # 加载Excel文件
         wb = openpyxl.load_workbook(data_requirements_path)
         try:
@@ -502,7 +506,6 @@ class App(object):
                         ws1.cell(row, 19, values.get('NA业绩', ''))
                         ws1.cell(row, 20, values.get('SMB业绩', ''))
                         ws1.cell(row, 21, values.get('SMBcore业绩', ''))
-
 
             if '二' in wb.sheetnames:
                 ws2 = wb['二']
@@ -704,6 +707,53 @@ class App(object):
                     ws9.cell(row=current_row, column=6, value=float(data.get('SMB-CORE', 0)))  # F列
                     ws9.cell(row=current_row, column=7, value=data.get('销售员', ''))  # G列
                     ws9.cell(row=current_row, column=8, value=data.get('客户标签', ''))  # H列
+
+            if '十' in wb.sheetnames:
+                ws10 = wb['十']
+                # 列映射（字典字段 -> Excel列字母）
+                column_map = {
+                    '渠道': 'A', '客户': 'B', '销售员': 'C', '区域': 'D', '1月': 'E', '2月': 'F', '3月': 'G', '4月': 'H', '5月': 'I', '6月': 'J',
+                    '7月': 'K', '8月': 'L', '9月': 'M', '10月': 'N', '11月': 'O', '12月': 'P', '合计': 'Q'
+                }
+                # 起始行（数据从第4行开始填充）
+                current_row = 3
+                # 遍历每一条数据
+                for item in ten:
+                    # 填充渠道和客户
+                    ws10[f"A{current_row}"] = item.get('渠道', '')
+                    ws10[f"B{current_row}"] = item.get('客户', '')
+
+                    # 填充月份和合计
+                    for field, col in column_map.items():
+                        if field in ['渠道', '客户']:
+                            continue  # 已单独处理
+                        value = item.get(field)
+                        if isinstance(value, Decimal):
+                            ws10[f"{col}{current_row}"] = float(value)
+                        else:
+                            ws10[f"{col}{current_row}"] = value
+                    current_row += 1  # 移动到下一行
+
+            if '十一' in wb.sheetnames:
+                ws11 = wb['十一']
+                # 列映射
+                column_map = {
+                    '25年截止目前业绩': 'C', '24年同期业绩': 'D', '同期增长率': 'E', '同比24年正负值': 'F'
+                }
+
+                # 动态遍历A列所有行
+                for row in ws11.iter_rows(min_row=2):  # 从第2行开始遍历
+                    company_name = row[0].value  # A列值
+                    if company_name in eleven:  # 当公司名称存在于数据字典时
+                        data = eleven[company_name]
+                        # 填充对应列数据
+                        for field, col in column_map.items():
+                            cell = ws11[f"{col}{row[0].row}"]  # 使用当前行号
+                            value = data.get(field)
+                            if isinstance(value, Decimal):
+                                cell.value = float(value)
+                            else:
+                                cell.value = value
 
             wb.save(f"{data_requirements_path.replace('.xlsx', '')}_result.xlsx")
             self.text.insert(tk.END, "结果表生成成功\r\n")

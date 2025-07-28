@@ -809,3 +809,91 @@ def result_table_nine(engine):
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     return result
+
+
+def result_table_ten(engine):
+    sql = '''
+        WITH base_data AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                ELSE '直客'
+                END AS secondary_dealer_re,
+                customer_name,
+                salesperson,
+                region,
+                MONTH(performance_date) AS month_re,
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
+            FROM hw_two_five_data
+            WHERE
+                sales_team = '华为云NA'
+            GROUP BY secondary_dealer_re, customer_name, salesperson, region, month_re
+        )
+        SELECT 
+            secondary_dealer_re AS `渠道`,
+            customer_name AS `客户`,
+            salesperson AS `销售员`,
+            region AS `区域`,
+            COALESCE(SUM(CASE WHEN month_re = 1 THEN sales_amount ELSE 0 END), 0) AS `1月`,
+            COALESCE(SUM(CASE WHEN month_re = 2 THEN sales_amount ELSE 0 END), 0) AS `2月`,
+            COALESCE(SUM(CASE WHEN month_re = 3 THEN sales_amount ELSE 0 END), 0) AS `3月`,
+            COALESCE(SUM(CASE WHEN month_re = 4 THEN sales_amount ELSE 0 END), 0) AS `4月`,
+            COALESCE(SUM(CASE WHEN month_re = 5 THEN sales_amount ELSE 0 END), 0) AS `5月`,
+            COALESCE(SUM(CASE WHEN month_re = 6 THEN sales_amount ELSE 0 END), 0) AS `6月`,
+            COALESCE(SUM(CASE WHEN month_re = 7 THEN sales_amount ELSE 0 END), 0) AS `7月`,
+            COALESCE(SUM(CASE WHEN month_re = 8 THEN sales_amount ELSE 0 END), 0) AS `8月`,
+            COALESCE(SUM(CASE WHEN month_re = 9 THEN sales_amount ELSE 0 END), 0) AS `9月`,
+            COALESCE(SUM(CASE WHEN month_re = 10 THEN sales_amount ELSE 0 END), 0) AS `10月`,
+            COALESCE(SUM(CASE WHEN month_re = 11 THEN sales_amount ELSE 0 END), 0) AS `11月`,
+            COALESCE(SUM(CASE WHEN month_re = 12 THEN sales_amount ELSE 0 END), 0) AS `12月`,
+            COALESCE(SUM(sales_amount), 0) AS 合计
+        FROM
+            base_data
+        GROUP BY secondary_dealer_re, customer_name, salesperson, region
+        ORDER BY 合计 DESC
+    '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    return result
+
+
+def result_table_eleven(engine, max_date):
+    sql = f'''
+        WITH 
+        base_data_25 AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                        ELSE customer_name
+                END AS secondary_dealer_re,
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
+            FROM hw_two_five_data
+            WHERE
+                    sales_team = '华为云NA'
+            GROUP BY secondary_dealer_re
+        ),
+        base_data_24 AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                        ELSE customer_name
+                END AS secondary_dealer_re,
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
+            FROM hw_two_four_data_na
+            WHERE
+                performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+            GROUP BY secondary_dealer_re
+        )
+        
+        SELECT
+            bd25.secondary_dealer_re AS `NA业绩`,
+            bd25.sales_amount AS `25年截止目前业绩`,
+            bd24.sales_amount AS `24年同期业绩`,
+            CASE 
+                    WHEN bd24.sales_amount IS NULL THEN NULL
+                    ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 0), '%')
+            END AS `同期增长率`,
+            bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
+        FROM
+        base_data_25 bd25
+        LEFT JOIN base_data_24 bd24 ON bd25.secondary_dealer_re = bd24.secondary_dealer_re
+    '''
+    result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
+    result = {re['NA业绩']: re for re in result}
+    return result
