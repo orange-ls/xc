@@ -561,17 +561,21 @@ def result_table_five(engine):
                 ELSE '直客'
                 END AS secondary_dealer_re,
                 customer_name,
+                salesperson,
+                region,
                 MONTH(performance_date) AS month_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_five_data
             WHERE
                 sales_team IN ('中长尾', '电网销')
                 AND is_traffic_product IN ('否','')
-            GROUP BY secondary_dealer_re, customer_name, month_re
+            GROUP BY secondary_dealer_re, customer_name, salesperson, region, month_re
         )
         SELECT 
             secondary_dealer_re AS `渠道`,
             customer_name AS `客户`,
+            salesperson AS `销售员`,
+            region AS `区域`,
             COALESCE(SUM(CASE WHEN month_re = 1 THEN sales_amount ELSE 0 END), 0) AS `1月`,
             COALESCE(SUM(CASE WHEN month_re = 2 THEN sales_amount ELSE 0 END), 0) AS `2月`,
             COALESCE(SUM(CASE WHEN month_re = 3 THEN sales_amount ELSE 0 END), 0) AS `3月`,
@@ -587,7 +591,7 @@ def result_table_five(engine):
             COALESCE(SUM(sales_amount), 0) AS 合计
         FROM
             base_data
-        GROUP BY secondary_dealer_re, customer_name
+        GROUP BY secondary_dealer_re, customer_name, salesperson, region
         ORDER BY 合计 DESC
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
