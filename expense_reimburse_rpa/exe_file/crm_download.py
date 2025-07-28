@@ -102,7 +102,7 @@ def crm_download_file(driver, order_num_list, source_dir, output_dir, file_name)
                 break
             for row in rows:
                 name = row.find_element(By.XPATH, 'td[2]').text
-                if '02_' in name or '05_' in name:
+                if '02_' in name or '05_' in name or '设备健康检查' in name:
                     row.find_element(By.XPATH, 'td[4]/div/div/div/div/a').click()
                     order_num_exist.append(order_num)
                     break
