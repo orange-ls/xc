@@ -4,20 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="华为云RPA 结果表5增加 销售员和区域">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="华为云RPA 增加结果表10、11">
       <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/code/result_table_processing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/files/huawei_cloud_rpa.sql" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/files/huawei_cloud_rpa.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/build/main/main.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/result_table_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/result_table_processing.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,14 +217,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00003" summary="华为云 需求文档">
-      <option name="closed" value="true" />
-      <created>1744336584817</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1744336584817</updated>
     </task>
     <task id="LOCAL-00004" summary="创建数据库表">
       <option name="closed" value="true" />
@@ -622,7 +602,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753673901064</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="华为云RPA 增加结果表10、11">
+      <option name="closed" value="true" />
+      <created>1753687108626</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1753687108626</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -652,7 +640,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="导出25年数据" />
     <MESSAGE value="以万元位单位" />
     <MESSAGE value="部署测试" />
     <MESSAGE value="可执行文件" />
@@ -677,7 +664,8 @@
     <MESSAGE value="自动获取配置文件路径" />
     <MESSAGE value="增加crm“健康”文件的下载" />
     <MESSAGE value="华为云RPA 结果表5增加 销售员和区域" />
-    <option name="LAST_COMMIT_MESSAGE" value="华为云RPA 结果表5增加 销售员和区域" />
+    <MESSAGE value="华为云RPA 增加结果表10、11" />
+    <option name="LAST_COMMIT_MESSAGE" value="华为云RPA 增加结果表10、11" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
