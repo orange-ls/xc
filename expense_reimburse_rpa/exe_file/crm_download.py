@@ -30,16 +30,15 @@ def login_crm(driver, config_dict):
     # 关闭弹窗
     for i in range(3):
         try:
+            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, "//*[@class='fx-g-topnav-container']")))
             rows = driver.execute_script('return document.getElementsByClassName("el-dialog__body");')
             if len(rows) > 0:
-                time.sleep(1)
-                # WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@class="new-ui-guide-dialog-header"/span'))).click()
-                WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@class="el-dialog__body"]/div[1]/span]'))).click()
+                WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@class="el-dialog__body"]/div[1]/span'))).click()
             rows = driver.execute_script('return document.getElementsByClassName("el-message-box");')
             if len(rows) > 0:
-                time.sleep(1)
                 WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@class="el-message-box"]/div[1]/button'))).click()
-        except:
+            break
+        except Exception as e:
             time.sleep(1)
             driver.refresh()
             continue

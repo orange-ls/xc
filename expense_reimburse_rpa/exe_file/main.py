@@ -99,6 +99,7 @@ class App(object):
             config_dict['月份'] = month   # 2月
             year = f"20{date[:2]}"   # 2025
             config_dict['年份'] = year
+            config_dict['数字月份'] = date[2:].replace('月', '')
 
             # 读取asp表
             asp_table = pd.read_excel(asp_table_path, sheet_name='Sheet1')[['项目编号', '技服预提金额', '外包供应商名称', '业务范围', '项目总收入']].sort_values(by='外包供应商名称')
@@ -129,7 +130,7 @@ class App(object):
                     return
             config_dict['工单号表'] = order_num_paths
 
-            # 判断通用报销文件是否存在
+            # 判断通用报销文件是否存在  按照ASP表中的公司名，找到对应公司总表中的sheet名，再在对应的路径中寻找是否有包含sheet名的文件
             general_path_list = []
             list_server = ['标准服务', '高级服务']
             for supplier in asp_suppliers:
@@ -138,10 +139,7 @@ class App(object):
                     if os.path.exists(path):
                         general_path_list.append(path)
 
-            # 登录CRM系统，跳转到工单搜索界面
-            driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
-            driver = crm_download.login_crm(driver, config_dict)
-
+            is_crm_login = None
             for order_num_path in order_num_paths:
                 # 读取工单号表
                 all_sheets = pd.ExcelFile(order_num_path).sheet_names
@@ -158,27 +156,42 @@ class App(object):
                     # config_dict中增加税前金额 config_dict['ASP名称-例外服务-MU01'] = 金额，如果asp表不能抓取出金额，则使用这个值
                     config_dict[f'{asp_name}-{sheet_name}'] = asp_amount
 
-                    file_name = f"{month}-{asp_name}-{sheet_name}-{asp_amount}"      # 压缩包名：2月-北京神州光大科技有限公司-例外服务-MU01-金额总和
-                    zip_name = os.path.join(config_dict['验收文件保存路径'], f"{file_name}.zip")
-                    if os.path.exists(zip_name):
-                        # 判断压缩包是否存在，存在就跳过
-                        self.text.insert(tk.END, f"{zip_name} 文件已存在！\r\n")
-                        continue
+                    file_name = f"{asp_name}\{config_dict['年份']}\现场服务单\{config_dict['数字月份']}\{month}-{asp_name}-{sheet_name}-现场服务报告"      # 压缩包名：2月-北京神州光大科技有限公司-例外服务-MU01-现场服务报告
+                    zip_name = os.path.join(config_dict['验收文件保存路径'], f"{file_name}.zip")    # D:\工作\01-合作管理\01-派单记录\河北华恒信通信技术有限公司\2025\现场服务单\02\2月-北京神州光大科技有限公司-例外服务-MU01-现场服务报告
+
+                    # 先判断压缩包保存文件夹是否存在，不存在 就创建；存在 再判断压缩包是否存在，存在就跳过
+                    if not os.path.exists(os.path.dirname(zip_name)):
+                        os.makedirs(os.path.dirname(zip_name))
+                    else:
+                        if os.path.exists(zip_name):
+                            # 判断压缩包是否存在，存在就跳过
+                            self.text.insert(tk.END, f"{zip_name} 文件已存在！\r\n")
+                            continue
+
+                    if is_crm_login:
+                        pass
+                    else:
+                        # 登录CRM系统，跳转到工单搜索界面
+                        driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
+                        driver = crm_download.login_crm(driver, config_dict)
+                        is_crm_login = driver.current_window_handle
 
                     # 搜索工单，下载文件。 压缩包文件保存位置 使用配置文件管理
                     crm_download.crm_download_file(driver, order_num_list, config_dict['谷歌浏览器下载路径'], config_dict['验收文件保存路径'], file_name)
-            driver.quit()
+            if is_crm_login:
+                driver.quit()
+                is_crm_login = None
 
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             # 登录OA系统，跳转到报销系统界面
             oa_expense.login_oa(driver, config_dict)
             # 进入技服外包报销
-            # for key, value in asp_dict.items():
-            #     service_cor_data = service_cor_dict.get(value[0]['外包供应商名称'])
-            #     if not service_cor_data:
-            #         self.text.insert(tk.END, f"配置表中没有找到{value[0]['外包供应商名称']}的配置信息！\r\n")
-            #         continue
-            #     oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
+            for key, value in asp_dict.items():
+                service_cor_data = service_cor_dict.get(value[0]['外包供应商名称'])
+                if not service_cor_data:
+                    self.text.insert(tk.END, f"配置表中没有找到{value[0]['外包供应商名称']}的配置信息！\r\n")
+                    continue
+                oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
 
             # 开始通用报销处理
             for general_path in general_path_list:
