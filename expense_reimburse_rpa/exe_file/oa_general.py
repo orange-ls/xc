@@ -72,15 +72,15 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
         raise FileNotFoundError(f"文件路径不存在:{config_amount_name}")
     # 进入技服外包报销界面
     driver, reimburse_handels = go_reimbursement(driver)
-    for index in range(5):
+    for index in range(3):
         try:
             for i in range(3):
                 # 进入创建报销单页面
                 # 检查页面是否加载完成
                 try:
                     time.sleep(3)
-                    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
-                    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
+                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
                     break
                 except:
                     driver.refresh()
@@ -171,37 +171,37 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             # 汇入市
             driver.find_element(By.XPATH, '//*[@id="field353786"]').send_keys(service_cor_dict['城市'])
 
-            # 上传发票
-            invoice_name = f"{config_dict['月份']}-{service_provider_name}-{config_dict[config_amount_name]}.pdf"
-            invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
-            if not os.path.exists(invoice_path):
-                raise FileNotFoundError(f"文件路径不存在:{invoice_path}")
-            # 点击"选择发票"按钮
-            driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
-            iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
-            driver.switch_to.frame(iframe)
-            # 点击"发票录入"按钮
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
-            # 上传发票文件
-            driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
-            # 点击"开始识别"按钮
-            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            time.sleep(3)
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[4]")))
-            # 点击"确认"按钮
-            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            # 等待"发票录入"按钮出现
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='el-button-group']/button[1]")))
-            time.sleep(3)
-            # 点击"确认"按钮
-            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            # 等待"确认"按钮消失
-            # WebDriverWait(driver, 60).until(EC.invisibility_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[2]")))
-            time.sleep(3)
-            # 切换回主文档
-            driver.switch_to.default_content()
-            time.sleep(1)
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button')))
+            # # 上传发票
+            # invoice_name = f"{config_dict['月份']}-{service_provider_name}-{config_dict[config_amount_name]}.pdf"
+            # invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
+            # if not os.path.exists(invoice_path):
+            #     raise FileNotFoundError(f"文件路径不存在:{invoice_path}")
+            # # 点击"选择发票"按钮
+            # driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
+            # iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
+            # driver.switch_to.frame(iframe)
+            # # 点击"发票录入"按钮
+            # WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
+            # # 上传发票文件
+            # driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
+            # # 点击"开始识别"按钮
+            # driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # time.sleep(3)
+            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[4]")))
+            # # 点击"确认"按钮
+            # driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # # 等待"发票录入"按钮出现
+            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='el-button-group']/button[1]")))
+            # time.sleep(3)
+            # # 点击"确认"按钮
+            # driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # # 等待"确认"按钮消失
+            # # WebDriverWait(driver, 60).until(EC.invisibility_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[2]")))
+            # time.sleep(3)
+            # # 切换回主文档
+            # driver.switch_to.default_content()
+            # time.sleep(1)
+            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button')))
 
             # 附件
             # 派单记录表
@@ -230,37 +230,37 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
                 raise FileNotFoundError(f"文件路径不存在:{file_name}")
             driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_name)
 
-            # 审批信息
-            # 搜索部门预审
-            driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input"))).send_keys(config_dict['部门预审'])
-            but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
-            tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
-            driver.find_element(By.XPATH, but_address).click()
-            search_basic_infor(driver, but_address, tr_address)
-            # 确认部门预审
-            time.sleep(1)
-            driver.find_element(By.XPATH, "//*[@class='wea-transfer-opration']/div/button[3]").click()
-            time.sleep(1)
-            driver.find_element(By.XPATH, '/html/body/div[14]/div/div[2]/div/div[1]/div[3]/button[1]').click()
-
-            # 部门一级审批
-            driver.find_element(By.XPATH, '//*[@id="field353753_sel"]/div/div/div/div/span').click()
-            time.sleep(0.5)
-            element = driver.find_element(By.XPATH, '/html/body/div[15]/div/div/div/ul')
-            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门一级审批']}')]").click()
-
-            # 部门终审
-            driver.find_element(By.XPATH, '//*[@id="field353757_sel"]/div/div/div/div/span').click()
-            time.sleep(0.5)
-            element = driver.find_element(By.XPATH, '/html/body/div[16]/div/div/div/ul')
-            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门终审']}')]").click()
-
-            # 业务单元一级加签
-            driver.find_element(By.XPATH, '//*[@id="field353758_sel"]/div/div/div/div/span').click()
-            time.sleep(0.5)
-            element = driver.find_element(By.XPATH, '/html/body/div[17]/div/div/div/ul')
-            element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['业务单元一级加签']}')]").click()
+            # # 审批信息
+            # # 搜索部门预审
+            # driver.find_element(By.XPATH, "//*[@id='field353752span']/div[2]/button").click()
+            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/span/input"))).send_keys(config_dict['部门预审'])
+            # but_address = "//*[@class='wea-hr-muti-input-left']/div[1]/div[1]/div/button"
+            # tr_address = "//*[@class='wea-hr-muti-input-left']/div[3]/div/div[1]/div/ul/li"
+            # driver.find_element(By.XPATH, but_address).click()
+            # search_basic_infor(driver, but_address, tr_address)
+            # # 确认部门预审
+            # time.sleep(1)
+            # driver.find_element(By.XPATH, "//*[@class='wea-transfer-opration']/div/button[3]").click()
+            # time.sleep(1)
+            # driver.find_element(By.XPATH, '/html/body/div[14]/div/div[2]/div/div[1]/div[3]/button[1]').click()
+            #
+            # # 部门一级审批
+            # driver.find_element(By.XPATH, '//*[@id="field353753_sel"]/div/div/div/div/span').click()
+            # time.sleep(0.5)
+            # element = driver.find_element(By.XPATH, '/html/body/div[15]/div/div/div/ul')
+            # element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门一级审批']}')]").click()
+            #
+            # # 部门终审
+            # driver.find_element(By.XPATH, '//*[@id="field353757_sel"]/div/div/div/div/span').click()
+            # time.sleep(0.5)
+            # element = driver.find_element(By.XPATH, '/html/body/div[16]/div/div/div/ul')
+            # element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['部门终审']}')]").click()
+            #
+            # # 业务单元一级加签
+            # driver.find_element(By.XPATH, '//*[@id="field353758_sel"]/div/div/div/div/span').click()
+            # time.sleep(0.5)
+            # element = driver.find_element(By.XPATH, '/html/body/div[17]/div/div/div/ul')
+            # element.find_element(By.XPATH, f".//li[contains(.,'{config_dict['业务单元一级加签']}')]").click()
 
             # 等待上传附件完成
             WebDriverWait(driver, 600).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[48]/td[5]/div/div/span/div/div[1]/div[4]')))
@@ -275,7 +275,7 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
         except Exception as e:
             if '文件路径不存在' in str(e):
                 raise Exception(e)
-            driver.refresh()
-            if index == 4:
-                raise Exception(f"技服外包报销失败：{e}")
-            continue
+            # if index == 4:
+            raise Exception(f"技服外包报销失败：{e}")
+            # driver.refresh()
+            # continue

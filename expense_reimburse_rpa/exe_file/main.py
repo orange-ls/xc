@@ -173,12 +173,12 @@ class App(object):
             # 登录OA系统，跳转到报销系统界面
             oa_expense.login_oa(driver, config_dict)
             # 进入技服外包报销
-            for key, value in asp_dict.items():
-                service_cor_data = service_cor_dict.get(value[0]['外包供应商名称'])
-                if not service_cor_data:
-                    self.text.insert(tk.END, f"配置表中没有找到{value[0]['外包供应商名称']}的配置信息！\r\n")
-                    continue
-                oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
+            # for key, value in asp_dict.items():
+            #     service_cor_data = service_cor_dict.get(value[0]['外包供应商名称'])
+            #     if not service_cor_data:
+            #         self.text.insert(tk.END, f"配置表中没有找到{value[0]['外包供应商名称']}的配置信息！\r\n")
+            #         continue
+            #     oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
 
             # 开始通用报销处理
             for general_path in general_path_list:

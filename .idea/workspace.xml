@@ -4,28 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="华为云RPA">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="费用报销">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_general.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/oa_general.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/费用报销rpa配置表.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/费用报销rpa配置表.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/Analysis-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/EXE-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PKG-00.toc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PYZ-00.pyz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/base_library.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/main.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/crm_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/crm_download.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/main.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_v1.0.exe" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_v1.0.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_v1.0_bak.exe" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_v1.0_bak.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/warn-main.txt" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/warn-main.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/xref-main.html" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/xref-main.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_expense.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_expense.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_general.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/oa_general.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/huawei_cloud_rpa/hw_exe/dist/华为云RPA_20250728.exe" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,14 +209,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00005" summary="数据入库">
-      <option name="closed" value="true" />
-      <created>1744366670799</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1744366670799</updated>
     </task>
     <task id="LOCAL-00006" summary="24年25年数据入库">
       <option name="closed" value="true" />
@@ -607,7 +594,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753687691370</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="费用报销">
+      <option name="closed" value="true" />
+      <created>1753771224873</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1753771224874</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -646,7 +641,6 @@
     <MESSAGE value="商务通知单" />
     <MESSAGE value="华为云 第九个表修改" />
     <MESSAGE value="华为云 第九个表修改-打包" />
-    <MESSAGE value="费用报销" />
     <MESSAGE value="费用报销 填写基础信息部分" />
     <MESSAGE value="费用报销 oa填写基础信息部分" />
     <MESSAGE value="crm下载" />
@@ -662,7 +656,8 @@
     <MESSAGE value="华为云RPA 结果表5增加 销售员和区域" />
     <MESSAGE value="华为云RPA 增加结果表10、11" />
     <MESSAGE value="华为云RPA" />
-    <option name="LAST_COMMIT_MESSAGE" value="华为云RPA" />
+    <MESSAGE value="费用报销" />
+    <option name="LAST_COMMIT_MESSAGE" value="费用报销" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -814,7 +809,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py</url>
-          <line>143</line>
+          <line>144</line>
           <option name="timeStamp" value="346" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -834,7 +829,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
-          <line>373</line>
+          <line>375</line>
           <option name="timeStamp" value="384" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

@@ -30,6 +30,7 @@ def login_crm(driver, config_dict):
     # 关闭弹窗
     for i in range(3):
         try:
+            time.sleep(1)
             rows = driver.execute_script('return document.getElementsByClassName("el-dialog__body");')
             if len(rows) > 0:
                 time.sleep(1)
