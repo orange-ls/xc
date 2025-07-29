@@ -47,11 +47,6 @@ def login_crm(driver, config_dict):
     # 点击服务通、工单管理、服务报告
     for i in range(3):
         try:
-            # WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-portal"]/header/div/div[1]/div[2]/div[1]/div/ul/li[2]'))).click()
-            # driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[2]/div[1]/div/div/div/div[3]/div/div/div[1]/ul[1]/li[6]').click()
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div/div[2]/div[1]/div/div/div/div[3]/div/div/div[1]/ul[1]/li[6]/div/div/ul/li[4]'))).click()
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div/div[2]/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/div/div/div/div/div/div[2]/div/div[5]/div/div/div[3]/form/div/input')))
-
             WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app-portal"]/header/div/div[1]/div/div[1]/div/ul/li[2]'))).click()
             driver.find_element(By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[1]/div/div[1]/div/div[2]/div[3]/div/div/div[1]/ul[1]/li[6]').click()
             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sub-tpl"]/div[3]/div[1]/div/div[1]/div/div[2]/div[3]/div/div/div[1]/ul[1]/li[6]/div/div/ul/li[4]'))).click()

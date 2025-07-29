@@ -153,7 +153,15 @@ def create_general_reimbursement(driver, config_dict, service_cor_dict, general_
             except:
                 print("no alert")
             # 收款单位开户行
-            driver.find_element(By.XPATH, '//*[@id="field353783"]').send_keys(service_cor_dict['收款单位开户行'])
+            # driver.find_element(By.XPATH, '//*[@id="field353783"]').send_keys(service_cor_dict['收款单位开户行'])
+            # 收款单位开户行 获取收款单位客户行的值
+            for i in range(6):
+                customer_bank_account = driver.find_element(By.XPATH, '//*[@id="field353783"]').get_attribute('value')
+                if customer_bank_account == service_cor_dict['收款单位开户行']:
+                    break
+                else:
+                    driver.find_element(By.XPATH, '//*[@id="field353783"]').clear()
+                    driver.find_element(By.XPATH, '//*[@id="field353783"]').send_keys(service_cor_dict['收款单位开户行'])
             # 收款账号
             driver.find_element(By.XPATH, '//*[@id="field353784"]').send_keys(service_cor_dict['收款账号'])
             # 是否冲借款

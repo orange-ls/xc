@@ -58,7 +58,7 @@ class App(object):
         self.text.grid(row=9, column=0, columnspan=10)
 
         self.text.insert(tk.END, "--------------------------------------------------------------------------------\r\n")
-        self.text.insert(tk.END, "1、ASP表名规则：数字年月+月+ASP，例：2501月ASP.xlsx \r\n\n")
+        self.text.insert(tk.END, "1、ASP表名规则：数字年月+月+ASP，例：2501月ASP.xlsx  读取名为“Sheet1“的Sheet\r\n\n")
         self.text.insert(tk.END, "2、派单记录表名规则：数字月+月份ASP上门派单记录-公司名-服务种类，例：1月份ASP上门派单记录-北京神州光大科技有限公司-例外服务-MU01.xlsx \r\n\n")
         self.text.insert(tk.END, "3、路径和表格中涉及到公司名，请使用全称，如北京神州光大科技有限公司\r\n\n")
         self.text.insert(tk.END, "4、发票命名规则：月份-公司名-税前金额，例：1月-北京神州光大科技有限公司-1000.pdf\r\n")
@@ -138,7 +138,7 @@ class App(object):
                     if os.path.exists(path):
                         general_path_list.append(path)
 
-            # # 登录CRM系统，跳转到工单搜索界面
+            # 登录CRM系统，跳转到工单搜索界面
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             driver = crm_download.login_crm(driver, config_dict)
 

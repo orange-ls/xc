@@ -107,8 +107,8 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
             for i in range(3):
                 try:
                     time.sleep(3)
-                    WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
-                    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
+                    WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="field353734span"]/div[2]/button')))
+                    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[6]')))
                     break
                 except:
                     driver.refresh()
@@ -178,9 +178,15 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
                 alert = WebDriverWait(driver, 5).until(EC.alert_is_present())
                 alert.dismiss()
             except:
-                print("no alert")
-            # 收款单位开户行
-            driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').send_keys(service_cor_dict['收款单位开户行'])
+                pass
+            # 收款单位开户行 获取收款单位客户行的值
+            for i in range(6):
+                customer_bank_account = driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').get_attribute('value')
+                if customer_bank_account == service_cor_dict['收款单位开户行']:
+                    break
+                else:
+                    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').clear()
+                    driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[12]/td[5]/div/div/input').send_keys(service_cor_dict['收款单位开户行'])
             # 收款账号
             driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[13]/td[5]/div/div/input').send_keys(service_cor_dict['收款账号'])
             # 是否冲借款
