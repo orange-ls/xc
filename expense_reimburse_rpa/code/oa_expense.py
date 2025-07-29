@@ -308,7 +308,8 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
                 raise FileNotFoundError(f"文件路径不存在:{file_name}")
             driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[56]/td[5]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_name)
             # 上传验收文件
-            file_name = f"{config_dict['月份']}-{config_amount_name}-{config_dict[config_amount_name]}.zip"
+            file_name = f"{service_provider_name}\{config_dict['年份']}\现场服务单\{config_dict['数字月份']}\{config_dict['月份']}-{config_amount_name}-现场服务报告.zip"
+            # file_name = f"{config_dict['月份']}-{config_amount_name}-{config_dict[config_amount_name]}.zip"
             file_name = os.path.join(config_dict['验收文件保存路径'], file_name)
             if not os.path.exists(file_name):
                 raise FileNotFoundError(f"文件路径不存在:{file_name}")
