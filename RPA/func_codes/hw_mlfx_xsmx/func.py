@@ -894,8 +894,7 @@ def matchProject3(series, df_Z30List, df_Move, matchDict):
         elif matchCustomNum == 1:
             index = finalIdx
         else:
-            return pd.Series(data=[f"未匹配原因：匹配到多个批次且有{matchCustomNum}组均匹配客户名称"] * 3 + [""],
-                             index=addCol)
+            return pd.Series(data=[f"未匹配原因：匹配到多个批次且有{matchCustomNum}组均匹配客户名称"] * 3 + [""], index=addCol)
 
     # 获取到index后，依据移动明细数据、开单记录匹配到"下单合同号"、"项目名称"、"评审二代"
     return matchingMovementTable(series, index, df_Move, matchDict)
@@ -1312,9 +1311,7 @@ def calDataStep3(df: pd.DataFrame, moveFilePath, matchDict):
     global matchFlag
     matchFlag = False
     df[addCol[-1]] = ""
-    df.loc[df["下单合同号"] == '', addCol] = df.loc[df["下单合同号"] == ''].apply(matchProject3,
-                                                                                  args=(df_Z30List, df_Move, matchDict),
-                                                                                  axis=1)
+    df.loc[df["下单合同号"] == '', addCol] = df.loc[df["下单合同号"] == ''].apply(matchProject3, args=(df_Z30List, df_Move, matchDict), axis=1)
 
     # 将标记为"已拆行处理"的原数据删除并将拆行后的数据集addDataFrame添加到原数据中
     dropIndex = df[df["下单合同号"] == "已拆行处理"].index.tolist()
