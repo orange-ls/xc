@@ -348,8 +348,8 @@ def match_validData(filepath, excludeCode: list, delPath):
     # 筛选出"备注"列不为"已销未提"或"部分已销未提"的数据
     df = df.query("备注 not in ['已销未提', '部分已销未提']")
 
-    # 筛选数据需要的列 --20250429 增加“项目注释”列，用于填充”价外费用“（后面删除这一列）
-    df = df[usedCol+['项目注释']]
+    # 筛选数据需要的列
+    df = df[usedCol]
 
     # 获取排除不参与计算的销售员编码后的数据
     df = df.query("销售员编码 not in @excludeCode")
@@ -409,11 +409,6 @@ def addExtraData(df, extraPath):
     validDf = df_extra.query("销售订单号.isin(@extraOrderList)")
     initMatchDf = df_extra.query("~销售订单号.isin(@extraOrderList)")
     df = df.append(validDf)
-
-    # 删除df中的”服务产品线“和”服务产品类别“列
-    cols_to_drop = [col for col in ["服务产品线", "服务产品线类别"] if col in df.columns]
-    if cols_to_drop:
-        df.drop(columns=cols_to_drop, inplace=True)
 
     # 清理内存
     gc.collect()
@@ -804,7 +799,7 @@ def matchProject1(series):
     """
 
     if "价外费用" in series["物料名称"]:
-        if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596", "600-217668"]:
+        if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596"]:
             return pd.Series(data=["罚息", "", ""], index=matchCol)
         elif series["物料号"] in ["600-072585", "600-072589", "600-072593", "600-072597"]:
             return pd.Series(data=["物流费", "", ""], index=matchCol)
@@ -813,15 +808,15 @@ def matchProject1(series):
         elif series["物料号"] in ["600-072587", "600-072591", "600-072595", "600-072599"]:
             return pd.Series(data=["折旧费", "", ""], index=matchCol)
         else:
-            return pd.Series(data=["价外费用", "", ""], index=matchCol)  # 后面将"价外费用"替换成BO采购信息中的"下单合同号"
+            return pd.Series(data=["价外费用", "", ""], index=matchCol)
     elif "折让" in series["合同号（客户PO号）"] or "折让" in series["物料名称"]:
         return pd.Series(data=["折让", "", ""], index=matchCol)
-    # elif series["批次"].startswith("WG"):
-    #     return pd.Series(data=["外购", "", ""], index=matchCol)
+    elif series["批次"].startswith("WG"):
+        return pd.Series(data=["外购", "", ""], index=matchCol)
     elif series["批次"].startswith("D") and re.match("[A-Z]{3}.*", series["批次"], re.I):
-        return pd.Series(data=["样机借转销", "", ""], index=matchCol)
-    # elif "NCS" in series["批次"] or "ECAS" in series["批次"]:
-    #     return pd.Series(data=["外购", "", ""], index=matchCol)
+        return pd.Series(data=["借转销", "", ""], index=matchCol)
+    elif "NCS" in series["批次"] or "ECAS" in series["批次"]:
+        return pd.Series(data=["外购", "", ""], index=matchCol)
     elif series["物料号"][:2] in ["80", "81"] and series["产品组"] == "HT":
         return pd.Series(data=["自有服务", "", ""], index=matchCol)
     elif series["批次"] == "":
@@ -1081,51 +1076,29 @@ def matchCGLX(series):
     :return: 返回"采购类型"
     """
     series = series.copy().fillna("")
-    if "价外费用" in series["物料名称"]:
-        return "价外费用"
-    elif (series["下单合同号"] == "外购" or series["批次"].startswith("WG") or "NCS" in series["批次"] or
-            "ECAS" in series["批次"] or series["批次"]==''):
+    if series["下单合同号"] == "外购":
         return "外购"
-    elif series["下单合同号"] == "样机借转销":
+    elif "价外费用" in series["物料名称"]:
+        return "价外费用"
+    elif series["下单合同号"] == "借转销":
         return "渠道分销"
     elif series["下单合同号"] == "折让":
         return "折让"
-    elif (series["下单合同号"] and not series["下单合同号"].startswith("CY") and not series["下单合同号"].startswith("1Y") and
-          not '\u4e00' <= series["下单合同号"][0] <= '\u9fa5' and not series["采购类型"] == "外购"):
+    elif series["下单合同号"] and not series["下单合同号"].startswith("CY") and not series["下单合同号"].startswith(
+            "1Y") and not '\u4e00' <= series["下单合同号"][0] <= '\u9fa5':
         return "鲲泰"
     elif series["下单合同号"].startswith("CY"):
         return "超聚变"
-    elif series["区域"] == "创新业务":
-        return "创新业务"
+    elif series["事业部"] == "服务事业部":
+        return "服务"
     elif "公有云" in series["项目名称"]:
         return "公有云"
     else:
         return "原厂下单"
 
-# 匹配"采购类型-二级分类"
-def matchCGLX_2(series):
-    """
-    :param series: DataFrame行series
-    :return: 返回"采购类型"
-    """
-    series = series.copy().fillna("")
-    if "价外费用" in series["物料名称"]:
-        if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596", "600-217668"]:
-            return "罚息"
-        elif series["物料号"] in ["600-072585", "600-072589", "600-072593", "600-072597"]:
-            return "物流费"
-        elif series["物料号"] in ["600-072586", "600-072590", "600-072594", "600-072598"]:
-            return "诉讼费&律师费"
-        elif series["物料号"] in ["600-072587", "600-072591", "600-072595", "600-072599"]:
-            return "折旧费"
-        else:
-            return "价外费用"
-    else:
-        return ""
-
 
 # 匹配“运输方式”
-def matchYSFS(series, BoTransDict, HWOrderDict):
+def matchYSFS(series, BoTransDict, HWOrderDict, KTOrderDict):
     """
     :param series: DataFrame行series
     :param BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
@@ -1136,13 +1109,7 @@ def matchYSFS(series, BoTransDict, HWOrderDict):
     purchaseType = series["采购类型"]
     orderNum = series["下单合同号"]
     if purchaseType == "鲲泰":
-        # return KTOrderDict.get(orderNum, "鲲泰外挂表未匹配到")
-        # --20250429 参考"库存地"字段最后两个字符判断
-        stock_last2 = series["库存地"][-2:]
-        if stock_last2 == "99":
-            return "汽运"
-        elif stock_last2 == "01" or stock_last2 == "XN" or stock_last2 == '':
-            return "自提"
+        return KTOrderDict.get(orderNum, "鲲泰外挂表未匹配到")
     elif purchaseType in ["公有云", "服务", "服务预提", "渠道分销", "外购", "价外费用", "折让"]:
         return "自提"
     if purchaseType == "超聚变":
@@ -1252,19 +1219,8 @@ def calDataStep2(df, BO_file):
     matchDict = dict(zip(df_BO["批次"], df_BO[boMatchCol].values.tolist()))
     # logger.info(matchDict)
     # df.loc[df["下单合同号"] == '', matchCol] = df['批次'].apply(matchProject2, args=(matchDict, matchCol,))
-    df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
-
-    # --20250807 下单合同号 新增批次和区域的匹配
-    df.loc[df["批次"] == '', ["下单合同号"]] = df.loc[df["批次"] == '', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    df.loc[df["区域"] == '创新业务', ["下单合同号"]] = df.loc[df["区域"] == '创新业务', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    # --20250429 新增”价外费用“的填充，然后替换”价外费用“，并删除”项目注释“列
-    # df.loc[df["下单合同号"] == '价外费用', ["项目名称", "评审二代"]] = df.loc[df["下单合同号"] == '价外费用', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
-    # df.loc[df["下单合同号"] == '价外费用', ["下单合同号"]] = df.loc[df["下单合同号"] == '价外费用', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    mask = df["下单合同号"] == '价外费用'
-    if mask.any():
-        df.loc[mask, ["项目名称", "评审二代"]] = df.loc[mask, "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
-        df.loc[mask, ["下单合同号"]] = df.loc[mask, "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
+    df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(
+        lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
 
     """生成{下单合同号：运输方式}字典"""
     dfBo_copy["发货方式"] = dfBo_copy["发货方式"].map(lambda x: BoDeliveryDict.get(x, ""))
@@ -1362,33 +1318,40 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
     dataList = initMatchDf[["销售订单号", "销售订单行项目", calAmountCol]].values.tolist()
     dataSet = set([tuple(i) for i in dataList])
     for orderNum, oneProject, amount in dataSet:
-        df_Match = initMatchDf.loc[(initMatchDf["销售订单号"] == orderNum) & (initMatchDf["销售订单行项目"] == oneProject) & (initMatchDf[calAmountCol] == amount)]
-        target_df = df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject) & (df[calAmountCol] == amount)]
+        df_Match = initMatchDf.loc[
+            (initMatchDf["销售订单号"] == orderNum) & (initMatchDf["销售订单行项目"] == oneProject) & (
+                    initMatchDf[calAmountCol] == amount)]
+        target_df = df.loc[
+            (df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject) & (df[calAmountCol] == amount)]
         if df_Match.shape[0] != target_df.shape[0]:
-            df_Match_ = initMatchDf.loc[(initMatchDf["销售订单号"] == orderNum) & (initMatchDf["销售订单行项目"] == oneProject)][["销售订单号", "销售订单行项目", calAmountCol]]
-            target_df_ = df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject)][["销售订单号", "销售订单行项目", calAmountCol]]
+            df_Match_ = \
+                initMatchDf.loc[
+                    (initMatchDf["销售订单号"] == orderNum) & (initMatchDf["销售订单行项目"] == oneProject)][
+                    ["销售订单号", "销售订单行项目", calAmountCol]]
+            target_df_ = df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject)][
+                ["销售订单号", "销售订单行项目", calAmountCol]]
             raise Exception(
                 f"销售订单号为{orderNum}，销售订单行项目为{oneProject}，{calAmountCol}为{amount}的数据补充表匹配异常\n"
                 f"补充表数据为{df_Match_.values.tolist()},匹配到的数据为{df_Match[['销售订单号', '销售订单行项目', calAmountCol]].values.tolist()}\n"
                 f"销售明细表对应数据为{target_df_.values.tolist()}，匹配到的数据为{target_df[['销售订单号', '销售订单行项目', calAmountCol]].values.tolist()}")
-        df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject) & (df[calAmountCol] == amount), matchCol] = df_Match[matchCol].values
+        df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject) & (
+                df[calAmountCol] == amount), matchCol] = \
+            df_Match[matchCol].values
     return df
 
 
 # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
-def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList):
+def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
     """
     :param df: 需要处理的df
     :param BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     :param HWOrderPathList: 华为订单表路径列表
+    :param KTconfigPath: 鲲泰跟踪表路径，用于匹配鲲泰运输方式
     :return: 处理后的df
     """
     # 匹配采购类型
     # df["采购类型"] = df.apply(matchCGLX, axis=1)
     df.loc[df["采购类型"] == '', "采购类型"] = df.loc[df["采购类型"] == ''].apply(matchCGLX, axis=1)
-    # 在"采购类型"后增加一列"采购类型-二级分类"，取值规则为matchCGLX_2
-    col_position = df.columns.get_loc("采购类型") + 1
-    df.insert(col_position, "采购类型-二级分类", df.apply(matchCGLX_2, axis=1))
 
     '''
     # 匹配销售类型
@@ -1424,7 +1387,6 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList):
     df.loc[df["销售类型"] == "", "销售类型"] = "正常销售"
     '''
 
-    '''
     # 匹配销售类型
     """
     Step1.合同号包含”折让”，销售类型=折让
@@ -1450,42 +1412,6 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList):
                 df.loc[(df["下单合同号"] == num) & (df["出具发票日"] == date), "销售类型"] = "退货"
             else:
                 df.loc[(df["下单合同号"] == num) & (df["出具发票日"] == date), "销售类型"] = "正常销售"
-    # # 新增一列“销售类型-二级分类”，值复制"销售类型"列
-    # col_pos = df.columns.get_loc("销售类型") + 1
-    # # 在指定位置插入新列
-    # df.insert(col_pos, "销售类型-二级分类", df["销售类型"])
-    '''
-
-    # '''
-    # 匹配销售类型
-    """
-    Step1.合同号包含”折让”，销售类型=折让
-    Step2.筛选合同金额<0的合同号，按合同号+客户+销售员维度处理：
-        1. 若“合同金额”总和在-0.1-0.1之间，销售类型标“冲红”
-        2. 若“合同金额”总和 < -0.1，销售类型标“退货”
-        3. 若“合同金额”总和 > 0.1，销售类型标“正常销售”
-    Step3.其他情况标正常销售
-    """
-    # Step1：标记折让类型
-    df["销售类型"] = df["下单合同号"].apply(lambda x: "折让" if "折让" in x else "")
-    # Step2：处理非折让订单
-    # 筛选条件：销售类型为空且合同金额<0的合同号
-    df["合同金额"] = df["合同金额"].astype(float)
-    contract_groups = df[(df["销售类型"] == '')].groupby(['下单合同号', '客户名称', '销售员'])
-    for (contract_num, customer, seller), group in contract_groups:
-        # 计算分组特征
-        total_amount = group['合同金额'].sum()
-        dates = group['出具发票日'].unique()
-        for date in dates:
-            if abs(total_amount) <= 0.1:
-                df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "冲红"
-            elif total_amount < -0.1:
-                df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "退货"
-            else:
-                df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "正常销售"
-    # Step3：未处理数据兜底
-    df.loc[df["销售类型"] == '', "销售类型"] = "正常销售"
-    # '''
 
     # 匹配运输方式
     df_HWOrder = pd.DataFrame()
@@ -1493,11 +1419,10 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList):
         orderTempDf = pd.read_excel(path, dtype=str).fillna("")
         df_HWOrder = df_HWOrder.append(orderTempDf)
     HWOrderDict = dict(zip(df_HWOrder["华为订单号"], df_HWOrder["运输方式"]))
-    # df_KT = pd.read_excel(KTconfigPath, dtype=str)
-    # df_KT.rename(columns={"供货方编号": "下单合同号"}, inplace=True)
-    # KTOrderDict = dict(zip(df_KT["下单合同号"].fillna(""), df_KT["运输方式"].fillna("鲲泰外挂表运输方式为空")))
-    # df["运输方式"] = df.apply(matchYSFS, args=(BoTransDict, HWOrderDict, KTOrderDict), axis=1)
-    df["运输方式"] = df.apply(matchYSFS, args=(BoTransDict, HWOrderDict), axis=1)
+    df_KT = pd.read_excel(KTconfigPath, dtype=str)
+    df_KT.rename(columns={"供货方编号": "下单合同号"}, inplace=True)
+    KTOrderDict = dict(zip(df_KT["下单合同号"].fillna(""), df_KT["运输方式"].fillna("鲲泰外挂表运输方式为空")))
+    df["运输方式"] = df.apply(matchYSFS, args=(BoTransDict, HWOrderDict, KTOrderDict), axis=1)
 
     # 匹配是否直发
     df["是否直发"] = df["运输方式"].apply(lambda x: "否" if x == "自提" else ("是" if x in ["汽运", "空运"] else ""))
@@ -1711,23 +1636,14 @@ logger = None
 calYearMonth = ""
 
 if __name__ == "__main__":
-    # g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
-    #                 "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
-    #                 "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",
-    #                 "销售明细补充表路径": r"C:\Users\11598\Desktop\测试文件\销售明细补充.xlsx",
-    #                 "物料移动明细": r"C:\Users\11598\Desktop\测试文件\物料移动明细汇总_20230205.xlsx",
-    #                 "OA预提表路径": r"C:\Users\11598\Desktop\测试文件\预提表_20230206.xlsx",
-    #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
-    #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
-    #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY25销售明细(8月)_0806.xlsx",
-                    "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
-                    "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
-                    "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
-                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20250806.xlsx",
-                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20250807.xlsx",
-                    "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
-                    "结果保存路径": r"D:\xc_files\销售明细\result",
+    g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
+                    "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
+                    "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",
+                    "销售明细补充表路径": r"C:\Users\11598\Desktop\测试文件\销售明细补充.xlsx",
+                    "物料移动明细": r"C:\Users\11598\Desktop\测试文件\物料移动明细汇总_20230205.xlsx",
+                    "OA预提表路径": r"C:\Users\11598\Desktop\测试文件\预提表_20230206.xlsx",
+                    "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
+                    "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
                     }
     g_selectPath = g_dictGlobal["销售日报"]
     BO_filePath = g_dictGlobal["BO下载路径"]
@@ -1738,39 +1654,25 @@ if __name__ == "__main__":
 
     # initWriteLog(r"C:\Users\11598\Desktop\test\log(exe_cmd)\202207")
 
-    # 初始化func中的全局变量calYearMonth（处理日期: yyyymm）
     initOperateDate(g_selectPath)
 
-    # 筛选销售日报有效数据, 返回df：筛选后的的df；colNum：原始数据列数
     df, colNum = match_validData(g_selectPath, ["00049539", "00074453"], g_dictGlobal["分销销售名单"])
 
-    # 增加销售明细补充表数据
-    # initMatchDf: “销售明细补充”外挂表中人工新增的[下单合同号, 项目名称, 评审二代]的数据
     df, initMatchDf = addExtraData(df, g_dictGlobal["销售明细补充表路径"])
 
-    # 依据"物料名称"、"批次"的内容初步匹配"下单合同号"、"项目名称"、"评审二代"
     df = calDataStep1(df)
 
-    # 通过批次匹配BO采购信息表的"下单合同号"、"项目名称"、"评审二代"
-    # matchDict：BusinessObjects采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
-    # BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     df, matchDict, BoTransDict = calDataStep2(df, BO_filePath)
 
-    # 通过物料移动明细表匹配"下单合同号"、"项目名称"、"评审二代"
     df = calDataStep3(df, moveFilePath, matchDict)
-    # "下单合同号"、"项目名称"、"评审二代"初步匹配完成后，再写入人工补充的数据
     df = matchExtraData(df, initMatchDf)
 
     allOrderList = glob.glob(r"E:\Uibot项目文件\汇总表\*订单表*.xlsx")
-    # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
     df = calDataStep4(df, BoTransDict, orderFileList)
 
-    # 匹配”成本总价”、“月份”
     df = calDataStep5(df, ytPath)
 
     HWYJPathList = glob.glob(r"E:\Uibot项目文件\汇总表\*业绩表*.xlsx")
-    # 匹配”产品”、”产品线”,返回finalPath：销售明细结果文件路径
     finalPath = calDataStep6(df, yjFileList, g_dictGlobal["产品线"], g_dictGlobal["结果保存路径"])
 
-    # 设置格式
     setStyle(finalPath, colNum)
