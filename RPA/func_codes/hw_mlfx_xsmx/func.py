@@ -1373,11 +1373,12 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
 
 
 # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
-def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList):
+def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
     """
     :param df: 需要处理的df
     :param BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     :param HWOrderPathList: 华为订单表路径列表
+    :param KTconfigPath: 鲲泰跟踪表路径，用于匹配鲲泰运输方式 (弃用)
     :return: 处理后的df
     """
     # 匹配采购类型
