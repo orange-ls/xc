@@ -1247,8 +1247,12 @@ def calDataStep2(df, BO_file):
 
     """生成{批次：[下单合同号, 项目名称, 评审二代]}字典"""
     # 去重（保留最后一条数据）并匹配到销售明细df中
-    df_BO = df_BO.drop_duplicates("批次", keep="last", ignore_index=True)
-    matchDict = dict(zip(df_BO["批次"], df_BO[boMatchCol].values.tolist()))
+    df_BO_pc = df_BO.drop_duplicates("批次", keep="last", ignore_index=True)
+    matchDict = dict(zip(df_BO_pc["批次"], df_BO_pc[boMatchCol].values.tolist()))
+    # --20250813
+    df_BO_po = df_BO.drop_duplicates("华为_厂商PO号", keep="last", ignore_index=True)
+    po_matchDict = dict(zip(df_BO_po["华为_厂商PO号"], df_BO_po[["项目名称(查询 1 用 系统科技销售管理采购信息)", "签约客户名称"]].values.tolist()))
+
     # logger.info(matchDict)
     # df.loc[df["下单合同号"] == '', matchCol] = df['批次'].apply(matchProject2, args=(matchDict, matchCol,))
     df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
@@ -1263,6 +1267,7 @@ def calDataStep2(df, BO_file):
     if mask.any():
         df.loc[mask, ["项目名称", "评审二代"]] = df.loc[mask, "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
         df.loc[mask, ["下单合同号"]] = df.loc[mask, "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
+    df.loc[df["项目名称"] == '', ["项目名称", "评审二代"]] = df.loc[df["项目名称"] == '', "下单合同号"].apply(lambda x: pd.Series(data=po_matchDict.get(x, ["", ""]), index=["项目名称", "评审二代"]))
     df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
     """生成{下单合同号：运输方式}字典"""
@@ -1761,7 +1766,7 @@ if __name__ == "__main__":
 
     allOrderList = glob.glob(r"E:\Uibot项目文件\汇总表\*订单表*.xlsx")
     # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
-    df = calDataStep4(df, BoTransDict, orderFileList)
+    df = calDataStep4(df, BoTransDict, orderFileList, KTconfigPath='')
 
     # 匹配”成本总价”、“月份”
     df = calDataStep5(df, ytPath)
