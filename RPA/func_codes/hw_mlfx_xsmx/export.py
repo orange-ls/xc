@@ -208,7 +208,13 @@ def init_PivotData(filepath, costAdjustPath):
         df[col] = pd.to_numeric(df[col], errors='coerce')
 
     # 筛选出销售类型不为冲红的数据进行透视(pivotVal列为求和，产品、产品线、市场类型列取第一个值)
-    df = df.query("销售类型 != '冲红'")
+    # df = df.query("销售类型 != '冲红'")
+    df = df.query(
+        "销售类型 != '冲红'"
+        " and 采购类型 != '折让'"  # 剔除采购类型为折让
+        " and (采购类型 != '价外费用' or `采购类型-二级分类` == '折旧费')"  # 保留价外费用的折旧费
+        # " and not (采购类型 == '价外费用' and `采购类型-二级分类` in ['罚息','物流费','诉讼费&律师费'])"  # 剔除价外费用的特定分类
+    )
     funDict = {col: "sum" for col in pivotVal}
     funDict.update({col: "first" for col in ["销售类型", "产品", "产品线", "市场类型"]})
     df = df.pivot_table(index=pivotIndex, values=pivotVal + ["销售类型", "产品", "产品线", "市场类型"], aggfunc=funDict)
@@ -576,7 +582,7 @@ if __name__ == "__main__":
                     "物料移动明细": r"E:\Uibot项目文件\汇总表\物料移动明细汇总_20220807.xlsx",
                     }
     calYearMonth = "202207"
-    filePath = r"C:\Users\11598\Desktop\销售明细.xlsx"
+    filePath = r"C:\Users\user\Desktop\销售明细.xlsx"
     recordPath = r"E:\Uibot项目文件\配置表\运费、现金返点记录.xlsx"
     allFieldfpList = glob.glob(r"E:\Uibot项目文件\汇总表\*订单全字段报表*.xlsx")
 
