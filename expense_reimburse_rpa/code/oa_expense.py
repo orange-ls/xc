@@ -205,37 +205,37 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
             # 销售合同号
             driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[32]/td[5]/div/div/input').send_keys('无')
 
-            # # 上传发票
-            # invoice_name = f"{config_dict['月份']}-{service_provider_name}-{config_dict[config_amount_name]}.pdf"
-            # invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
-            # if not os.path.exists(invoice_path):
-            #     raise FileNotFoundError(f"文件路径不存在:{invoice_path}")
-            # # 点击"选择发票"按钮
-            # driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
-            # iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
-            # driver.switch_to.frame(iframe)
-            # # 点击"发票录入"按钮
-            # WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
-            # # 上传发票文件
-            # driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
-            # # 点击"开始识别"按钮
-            # driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            # time.sleep(3)
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[4]")))
-            # # 点击"确认"按钮
-            # driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            # # 等待"发票录入"按钮出现
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='el-button-group']/button[1]")))
-            # time.sleep(3)
-            # # 点击"确认"按钮
-            # driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
-            # # 等待"确认"按钮消失
-            # # WebDriverWait(driver, 60).until(EC.invisibility_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[2]")))
-            # time.sleep(3)
-            # # 切换回主文档
-            # driver.switch_to.default_content()
-            # time.sleep(1)
-            # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button')))
+            # 上传发票
+            invoice_name = f"{config_dict['月份']}-{service_provider_name}-{config_dict[config_amount_name]}.pdf"
+            invoice_path = os.path.join(config_dict['发票保存路径'], invoice_name)
+            if not os.path.exists(invoice_path):
+                raise FileNotFoundError(f"文件路径不存在:{invoice_path}")
+            # 点击"选择发票"按钮
+            driver.find_element(By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button').click()
+            iframe = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='ec-iframe']")))
+            driver.switch_to.frame(iframe)
+            # 点击"发票录入"按钮
+            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//*[@class='el-button-group']/button[1]"))).click()
+            # 上传发票文件
+            driver.find_element(By.XPATH, "//*[@class='c-csifr-tip-content']/input").send_keys(invoice_path)
+            # 点击"开始识别"按钮
+            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            time.sleep(3)
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[4]")))
+            # 点击"确认"按钮
+            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # 等待"发票录入"按钮出现
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, "//*[@class='el-button-group']/button[1]")))
+            time.sleep(3)
+            # 点击"确认"按钮
+            driver.find_element(By.XPATH, "//*[@class='c-ccsi-footer']/button[2]").click()
+            # 等待"确认"按钮消失
+            # WebDriverWait(driver, 60).until(EC.invisibility_of_element_located((By.XPATH, "//*[@class='c-ccsi-footer']/button[2]")))
+            time.sleep(3)
+            # 切换回主文档
+            driver.switch_to.default_content()
+            time.sleep(1)
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '//*[@id="oTable0"]/tbody/tr[2]/td[1]/div/div/button')))
 
             # 填写 项目明细
             WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[44]/td[5]/div/div/div/label[1]/span[1]/input'))).click()
@@ -322,7 +322,7 @@ def create_expense_reimbursement(driver, key, datas, config_dict, service_cor_di
                 raise FileNotFoundError(f"文件路径不存在:{file_path}")
             file_name = sorted(os.listdir(file_path), reverse=True)
             if not file_name:
-                raise FileNotFoundError(f"文件路径不存在:{file_path}")
+                raise FileNotFoundError(f"文件路径不存在:{file_path} 路径下没有文件")
             file_name = os.path.join(file_path, file_name[0])
             driver.find_element(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div/div[2]/div[1]/div/table/tbody/tr[58]/td[8]/div/div/span/div/div[2]/span[1]/span/div/input').send_keys(file_name)
             # 等待验收文件上传成功

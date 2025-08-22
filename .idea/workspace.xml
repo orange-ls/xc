@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="毛利分析 增加创新业务的匹配">
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="毛利分析 筛选销售类型二级分类">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,6 +55,7 @@
   &quot;keyToString&quot;: {
     &quot;Python.222.executor&quot;: &quot;Run&quot;,
     &quot;Python.crm_download.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.export.executor&quot;: &quot;Debug&quot;,
     &quot;Python.func (1).executor&quot;: &quot;Debug&quot;,
     &quot;Python.func.executor&quot;: &quot;Debug&quot;,
     &quot;Python.main (1).executor&quot;: &quot;Debug&quot;,
@@ -82,8 +83,8 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.func">
-    <configuration name="crm_download" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.export">
+    <configuration name="export" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -92,11 +93,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/expense_reimburse_rpa/code" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -195,11 +196,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.export" />
         <item itemvalue="Python.func" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.main (1)" />
         <item itemvalue="Python.test" />
-        <item itemvalue="Python.crm_download" />
       </list>
     </recent_temporary>
   </component>
@@ -218,14 +219,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00014" summary="修改bug">
-      <option name="closed" value="true" />
-      <created>1745316297383</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1745316297383</updated>
     </task>
     <task id="LOCAL-00015" summary="导出25年数据">
       <option name="closed" value="true" />
@@ -611,7 +604,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755072632396</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="毛利分析 筛选销售类型二级分类">
+      <option name="closed" value="true" />
+      <created>1755137565983</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1755137565983</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -651,7 +652,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="RPA" />
     <MESSAGE value="商务通知单" />
     <MESSAGE value="华为云 第九个表修改" />
     <MESSAGE value="华为云 第九个表修改-打包" />
@@ -676,7 +676,8 @@
     <MESSAGE value="销售明细" />
     <MESSAGE value="销售明细 项目名称按po号从bo表匹配" />
     <MESSAGE value="毛利分析 增加创新业务的匹配" />
-    <option name="LAST_COMMIT_MESSAGE" value="毛利分析 增加创新业务的匹配" />
+    <MESSAGE value="毛利分析 筛选销售类型二级分类" />
+    <option name="LAST_COMMIT_MESSAGE" value="毛利分析 筛选销售类型二级分类" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -945,6 +946,16 @@
           <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
           <line>1270</line>
           <option name="timeStamp" value="500" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py</url>
+          <line>211</line>
+          <option name="timeStamp" value="504" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py</url>
+          <line>224</line>
+          <option name="timeStamp" value="505" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
