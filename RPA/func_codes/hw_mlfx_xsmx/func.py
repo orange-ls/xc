@@ -1474,18 +1474,17 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
     # Step2：处理非折让订单
     # 筛选条件：销售类型为空且合同金额<0的合同号
     df["合同金额"] = df["合同金额"].astype(float)
-    contract_groups = df[(df["销售类型"] == '')].groupby(['下单合同号', '客户名称', '销售员'])
-    for (contract_num, customer, seller), group in contract_groups:
-        # 计算分组特征
+    df.loc[df["销售类型"].isnull(), "销售类型"] = ""
+    contract_groups = df[(df["销售类型"] == '')].groupby(['下单合同号', '客户名称', '销售员', '出具发票日'])
+    for (contract_num, customer, seller, date), group in contract_groups:
+        # 计算金额总和
         total_amount = group['合同金额'].sum()
-        dates = group['出具发票日'].unique()
-        for date in dates:
-            if abs(total_amount) <= 0.1:
-                df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "冲红"
-            elif total_amount < -0.1:
-                df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "退货"
-            else:
-                df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "正常销售"
+        if abs(total_amount) <= 0.1:
+            df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "冲红"
+        elif total_amount < -0.1:
+            df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "退货"
+        else:
+            df.loc[group.index[group['出具发票日'] == date], '销售类型'] = "正常销售"
     # Step3：未处理数据兜底
     df.loc[df["销售类型"] == '', "销售类型"] = "正常销售"
     # '''
