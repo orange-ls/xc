@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="加入发票日期的分组">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ml">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,7 +84,7 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.111">
+  <component name="RunManager" selected="Python.main">
     <configuration name="111" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -198,10 +197,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.111" />
         <item itemvalue="Python.export" />
         <item itemvalue="Python.func" />
-        <item itemvalue="Python.main" />
         <item itemvalue="Python.main (1)" />
       </list>
     </recent_temporary>
@@ -221,14 +220,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00018" summary="bug修改">
-      <option name="closed" value="true" />
-      <created>1745474358390</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1745474358390</updated>
     </task>
     <task id="LOCAL-00019" summary="可执行文件">
       <option name="closed" value="true" />
@@ -614,7 +605,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756089730827</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="ml">
+      <option name="closed" value="true" />
+      <created>1756869581652</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1756869581652</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -654,7 +653,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="费用报销 填写基础信息部分" />
     <MESSAGE value="费用报销 oa填写基础信息部分" />
     <MESSAGE value="crm下载" />
     <MESSAGE value="oa修改" />
@@ -679,7 +677,8 @@
     <MESSAGE value="费用报销RPA 加入发票上传部分" />
     <MESSAGE value="目录跟换" />
     <MESSAGE value="加入发票日期的分组" />
-    <option name="LAST_COMMIT_MESSAGE" value="加入发票日期的分组" />
+    <MESSAGE value="ml" />
+    <option name="LAST_COMMIT_MESSAGE" value="ml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -968,6 +967,16 @@
           <url>file://$USER_HOME$/Desktop/111.py</url>
           <line>62</line>
           <option name="timeStamp" value="512" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>124</line>
+          <option name="timeStamp" value="513" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>123</line>
+          <option name="timeStamp" value="514" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

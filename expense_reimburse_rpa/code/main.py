@@ -22,6 +22,7 @@ business_scope_dict = {
     '4001': 'MH400003',
     'QH01': 'MHQH0003',
     'MU01': 'MHMU0002',
+    'QG01': 'MHQG0001',
 }
 
 class App(object):
@@ -111,7 +112,7 @@ class App(object):
                 # 转换业务范围 MU01 -> MHMU0002
                 value = {
                     '外包供应商名称': row['外包供应商名称'],
-                    '业务范围': business_scope_dict.get(row['业务范围'], row['业务范围']),
+                    '业务范围': business_scope_dict.get(str(row['业务范围']), row['业务范围']),
                     '项目编号': row['项目编号'],
                     '技服预提金额': row['技服预提金额'],
                     '项目总收入': row['项目总收入'],
