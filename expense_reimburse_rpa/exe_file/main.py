@@ -140,6 +140,7 @@ class App(object):
                     if os.path.exists(path):
                         general_path_list.append(path)
 
+            self.text.insert(tk.END, "\n------开始下载现场服务报告------\r\n")
             is_crm_login = None
             for order_num_path in order_num_paths:
                 # 读取工单号表
@@ -183,6 +184,7 @@ class App(object):
                 driver.quit()
                 is_crm_login = None
 
+            self.text.insert(tk.END, "\n\n------开始技服外包报销------\r\n")
             driver = self.create_browser(config_dict['谷歌浏览器下载路径'])
             # 登录OA系统，跳转到报销系统界面
             oa_expense.login_oa(driver, config_dict)
@@ -192,9 +194,14 @@ class App(object):
                 if not service_cor_data:
                     self.text.insert(tk.END, f"配置表中没有找到{value[0]['外包供应商名称']}的配置信息！\r\n")
                     continue
-                oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
 
+                path = os.path.join(config_dict['派单记录表路径'], f"{key[0]}\{year}\{month}份ASP上门派单记录-{key[0]}-例外服务-{key[1]}.xlsx")
+                if os.path.exists(path):
+                    oa_expense.create_expense_reimbursement(driver, key[1], value, config_dict, service_cor_data)
+                else:
+                    self.text.insert(tk.END, f"\n跳过技服外包报销，{path} 文件不存在！\r\n")
             # 开始通用报销处理
+            self.text.insert(tk.END, "\n\n ------开始通用报销处理------\r\n")
             for general_path in general_path_list:
                 asp_name = os.path.basename(general_path).split('-')[1]
                 service_cor_data = service_cor_dict.get(asp_name)
