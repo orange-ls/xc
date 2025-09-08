@@ -6,13 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="费用报销 增加技服报销 跳过逻辑">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/Analysis-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/EXE-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PKG-00.toc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/PYZ-00.pyz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/build/main/main.pkg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/7、神奇索引和比较.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/7、神奇索引和比较.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -205,14 +199,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00021" summary="结果表一，增加24年同期数据">
-      <option name="closed" value="true" />
-      <created>1745819816523</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1745819816523</updated>
     </task>
     <task id="LOCAL-00022" summary="更新exe文件">
       <option name="closed" value="true" />
@@ -598,7 +584,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757297761963</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="费用报销 增加技服报销 跳过逻辑">
+      <option name="closed" value="true" />
+      <created>1757298803701</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1757298803701</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
