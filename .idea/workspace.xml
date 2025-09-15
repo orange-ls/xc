@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ml">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/8、matplotlib基础语法.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/8、matplotlib基础语法.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -224,14 +221,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00024" summary="销售明细">
-      <option name="closed" value="true" />
-      <created>1745826217382</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1745826217382</updated>
     </task>
     <task id="LOCAL-00025" summary="销售明细">
       <option name="closed" value="true" />
@@ -617,7 +606,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757327401343</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="ml">
+      <option name="closed" value="true" />
+      <created>1757924805441</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1757924805442</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
