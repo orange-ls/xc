@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="测试" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ml">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/8、matplotlib基础语法.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/8、matplotlib基础语法.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,28 +28,68 @@
         <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/RPA" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;orange-ls&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/orange-ls/xc.git&quot;,
+    &quot;accountId&quot;: &quot;3fbc9d33-a7ab-4646-901c-d97f1a2e5c92&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="2uU8KvxlsMKju2rh1NSIgVnYWkd" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.111.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.222.executor&quot;: &quot;Run&quot;,
+    &quot;Python.crm_download.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.export.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.func (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.func.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.result_table_processing.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test.executor&quot;: &quot;Debug&quot;,
     &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
     &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.输出两个文件中的不同数据.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.test_2">
-    <configuration name="test_1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Workspace\xc\RPA\func_codes\hw_xiaoshou_ribao" />
+      <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
+      <recent name="D:\Workspace\xc\expense_reimburse_rpa" />
+      <recent name="D:\Workspace\xc\RPA\func_file\hw_mlfx_xsmx" />
+      <recent name="D:\Workspace\xc\huawei_cloud_rpa\files" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main">
+    <configuration name="111" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -53,11 +98,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/crawler-_-li/demo_1" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/crawler-_-li/demo_1/test_1.py" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/111.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -66,7 +111,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="test_2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="export" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -75,11 +120,77 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/crawler-_-li/demo_1" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/crawler-_-li/demo_1/test_2.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="func (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/swtzd" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/swtzd/func.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="func" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/expense_reimburse_rpa/code" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/expense_reimburse_rpa/code/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -90,8 +201,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test_2" />
-        <item itemvalue="Python.test_1" />
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.func (1)" />
+        <item itemvalue="Python.111" />
+        <item itemvalue="Python.export" />
+        <item itemvalue="Python.func" />
       </list>
     </recent_temporary>
   </component>
@@ -111,40 +225,464 @@
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
     </task>
-    <task id="LOCAL-00001" summary="抓取DB页面数据">
+    <task id="LOCAL-00024" summary="销售明细">
       <option name="closed" value="true" />
-      <created>1742379042303</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
+      <created>1745826217382</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
       <option name="project" value="LOCAL" />
-      <updated>1742379042303</updated>
+      <updated>1745826217382</updated>
     </task>
-    <task id="LOCAL-00002" summary="测试">
+    <task id="LOCAL-00025" summary="销售明细">
       <option name="closed" value="true" />
-      <created>1742379073337</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
+      <created>1745826228832</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
       <option name="project" value="LOCAL" />
-      <updated>1742379073337</updated>
+      <updated>1745826228832</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00026" summary="销售明细">
+      <option name="closed" value="true" />
+      <created>1745837217265</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1745837217265</updated>
+    </task>
+    <task id="LOCAL-00027" summary="销售明细">
+      <option name="closed" value="true" />
+      <created>1745919201301</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1745919201301</updated>
+    </task>
+    <task id="LOCAL-00028" summary="商务通知单">
+      <option name="closed" value="true" />
+      <created>1746613775243</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1746613775243</updated>
+    </task>
+    <task id="LOCAL-00029" summary="华为云 第九个表修改">
+      <option name="closed" value="true" />
+      <created>1749546284198</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1749546284198</updated>
+    </task>
+    <task id="LOCAL-00030" summary="华为云 第九个表修改-打包">
+      <option name="closed" value="true" />
+      <created>1749547437003</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1749547437003</updated>
+    </task>
+    <task id="LOCAL-00031" summary="费用报销">
+      <option name="closed" value="true" />
+      <created>1750729597049</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1750729597049</updated>
+    </task>
+    <task id="LOCAL-00032" summary="费用报销 填写基础信息部分">
+      <option name="closed" value="true" />
+      <created>1750818495970</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1750818495970</updated>
+    </task>
+    <task id="LOCAL-00033" summary="费用报销 oa填写基础信息部分">
+      <option name="closed" value="true" />
+      <created>1751278433937</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1751278433937</updated>
+    </task>
+    <task id="LOCAL-00034" summary="crm下载">
+      <option name="closed" value="true" />
+      <created>1751618181988</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1751618181988</updated>
+    </task>
+    <task id="LOCAL-00035" summary="oa修改">
+      <option name="closed" value="true" />
+      <created>1752112322011</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1752112322011</updated>
+    </task>
+    <task id="LOCAL-00036" summary="审批信息 部门预审">
+      <option name="closed" value="true" />
+      <created>1752215561210</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1752215561210</updated>
+    </task>
+    <task id="LOCAL-00037" summary="审批信息 部门预审">
+      <option name="closed" value="true" />
+      <created>1752229778013</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1752229778013</updated>
+    </task>
+    <task id="LOCAL-00038" summary="华为云RPA计算H2数据">
+      <option name="closed" value="true" />
+      <created>1752479129805</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1752479129805</updated>
+    </task>
+    <task id="LOCAL-00039" summary="华为云RPA计算H2数据">
+      <option name="closed" value="true" />
+      <created>1752716640451</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1752716640451</updated>
+    </task>
+    <task id="LOCAL-00040" summary="通用报销">
+      <option name="closed" value="true" />
+      <created>1752823685463</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1752823685463</updated>
+    </task>
+    <task id="LOCAL-00041" summary="工单号表处理">
+      <option name="closed" value="true" />
+      <created>1753152431507</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1753152431507</updated>
+    </task>
+    <task id="LOCAL-00042" summary="上传附件">
+      <option name="closed" value="true" />
+      <created>1753257776180</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1753257776180</updated>
+    </task>
+    <task id="LOCAL-00043" summary="bug修改">
+      <option name="closed" value="true" />
+      <created>1753265352230</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1753265352230</updated>
+    </task>
+    <task id="LOCAL-00044" summary="bug修改">
+      <option name="closed" value="true" />
+      <created>1753321557460</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1753321557460</updated>
+    </task>
+    <task id="LOCAL-00045" summary="bug修改">
+      <option name="closed" value="true" />
+      <created>1753335242319</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1753335242319</updated>
+    </task>
+    <task id="LOCAL-00046" summary="bug修改">
+      <option name="closed" value="true" />
+      <created>1753407789078</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1753407789078</updated>
+    </task>
+    <task id="LOCAL-00047" summary="bug修改">
+      <option name="closed" value="true" />
+      <created>1753409811868</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1753409811868</updated>
+    </task>
+    <task id="LOCAL-00048" summary="自动获取配置文件路径">
+      <option name="closed" value="true" />
+      <created>1753413089729</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1753413089729</updated>
+    </task>
+    <task id="LOCAL-00049" summary="增加crm“健康”文件的下载">
+      <option name="closed" value="true" />
+      <created>1753434470440</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1753434470440</updated>
+    </task>
+    <task id="LOCAL-00050" summary="增加crm“健康”文件的下载">
+      <option name="closed" value="true" />
+      <created>1753670739546</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1753670739547</updated>
+    </task>
+    <task id="LOCAL-00051" summary="华为云RPA 结果表5增加 销售员和区域">
+      <option name="closed" value="true" />
+      <created>1753673901064</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1753673901064</updated>
+    </task>
+    <task id="LOCAL-00052" summary="华为云RPA 增加结果表10、11">
+      <option name="closed" value="true" />
+      <created>1753687108626</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1753687108626</updated>
+    </task>
+    <task id="LOCAL-00053" summary="华为云RPA">
+      <option name="closed" value="true" />
+      <created>1753687691370</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1753687691370</updated>
+    </task>
+    <task id="LOCAL-00054" summary="费用报销">
+      <option name="closed" value="true" />
+      <created>1753771224873</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1753771224874</updated>
+    </task>
+    <task id="LOCAL-00055" summary="费用报销 测试">
+      <option name="closed" value="true" />
+      <created>1753775810111</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1753775810111</updated>
+    </task>
+    <task id="LOCAL-00056" summary="费用报销 验收文件存在时不触发登录CRM">
+      <option name="closed" value="true" />
+      <created>1753784578731</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1753784578731</updated>
+    </task>
+    <task id="LOCAL-00057" summary="费用报销 验收文件存在时不触发登录CRM">
+      <option name="closed" value="true" />
+      <created>1753785233638</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1753785233638</updated>
+    </task>
+    <task id="LOCAL-00058" summary="销售明细">
+      <option name="closed" value="true" />
+      <created>1754898844409</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1754898844409</updated>
+    </task>
+    <task id="LOCAL-00059" summary="销售明细">
+      <option name="closed" value="true" />
+      <created>1754904716046</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1754904716046</updated>
+    </task>
+    <task id="LOCAL-00060" summary="销售明细">
+      <option name="closed" value="true" />
+      <created>1754980201863</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1754980201863</updated>
+    </task>
+    <task id="LOCAL-00061" summary="销售明细 项目名称按po号从bo表匹配">
+      <option name="closed" value="true" />
+      <created>1755071104337</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1755071104337</updated>
+    </task>
+    <task id="LOCAL-00062" summary="毛利分析 增加创新业务的匹配">
+      <option name="closed" value="true" />
+      <created>1755072632396</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1755072632396</updated>
+    </task>
+    <task id="LOCAL-00063" summary="毛利分析 筛选销售类型二级分类">
+      <option name="closed" value="true" />
+      <created>1755137565983</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1755137565983</updated>
+    </task>
+    <task id="LOCAL-00064" summary="费用报销RPA 加入发票上传部分">
+      <option name="closed" value="true" />
+      <created>1755853918876</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1755853918876</updated>
+    </task>
+    <task id="LOCAL-00065" summary="目录跟换">
+      <option name="closed" value="true" />
+      <created>1756086292227</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1756086292227</updated>
+    </task>
+    <task id="LOCAL-00066" summary="加入发票日期的分组">
+      <option name="closed" value="true" />
+      <created>1756089730827</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1756089730827</updated>
+    </task>
+    <task id="LOCAL-00067" summary="ml">
+      <option name="closed" value="true" />
+      <created>1756869581652</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1756869581652</updated>
+    </task>
+    <task id="LOCAL-00068" summary="费用报销 增加QG01">
+      <option name="closed" value="true" />
+      <created>1756978589854</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1756978589854</updated>
+    </task>
+    <task id="LOCAL-00069" summary="费用报销 增加技服报销 跳过逻辑">
+      <option name="closed" value="true" />
+      <created>1757297761962</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1757297761963</updated>
+    </task>
+    <task id="LOCAL-00070" summary="费用报销 增加技服报销 跳过逻辑">
+      <option name="closed" value="true" />
+      <created>1757298803701</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1757298803701</updated>
+    </task>
+    <task id="LOCAL-00071" summary="商务通知单 “服务开票名称参考”修改为“服务品名”">
+      <option name="closed" value="true" />
+      <created>1757314633656</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1757314633656</updated>
+    </task>
+    <task id="LOCAL-00072" summary="ml">
+      <option name="closed" value="true" />
+      <created>1757327401343</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1757327401343</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="develop" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="抓取DB页面数据" />
-    <MESSAGE value="测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="测试" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/RPA" />
+    </ignored-roots>
+    <MESSAGE value="审批信息 部门预审" />
+    <MESSAGE value="华为云RPA计算H2数据" />
+    <MESSAGE value="通用报销" />
+    <MESSAGE value="工单号表处理" />
+    <MESSAGE value="上传附件" />
+    <MESSAGE value="bug修改" />
+    <MESSAGE value="自动获取配置文件路径" />
+    <MESSAGE value="增加crm“健康”文件的下载" />
+    <MESSAGE value="华为云RPA 结果表5增加 销售员和区域" />
+    <MESSAGE value="华为云RPA 增加结果表10、11" />
+    <MESSAGE value="华为云RPA" />
+    <MESSAGE value="费用报销" />
+    <MESSAGE value="费用报销 测试" />
+    <MESSAGE value="费用报销 验收文件存在时不触发登录CRM" />
+    <MESSAGE value="销售明细" />
+    <MESSAGE value="销售明细 项目名称按po号从bo表匹配" />
+    <MESSAGE value="毛利分析 增加创新业务的匹配" />
+    <MESSAGE value="毛利分析 筛选销售类型二级分类" />
+    <MESSAGE value="费用报销RPA 加入发票上传部分" />
+    <MESSAGE value="目录跟换" />
+    <MESSAGE value="加入发票日期的分组" />
+    <MESSAGE value="费用报销 增加QG01" />
+    <MESSAGE value="费用报销 增加技服报销 跳过逻辑" />
+    <MESSAGE value="商务通知单 “服务开票名称参考”修改为“服务品名”" />
+    <MESSAGE value="ml" />
+    <option name="LAST_COMMIT_MESSAGE" value="ml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -158,6 +696,276 @@
           <url>file://$PROJECT_DIR$/crawler-_-li/demo_1/test_1.py</url>
           <line>15</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>283</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>330</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>343</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>363</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>339</line>
+          <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>197</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>350</line>
+          <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>431</line>
+          <option name="timeStamp" value="100" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>383</line>
+          <option name="timeStamp" value="103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>772</line>
+          <option name="timeStamp" value="104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>818</line>
+          <option name="timeStamp" value="105" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>820</line>
+          <option name="timeStamp" value="107" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>222</line>
+          <option name="timeStamp" value="110" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>816</line>
+          <option name="timeStamp" value="112" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>767</line>
+          <option name="timeStamp" value="118" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/swtzd/func.py</url>
+          <line>189</line>
+          <option name="timeStamp" value="145" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>380</line>
+          <option name="timeStamp" value="146" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>480</line>
+          <option name="timeStamp" value="232" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>454</line>
+          <option name="timeStamp" value="236" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>494</line>
+          <option name="timeStamp" value="240" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>512</line>
+          <option name="timeStamp" value="241" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>508</line>
+          <option name="timeStamp" value="242" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>619</line>
+          <option name="timeStamp" value="261" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>204</line>
+          <option name="timeStamp" value="370" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>215</line>
+          <option name="timeStamp" value="372" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>191</line>
+          <option name="timeStamp" value="378" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
+          <line>376</line>
+          <option name="timeStamp" value="384" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/test.py</url>
+          <line>613</line>
+          <option name="timeStamp" value="397" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_general.py</url>
+          <line>278</line>
+          <option name="timeStamp" value="405" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
+          <line>165</line>
+          <option name="timeStamp" value="415" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
+          <line>310</line>
+          <option name="timeStamp" value="441" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
+          <line>313</line>
+          <option name="timeStamp" value="442" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_expense.py</url>
+          <line>369</line>
+          <option name="timeStamp" value="443" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_general.py</url>
+          <line>228</line>
+          <option name="timeStamp" value="444" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/oa_general.py</url>
+          <line>271</line>
+          <option name="timeStamp" value="445" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1777</line>
+          <option name="timeStamp" value="468" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1767</line>
+          <option name="timeStamp" value="470" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1477</line>
+          <option name="timeStamp" value="473" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1770</line>
+          <option name="timeStamp" value="477" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1774</line>
+          <option name="timeStamp" value="482" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1761</line>
+          <option name="timeStamp" value="485" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>860</line>
+          <option name="timeStamp" value="492" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>856</line>
+          <option name="timeStamp" value="493" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1318</line>
+          <option name="timeStamp" value="494" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1249</line>
+          <option name="timeStamp" value="495" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1242</line>
+          <option name="timeStamp" value="499" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>1270</line>
+          <option name="timeStamp" value="500" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py</url>
+          <line>211</line>
+          <option name="timeStamp" value="504" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py</url>
+          <line>224</line>
+          <option name="timeStamp" value="505" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Desktop/111.py</url>
+          <line>49</line>
+          <option name="timeStamp" value="511" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Desktop/111.py</url>
+          <line>62</line>
+          <option name="timeStamp" value="512" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py</url>
+          <line>1485</line>
+          <option name="timeStamp" value="515" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>187</line>
+          <option name="timeStamp" value="518" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py</url>
+          <line>99</line>
+          <option name="timeStamp" value="525" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
