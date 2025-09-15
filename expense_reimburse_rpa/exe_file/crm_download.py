@@ -23,9 +23,10 @@ def login_crm(driver, config_dict):
     # 点击登录
     driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[1]/div/div[2]/div/div[6]').click()
     time.sleep(1)
-    driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[3]/ul/li[3]').click()
+    # 取消公司选择
+    # WebDriverWait(driver, 300).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[2]/div/div[3]/ul/li[3]'))).click()
 
-    time.sleep(2)
+    time.sleep(5)
 
     # 关闭弹窗
     for i in range(3):

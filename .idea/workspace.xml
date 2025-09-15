@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="商务通知单 “服务开票名称参考”修改为“服务品名”" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ml">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/8、matplotlib基础语法.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/8、matplotlib基础语法.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" beforeDir="false" afterPath="$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -83,7 +88,7 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.func (1)">
+  <component name="RunManager" selected="Python.main">
     <configuration name="111" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -196,8 +201,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.func (1)" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.func (1)" />
         <item itemvalue="Python.111" />
         <item itemvalue="Python.export" />
         <item itemvalue="Python.func" />
@@ -219,14 +224,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00023" summary="RPA">
-      <option name="closed" value="true" />
-      <created>1745825985136</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1745825985136</updated>
     </task>
     <task id="LOCAL-00024" summary="销售明细">
       <option name="closed" value="true" />
@@ -612,7 +609,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757314633656</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="ml">
+      <option name="closed" value="true" />
+      <created>1757327401343</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1757327401343</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -673,11 +678,11 @@
     <MESSAGE value="费用报销RPA 加入发票上传部分" />
     <MESSAGE value="目录跟换" />
     <MESSAGE value="加入发票日期的分组" />
-    <MESSAGE value="ml" />
     <MESSAGE value="费用报销 增加QG01" />
     <MESSAGE value="费用报销 增加技服报销 跳过逻辑" />
     <MESSAGE value="商务通知单 “服务开票名称参考”修改为“服务品名”" />
-    <option name="LAST_COMMIT_MESSAGE" value="商务通知单 “服务开票名称参考”修改为“服务品名”" />
+    <MESSAGE value="ml" />
+    <option name="LAST_COMMIT_MESSAGE" value="ml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -959,7 +964,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py</url>
-          <line>98</line>
+          <line>99</line>
           <option name="timeStamp" value="525" />
         </line-breakpoint>
       </breakpoints>
