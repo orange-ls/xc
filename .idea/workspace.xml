@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="商务通知单 兼容新旧单">
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ML">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/.ipynb_checkpoints/2、numpy的ndarray及创建-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/.ipynb_checkpoints/2、numpy的ndarray及创建-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/2、numpy的ndarray及创建.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/2、numpy的ndarray及创建.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/5、numpy数组的统计运算.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/5、numpy数组的统计运算.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/7、神奇索引和比较.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/7、神奇索引和比较.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/.ipynb_checkpoints/9、KNN代码实现-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/.ipynb_checkpoints/9、KNN代码实现-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/9、KNN代码实现.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/9、KNN代码实现.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,28 +57,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.111.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.222.executor&quot;: &quot;Run&quot;,
-    &quot;Python.crm_download.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.export.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.func (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.func.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.result_table_processing.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.输出两个文件中的不同数据.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.111.executor": "Debug",
+    "Python.222.executor": "Run",
+    "Python.crm_download.executor": "Debug",
+    "Python.export.executor": "Debug",
+    "Python.func (1).executor": "Debug",
+    "Python.func.executor": "Debug",
+    "Python.main (1).executor": "Debug",
+    "Python.main.executor": "Debug",
+    "Python.result_table_processing.executor": "Debug",
+    "Python.test.executor": "Debug",
+    "Python.test_1.executor": "Debug",
+    "Python.test_2.executor": "Debug",
+    "Python.筛选不重复的数据.executor": "Debug",
+    "Python.输出两个文件中的不同数据.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Workspace\xc\RPA\func_codes\hw_xiaoshou_ribao" />
@@ -229,14 +227,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00025" summary="销售明细">
-      <option name="closed" value="true" />
-      <created>1745826228832</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1745826228832</updated>
     </task>
     <task id="LOCAL-00026" summary="销售明细">
       <option name="closed" value="true" />
@@ -622,7 +612,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757924805442</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="ML">
+      <option name="closed" value="true" />
+      <created>1758190576770</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1758190576770</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -662,7 +660,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="审批信息 部门预审" />
     <MESSAGE value="华为云RPA计算H2数据" />
     <MESSAGE value="通用报销" />
     <MESSAGE value="工单号表处理" />
@@ -687,7 +684,8 @@
     <MESSAGE value="费用报销 增加技服报销 跳过逻辑" />
     <MESSAGE value="商务通知单 “服务开票名称参考”修改为“服务品名”" />
     <MESSAGE value="ml" />
-    <option name="LAST_COMMIT_MESSAGE" value="ml" />
+    <MESSAGE value="ML" />
+    <option name="LAST_COMMIT_MESSAGE" value="ML" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
