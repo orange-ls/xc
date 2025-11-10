@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ml">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ML" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,6 +16,9 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/develop" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -62,15 +63,16 @@
     &quot;Python.main (1).executor&quot;: &quot;Debug&quot;,
     &quot;Python.main.executor&quot;: &quot;Debug&quot;,
     &quot;Python.result_table_processing.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
     &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
     &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.同步生产数据到测试.executor&quot;: &quot;Debug&quot;,
     &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
     &quot;Python.输出两个文件中的不同数据.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -85,8 +87,8 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
-    <configuration name="111" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.同步生产数据到测试">
+    <configuration name="同步生产数据到测试" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -95,33 +97,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../files_record/代码" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/111.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="export" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="xc" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/export.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../files_record/代码/同步生产数据到测试.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -196,12 +176,34 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ai/machine_learning/ml/test_1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ai/machine_learning/ml/test_1/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.同步生产数据到测试" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.func (1)" />
-        <item itemvalue="Python.111" />
-        <item itemvalue="Python.export" />
         <item itemvalue="Python.func" />
       </list>
     </recent_temporary>
@@ -221,30 +223,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00025" summary="销售明细">
-      <option name="closed" value="true" />
-      <created>1745826228832</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1745826228832</updated>
-    </task>
-    <task id="LOCAL-00026" summary="销售明细">
-      <option name="closed" value="true" />
-      <created>1745837217265</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1745837217265</updated>
-    </task>
-    <task id="LOCAL-00027" summary="销售明细">
-      <option name="closed" value="true" />
-      <created>1745919201301</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1745919201301</updated>
     </task>
     <task id="LOCAL-00028" summary="商务通知单">
       <option name="closed" value="true" />
@@ -614,7 +592,31 @@
       <option name="project" value="LOCAL" />
       <updated>1757924805442</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="ML">
+      <option name="closed" value="true" />
+      <created>1758190576770</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1758190576770</updated>
+    </task>
+    <task id="LOCAL-00075" summary="ML">
+      <option name="closed" value="true" />
+      <created>1758537219955</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1758537219956</updated>
+    </task>
+    <task id="LOCAL-00076" summary="ML">
+      <option name="closed" value="true" />
+      <created>1758795321852</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1758795321852</updated>
+    </task>
+    <option name="localTasksCounter" value="77" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -654,7 +656,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="审批信息 部门预审" />
     <MESSAGE value="华为云RPA计算H2数据" />
     <MESSAGE value="通用报销" />
     <MESSAGE value="工单号表处理" />
@@ -679,7 +680,8 @@
     <MESSAGE value="费用报销 增加技服报销 跳过逻辑" />
     <MESSAGE value="商务通知单 “服务开票名称参考”修改为“服务品名”" />
     <MESSAGE value="ml" />
-    <option name="LAST_COMMIT_MESSAGE" value="ml" />
+    <MESSAGE value="ML" />
+    <option name="LAST_COMMIT_MESSAGE" value="ML" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -768,11 +770,6 @@
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>
           <line>767</line>
           <option name="timeStamp" value="118" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/RPA/func_codes/swtzd/func.py</url>
-          <line>189</line>
-          <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/huawei_cloud_rpa/code/main.py</url>

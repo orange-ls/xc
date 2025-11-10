@@ -79,10 +79,10 @@ def resetServiceField(series):
         return None
     else:
         # 如果有“设备/服务”列为服务，但“服务品名”列无数据，则返回默认的服务名称 unNamedService
-        if series["设备/服务"] == "服务" and pd.isna(series["服务品名"]):
+        if series["设备/服务"] == "服务" and pd.isna(series[tzd_field]):
             return unNamedService
         else:
-            return series["服务品名"]
+            return series[tzd_field]
 
 
 # 获取并写入通知单数据
@@ -115,12 +115,18 @@ def getNoticeFileContent(noticeFile, templatePath, saveDir, relationPath):
             df_use = df_use.append(dfdict["变更后配置明细-累计退货"].rename(columns={"退货赔偿金额": "成交总价"}))
     else:  # 商务通知单未变更
         df_use = dfdict["配置明细-物料"]
-    df_use["服务品名"] = df_use.apply(resetServiceField, axis=1)
+    # 判断df_use中是否有“服务品名”列，如果没有，则需要添加
+    global tzd_field
+    if "服务品名" not in df_use.columns:
+        tzd_field = "服务开票名称参考"
+    else:
+        tzd_field = "服务品名"
+    df_use[tzd_field] = df_use.apply(resetServiceField, axis=1)
     df_use["数量"] = pd.to_numeric(df_use["数量"])
     df_use["成交总价"] = pd.to_numeric(df_use["成交总价"])
     df_use = df_use.loc[(df_use["数量"] != 0) & (~df_use["数量"].isna()) & (df_use["成交总价"] != 0) & (~df_use["成交总价"].isna())]
 
-    df_base = df_use.loc[df_use["服务品名"].isna()].copy()
+    df_base = df_use.loc[df_use[tzd_field].isna()].copy()
     df_base["PO"] = msgDict['华为订单号：']
     inputArray = df_base[cols].values.tolist()
 
@@ -136,7 +142,7 @@ def getNoticeFileContent(noticeFile, templatePath, saveDir, relationPath):
     # print(rate)
 
     # 4.对不同的“服务品名”进行分组，获取“附件”数据
-    df_group = df_use.loc[df_use["成交总价"] != 0].groupby(["服务品名"])
+    df_group = df_use.loc[df_use["成交总价"] != 0].groupby([tzd_field])
     attachDict = {}
     idx = 0
     for key, df in df_group:
@@ -346,6 +352,7 @@ cols:结果表需要的列
 """
 unNamedService = "其他服务"
 cols = ["PO", "物料编码", "物料型号", "物料描述", "数量", "成交总价"]
+tzd_field = "服务品名"
 
 if __name__ == "__main__":
     getNoticeFileContent(

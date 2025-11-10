@@ -623,20 +623,26 @@ def result_table_six(engine, max_date):
             WHERE
                 performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
             GROUP BY secondary_dealer_re
+        ),
+        all_dealers AS(
+            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            UNION
+            SELECT secondary_dealer_re FROM base_data_24 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
         )
-        
+
         SELECT
-            bd25.secondary_dealer_re AS `SMBcore业绩`,
-            bd25.sales_amount AS `25年截止目前业绩`,
-            bd24.sales_amount AS `24年同期业绩`,
+            ad.secondary_dealer_re AS `SMBcore业绩`,
+            COALESCE(bd25.sales_amount, 0) AS `25年截止目前业绩`,
+            COALESCE(bd24.sales_amount, 0) AS `24年同期业绩`,
             CASE 
-                WHEN bd24.sales_amount IS NULL THEN NULL
-                ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 0), '%')
+                WHEN COALESCE(bd24.sales_amount, 0) = 0 THEN NULL
+                ELSE CONCAT(ROUND((COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0)) / COALESCE(bd24.sales_amount, 0) * 100, 0), '%')
             END AS `同期增长率`,
-            bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
+            COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0) AS `同比24年正负值`
         FROM
-        base_data_25 bd25
-        LEFT JOIN base_data_24 bd24 ON bd25.secondary_dealer_re = bd24.secondary_dealer_re
+            all_dealers ad
+            LEFT JOIN base_data_25 bd25 ON ad.secondary_dealer_re = bd25.secondary_dealer_re
+            LEFT JOIN base_data_24 bd24 ON ad.secondary_dealer_re = bd24.secondary_dealer_re
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     result = {re['SMBcore业绩']: re for re in result}
@@ -861,12 +867,12 @@ def result_table_eleven(engine, max_date):
         base_data_25 AS(
             SELECT
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
-                        ELSE customer_name
+                    ELSE customer_name
                 END AS secondary_dealer_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_five_data
             WHERE
-                    sales_team = '华为云NA'
+                sales_team = '华为云NA'
             GROUP BY secondary_dealer_re
         ),
         base_data_24 AS(
@@ -879,20 +885,26 @@ def result_table_eleven(engine, max_date):
             WHERE
                 performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
             GROUP BY secondary_dealer_re
+        ),
+        all_dealers AS(
+            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            UNION
+            SELECT secondary_dealer_re FROM base_data_24 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
         )
-        
+
         SELECT
-            bd25.secondary_dealer_re AS `NA业绩`,
-            bd25.sales_amount AS `25年截止目前业绩`,
-            bd24.sales_amount AS `24年同期业绩`,
+            ad.secondary_dealer_re AS `NA业绩`,
+            COALESCE(bd25.sales_amount, 0) AS `25年截止目前业绩`,
+            COALESCE(bd24.sales_amount, 0) AS `24年同期业绩`,
             CASE 
-                    WHEN bd24.sales_amount IS NULL THEN NULL
-                    ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 0), '%')
+                WHEN COALESCE(bd24.sales_amount, 0) = 0 THEN NULL
+                ELSE CONCAT(ROUND((COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0)) / COALESCE(bd24.sales_amount, 0) * 100, 0), '%')
             END AS `同期增长率`,
-            bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
+            COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0) AS `同比24年正负值`
         FROM
-        base_data_25 bd25
-        LEFT JOIN base_data_24 bd24 ON bd25.secondary_dealer_re = bd24.secondary_dealer_re
+            all_dealers ad
+            LEFT JOIN base_data_25 bd25 ON ad.secondary_dealer_re = bd25.secondary_dealer_re
+            LEFT JOIN base_data_24 bd24 ON ad.secondary_dealer_re = bd24.secondary_dealer_re
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     result = {re['NA业绩']: re for re in result}
