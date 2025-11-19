@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="K近邻算法预测">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/K近邻算法预测数据.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/K近邻算法预测数据.ipynb" afterDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="费用报销 获取月份bug修改">
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250728.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250729.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250822.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250904.exe" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,30 +57,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.111.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.222.executor&quot;: &quot;Run&quot;,
-    &quot;Python.crm_download.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.export.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.func (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.func.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.result_table_processing.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_1.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test_2.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.同步生产数据到测试.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.输出两个文件中的不同数据.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.111.executor": "Debug",
+    "Python.222.executor": "Run",
+    "Python.city.executor": "Debug",
+    "Python.crm_download.executor": "Debug",
+    "Python.export.executor": "Debug",
+    "Python.func (1).executor": "Debug",
+    "Python.func.executor": "Debug",
+    "Python.main (1).executor": "Debug",
+    "Python.main.executor": "Debug",
+    "Python.result_table_processing.executor": "Debug",
+    "Python.test.executor": "Run",
+    "Python.test_1.executor": "Debug",
+    "Python.test_2.executor": "Debug",
+    "Python.同步生产数据到测试.executor": "Debug",
+    "Python.筛选不重复的数据.executor": "Debug",
+    "Python.输出两个文件中的不同数据.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "develop",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Workspace\xc\RPA\func_codes\hw_xiaoshou_ribao" />
@@ -92,7 +94,7 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.city">
     <configuration name="同步生产数据到测试" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -115,7 +117,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="func (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="111" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -124,11 +126,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/swtzd" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/swtzd/func.py" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/111.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -137,7 +139,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="func" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="city" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -146,11 +148,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/li_meili" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/li_meili/city.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -205,11 +207,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.city" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.111" />
         <item itemvalue="Python.同步生产数据到测试" />
         <item itemvalue="Python.test" />
-        <item itemvalue="Python.func (1)" />
-        <item itemvalue="Python.func" />
       </list>
     </recent_temporary>
   </component>
@@ -228,14 +230,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00029" summary="华为云 第九个表修改">
-      <option name="closed" value="true" />
-      <created>1749546284198</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1749546284198</updated>
     </task>
     <task id="LOCAL-00030" summary="华为云 第九个表修改-打包">
       <option name="closed" value="true" />
@@ -621,7 +615,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762767550862</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="费用报销 获取月份bug修改">
+      <option name="closed" value="true" />
+      <created>1763541387513</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1763541387513</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -661,7 +663,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="通用报销" />
     <MESSAGE value="工单号表处理" />
     <MESSAGE value="上传附件" />
     <MESSAGE value="bug修改" />
@@ -686,7 +687,8 @@
     <MESSAGE value="ml" />
     <MESSAGE value="ML" />
     <MESSAGE value="K近邻算法预测" />
-    <option name="LAST_COMMIT_MESSAGE" value="K近邻算法预测" />
+    <MESSAGE value="费用报销 获取月份bug修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="费用报销 获取月份bug修改" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -813,17 +815,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>204</line>
+          <line>207</line>
           <option name="timeStamp" value="370" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>215</line>
+          <line>218</line>
           <option name="timeStamp" value="372" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>191</line>
+          <line>194</line>
           <option name="timeStamp" value="378" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -948,7 +950,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$USER_HOME$/Desktop/111.py</url>
-          <line>62</line>
+          <line>71</line>
           <option name="timeStamp" value="512" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -958,7 +960,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>187</line>
+          <line>190</line>
           <option name="timeStamp" value="518" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -968,23 +970,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>155</line>
+          <line>158</line>
           <option name="timeStamp" value="526" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>108</line>
+          <line>111</line>
           <option name="timeStamp" value="527" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>143</line>
+          <line>146</line>
           <option name="timeStamp" value="528" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
-          <line>136</line>
+          <line>139</line>
           <option name="timeStamp" value="529" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Desktop/111.py</url>
+          <line>57</line>
+          <option name="timeStamp" value="531" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>102</line>
+          <option name="timeStamp" value="532" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>97</line>
+          <option name="timeStamp" value="533" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
