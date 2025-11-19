@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="ML" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="K近邻算法预测">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/K近邻算法预测数据.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ai/machine_learning/ml/test_1/K近邻算法预测数据.ipynb" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,6 +74,7 @@
     &quot;Python.筛选不重复的数据.executor&quot;: &quot;Debug&quot;,
     &quot;Python.输出两个文件中的不同数据.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Workspace/xc/RPA/func_codes/hw_xiaoshou_ribao&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
@@ -87,7 +92,7 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.同步生产数据到测试">
+  <component name="RunManager" selected="Python.main">
     <configuration name="同步生产数据到测试" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -200,9 +205,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.同步生产数据到测试" />
         <item itemvalue="Python.test" />
-        <item itemvalue="Python.main" />
         <item itemvalue="Python.func (1)" />
         <item itemvalue="Python.func" />
       </list>
@@ -223,14 +228,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00028" summary="商务通知单">
-      <option name="closed" value="true" />
-      <created>1746613775243</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1746613775243</updated>
     </task>
     <task id="LOCAL-00029" summary="华为云 第九个表修改">
       <option name="closed" value="true" />
@@ -616,7 +613,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758795321852</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="K近邻算法预测">
+      <option name="closed" value="true" />
+      <created>1762767550862</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1762767550862</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -656,7 +661,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="华为云RPA计算H2数据" />
     <MESSAGE value="通用报销" />
     <MESSAGE value="工单号表处理" />
     <MESSAGE value="上传附件" />
@@ -681,7 +685,8 @@
     <MESSAGE value="商务通知单 “服务开票名称参考”修改为“服务品名”" />
     <MESSAGE value="ml" />
     <MESSAGE value="ML" />
-    <option name="LAST_COMMIT_MESSAGE" value="ML" />
+    <MESSAGE value="K近邻算法预测" />
+    <option name="LAST_COMMIT_MESSAGE" value="K近邻算法预测" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -960,6 +965,26 @@
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/crm_download.py</url>
           <line>99</line>
           <option name="timeStamp" value="525" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>155</line>
+          <option name="timeStamp" value="526" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>108</line>
+          <option name="timeStamp" value="527" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>143</line>
+          <option name="timeStamp" value="528" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
+          <line>136</line>
+          <option name="timeStamp" value="529" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
