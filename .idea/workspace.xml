@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="费用报销 获取月份bug修改">
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250728.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250729.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250822.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expense_reimburse_rpa/exe_file/dist/费用报销RPA_20250904.exe" beforeDir="false" />
+    <list default="true" id="6bdbc03c-d0f1-4694-bc61-0d0acb28737c" name="更改" comment="旧文件删除">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py" beforeDir="false" afterPath="$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +57,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.111.executor": "Debug",
+    "Python.111.executor": "Run",
     "Python.222.executor": "Run",
     "Python.city.executor": "Debug",
     "Python.crm_download.executor": "Debug",
@@ -94,7 +92,7 @@
       <recent name="D:\Workspace\xc\expense_reimburse_rpa\code" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.city">
+  <component name="RunManager" selected="Python.func">
     <configuration name="同步生产数据到测试" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -161,6 +159,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="func" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/func.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -183,35 +203,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="xc" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ai/machine_learning/ml/test_1" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ai/machine_learning/ml/test_1/test.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.func" />
+        <item itemvalue="Python.111" />
         <item itemvalue="Python.city" />
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.111" />
         <item itemvalue="Python.同步生产数据到测试" />
-        <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
   </component>
@@ -230,14 +228,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742291731595</updated>
-    </task>
-    <task id="LOCAL-00030" summary="华为云 第九个表修改-打包">
-      <option name="closed" value="true" />
-      <created>1749547437003</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1749547437003</updated>
     </task>
     <task id="LOCAL-00031" summary="费用报销">
       <option name="closed" value="true" />
@@ -623,7 +613,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763541387513</updated>
     </task>
-    <option name="localTasksCounter" value="79" />
+    <task id="LOCAL-00079" summary="旧文件删除">
+      <option name="closed" value="true" />
+      <created>1763541691868</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1763541691868</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -663,7 +661,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RPA" />
     </ignored-roots>
-    <MESSAGE value="工单号表处理" />
     <MESSAGE value="上传附件" />
     <MESSAGE value="bug修改" />
     <MESSAGE value="自动获取配置文件路径" />
@@ -688,7 +685,8 @@
     <MESSAGE value="ML" />
     <MESSAGE value="K近邻算法预测" />
     <MESSAGE value="费用报销 获取月份bug修改" />
-    <option name="LAST_COMMIT_MESSAGE" value="费用报销 获取月份bug修改" />
+    <MESSAGE value="旧文件删除" />
+    <option name="LAST_COMMIT_MESSAGE" value="旧文件删除" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -945,13 +943,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$USER_HOME$/Desktop/111.py</url>
-          <line>49</line>
+          <line>74</line>
           <option name="timeStamp" value="511" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$USER_HOME$/Desktop/111.py</url>
-          <line>71</line>
-          <option name="timeStamp" value="512" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py</url>
@@ -990,7 +983,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$USER_HOME$/Desktop/111.py</url>
-          <line>57</line>
+          <line>82</line>
           <option name="timeStamp" value="531" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -1002,6 +995,21 @@
           <url>file://$PROJECT_DIR$/expense_reimburse_rpa/code/main.py</url>
           <line>97</line>
           <option name="timeStamp" value="533" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Desktop/111.py</url>
+          <line>112</line>
+          <option name="timeStamp" value="534" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Desktop/func.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="535" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Desktop/func.py</url>
+          <line>13</line>
+          <option name="timeStamp" value="536" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

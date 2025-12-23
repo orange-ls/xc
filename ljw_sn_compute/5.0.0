@@ -1,0 +1,21 @@
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Collecting pyinstaller
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/2d/f5/6a122efe024433ecc34aab6f499e0bd2bbe059c639b77b0045aa2421b0bf/pyinstaller-6.17.0-py3-none-win_amd64.whl (1.4 MB)
+     ---------------------------------------- 1.4/1.4 MB 3.6 MB/s eta 0:00:00
+Collecting altgraph (from pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/a9/ba/000a1996d4308bc65120167c21241a3b205464a2e0b58deda26ae8ac21d1/altgraph-0.17.5-py2.py3-none-any.whl (21 kB)
+Collecting importlib-metadata>=4.6 (from pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/a0/d9/a1e041c5e7caa9a05c925f4bdbdfb7f006d1f74996af53467bc394c97be7/importlib_metadata-8.5.0-py3-none-any.whl (26 kB)
+Collecting packaging>=22.0 (from pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl (66 kB)
+Collecting pefile>=2022.5.30 (from pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/54/16/12b82f791c7f50ddec566873d5bdd245baa1491bac11d15ffb98aecc8f8b/pefile-2024.8.26-py3-none-any.whl (74 kB)
+Collecting pyinstaller-hooks-contrib>=2025.9 (from pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/86/de/a7688eed49a1d3df337cdaa4c0d64e231309a52f269850a72051975e3c4a/pyinstaller_hooks_contrib-2025.10-py3-none-any.whl (447 kB)
+Collecting pywin32-ctypes>=0.2.1 (from pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/de/3d/8161f7711c017e01ac9f008dfddd9410dff3674334c233bde66e7ba65bbf/pywin32_ctypes-0.2.3-py3-none-any.whl (30 kB)
+Requirement already satisfied: setuptools>=42.0.0 in d:\miniconda3\envs\ljw\lib\site-packages (from pyinstaller) (75.1.0)
+Collecting zipp>=3.20 (from importlib-metadata>=4.6->pyinstaller)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/62/8b/5ba542fa83c90e09eac972fc9baca7a88e7e7ca4b221a89251954019308b/zipp-3.20.2-py3-none-any.whl (9.2 kB)
+Installing collected packages: altgraph, zipp, pywin32-ctypes, pefile, packaging, importlib-metadata, pyinstaller-hooks-contrib, pyinstaller
+Successfully installed altgraph-0.17.5 importlib-metadata-8.5.0 packaging-25.0 pefile-2024.8.26 pyinstaller-6.17.0 pyinstaller-hooks-contrib-2025.10 pywin32-ctypes-0.2.3 zipp-3.20.2
