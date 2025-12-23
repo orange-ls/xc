@@ -96,7 +96,10 @@ class App(object):
 
             # 获取文件的月份
             date = re.search(r'(?:^|.*?)(\d+月)', os.path.basename(asp_table_name)).group(1)
-            month = date[2:].replace('0', '')
+            # month = date[2:].replace('0', '')
+            month = date[2:]
+            if month.startswith('0'):
+                month = month[1:]
             config_dict['月份'] = month   # 2月
             year = f"20{date[:2]}"   # 2025
             config_dict['年份'] = year

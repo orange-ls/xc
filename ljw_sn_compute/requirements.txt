@@ -1,0 +1,6 @@
+# Excel数据修复工具 依赖包
+# 安装命令: pip install -r requirements.txt
+
+openpyxl>=3.0.0
+pyinstaller>=5.0.0
+

@@ -780,23 +780,23 @@ def matchRate(series, flag):
         # if series["事业部"] in ["区域事业部", "行业事业部", "超聚变业务部", "商业分销及电商业务部"]:
         if series["事业部"] in ["北区", "南区", "超聚变及商业分销", "新业务"]:
             if series["付款天数差"] <= 15:
-                return 0.055
+                return 0.049
             else:
                 if series["运输方式"] == "自提":
-                    return 0.055
+                    return 0.049
                 elif series["运输方式"] in ["汽运", "空运"]:
                     return 0.09
                 else:
                     return f"事业部已配置，付款天数差>15，运输方式为{series['运输方式']}"
         elif series["事业部"] == "服务事业部":
             if series["付款天数差"] <= 8:
-                return 0.055
+                return 0.049
             else:
                 return 0.09
         else:
             return "事业部未配置"
     else:
-        return 0.055
+        return 0.049
 
 
 # 匹配"下单费用"
