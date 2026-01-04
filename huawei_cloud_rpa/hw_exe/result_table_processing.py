@@ -12,7 +12,7 @@
 from sqlalchemy import text
 
 
-def result_table_one(engine, max_date):
+def result_table_one(engine, start_date, max_date):
     '''
     第1个结果表
     :param engine: 数据库连接
@@ -151,7 +151,7 @@ def result_table_one(engine, max_date):
                 ), 0) AS amount_2024
             FROM hw_two_four_data d
             CROSS JOIN performance_types pt
-                WHERE d.performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+                WHERE d.performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY 
                 CASE 
                     WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
@@ -306,7 +306,7 @@ def result_table_one(engine, max_date):
                     THEN d.region 
                     ELSE '其他' 
                 END
-                AND d.performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+                AND d.performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY ar.region, pt.ptype
         ),
         
@@ -433,7 +433,7 @@ def result_table_three(engine):
     return result
 
 
-def result_table_four(engine, max_date):
+def result_table_four(engine, start_date, max_date):
     def select_sql(where_sql, max_date):
         sql = f'''
             WITH regions AS (
@@ -464,7 +464,7 @@ def result_table_four(engine, max_date):
                     ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
                 FROM hw_two_four_data
                 WHERE 
-                    performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+                    performance_date BETWEEN '{start_date}' AND '{max_date}'
                     {where_sql}
                 GROUP BY 区域, month
             )
@@ -598,7 +598,7 @@ def result_table_five(engine):
     return result
 
 
-def result_table_six(engine, max_date):
+def result_table_six(engine, start_date, max_date):
     sql = f'''
         WITH 
         base_data_25 AS(
@@ -621,29 +621,35 @@ def result_table_six(engine, max_date):
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_four_data_smbcore
             WHERE
-                performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+                performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY secondary_dealer_re
+        ),
+        all_dealers AS(
+            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            UNION
+            SELECT secondary_dealer_re FROM base_data_24 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
         )
-        
+
         SELECT
-            bd25.secondary_dealer_re AS `SMBcore业绩`,
-            bd25.sales_amount AS `25年截止目前业绩`,
-            bd24.sales_amount AS `24年同期业绩`,
+            ad.secondary_dealer_re AS `SMBcore业绩`,
+            COALESCE(bd25.sales_amount, 0) AS `25年截止目前业绩`,
+            COALESCE(bd24.sales_amount, 0) AS `24年同期业绩`,
             CASE 
-                WHEN bd24.sales_amount IS NULL THEN NULL
-                ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 0), '%')
+                WHEN COALESCE(bd24.sales_amount, 0) = 0 THEN NULL
+                ELSE CONCAT(ROUND((COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0)) / COALESCE(bd24.sales_amount, 0) * 100, 0), '%')
             END AS `同期增长率`,
-            bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
+            COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0) AS `同比24年正负值`
         FROM
-        base_data_25 bd25
-        LEFT JOIN base_data_24 bd24 ON bd25.secondary_dealer_re = bd24.secondary_dealer_re
+            all_dealers ad
+            LEFT JOIN base_data_25 bd25 ON ad.secondary_dealer_re = bd25.secondary_dealer_re
+            LEFT JOIN base_data_24 bd24 ON ad.secondary_dealer_re = bd24.secondary_dealer_re
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     result = {re['SMBcore业绩']: re for re in result}
     return result
 
 
-def result_table_seven(engine, max_date):
+def result_table_seven(engine, start_date, max_date):
     sql = f'''
         SELECT
             main.product,
@@ -675,7 +681,7 @@ def result_table_seven(engine, max_date):
                 ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
             FROM hw_two_four_data
             WHERE sales_team IN ('中长尾', '电网销')
-                        AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+                        AND performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY leased_line_product
         ) AS last_year ON main.product = last_year.leased_line_product
         GROUP BY product, last_year.same_performance_24
@@ -711,7 +717,7 @@ def result_table_seven(engine, max_date):
             WHERE 
                 enterprise_coop IS NOT NULL AND enterprise_coop <> ''
                 AND special_rebate_type <> '特殊商务'
-                AND performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) 
+                AND performance_date BETWEEN '{start_date}' 
                 AND '{max_date}'
         ) AS last_year_coop ON 1=1
         GROUP BY same_performance_24
@@ -855,18 +861,18 @@ def result_table_ten(engine):
     return result
 
 
-def result_table_eleven(engine, max_date):
+def result_table_eleven(engine, start_date, max_date):
     sql = f'''
         WITH 
         base_data_25 AS(
             SELECT
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
-                        ELSE customer_name
+                    ELSE customer_name
                 END AS secondary_dealer_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_five_data
             WHERE
-                    sales_team = '华为云NA'
+                sales_team = '华为云NA'
             GROUP BY secondary_dealer_re
         ),
         base_data_24 AS(
@@ -877,22 +883,28 @@ def result_table_eleven(engine, max_date):
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
             FROM hw_two_four_data_na
             WHERE
-                performance_date BETWEEN DATE(CONCAT(YEAR(CURDATE()) - 1, '-01-01')) AND '{max_date}'
+                performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY secondary_dealer_re
+        ),
+        all_dealers AS(
+            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            UNION
+            SELECT secondary_dealer_re FROM base_data_24 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
         )
-        
+
         SELECT
-            bd25.secondary_dealer_re AS `NA业绩`,
-            bd25.sales_amount AS `25年截止目前业绩`,
-            bd24.sales_amount AS `24年同期业绩`,
+            ad.secondary_dealer_re AS `NA业绩`,
+            COALESCE(bd25.sales_amount, 0) AS `25年截止目前业绩`,
+            COALESCE(bd24.sales_amount, 0) AS `24年同期业绩`,
             CASE 
-                    WHEN bd24.sales_amount IS NULL THEN NULL
-                    ELSE CONCAT(ROUND((bd25.sales_amount - bd24.sales_amount) / bd24.sales_amount * 100, 0), '%')
+                WHEN COALESCE(bd24.sales_amount, 0) = 0 THEN NULL
+                ELSE CONCAT(ROUND((COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0)) / COALESCE(bd24.sales_amount, 0) * 100, 0), '%')
             END AS `同期增长率`,
-            bd25.sales_amount - IFNULL(bd24.sales_amount,0) AS `同比24年正负值`
+            COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0) AS `同比24年正负值`
         FROM
-        base_data_25 bd25
-        LEFT JOIN base_data_24 bd24 ON bd25.secondary_dealer_re = bd24.secondary_dealer_re
+            all_dealers ad
+            LEFT JOIN base_data_25 bd25 ON ad.secondary_dealer_re = bd25.secondary_dealer_re
+            LEFT JOIN base_data_24 bd24 ON ad.secondary_dealer_re = bd24.secondary_dealer_re
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     result = {re['NA业绩']: re for re in result}
