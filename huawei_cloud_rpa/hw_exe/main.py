@@ -163,25 +163,26 @@ class App(object):
                 self.add_bi_to_bo(engine, two_five_path)
 
             # 24年同期时间
+            start_date = '2024-01-01'
             max_date = self.get_max_date(engine)
             if not max_date:
                 raise Exception("找不到25年最晚日期！")
             self.text.insert(tk.END, f"最晚的‘业绩形成时间’是：{max_date}\r\n")
             # 开始结果数据处理
             self.text.insert(tk.END, "数据第一部分...\r\n")
-            result_one = result_table_processing.result_table_one(engine, max_date)
+            result_one = result_table_processing.result_table_one(engine, start_date, max_date)
             self.text.insert(tk.END, "数据第二部分...\r\n")
             result_two = result_table_processing.result_table_two(engine)
             self.text.insert(tk.END, "数据第三部分...\r\n")
             result_three = result_table_processing.result_table_three(engine)
             self.text.insert(tk.END, "数据第四部分...\r\n")
-            result_four = result_table_processing.result_table_four(engine, max_date)
+            result_four = result_table_processing.result_table_four(engine, start_date, max_date)
             self.text.insert(tk.END, "数据第五部分...\r\n")
             result_five = result_table_processing.result_table_five(engine)
             self.text.insert(tk.END, "数据第六部分...\r\n")
-            result_six = result_table_processing.result_table_six(engine, max_date)
+            result_six = result_table_processing.result_table_six(engine, start_date, max_date)
             self.text.insert(tk.END, "数据第七部分...\r\n")
-            result_seven = result_table_processing.result_table_seven(engine, max_date)
+            result_seven = result_table_processing.result_table_seven(engine, start_date, max_date)
             self.text.insert(tk.END, "数据第八部分...\r\n")
             result_eight = result_table_processing.result_table_eight(engine)
             self.text.insert(tk.END, "数据第九部分...\r\n")
@@ -189,7 +190,7 @@ class App(object):
             self.text.insert(tk.END, "数据第十部分...\r\n")
             result_ten = result_table_processing.result_table_ten(engine)
             self.text.insert(tk.END, "数据第十一部分...\r\n")
-            result_eleven = result_table_processing.result_table_eleven(engine, max_date)
+            result_eleven = result_table_processing.result_table_eleven(engine, start_date, max_date)
             self.text.insert(tk.END, "结果表下载中...\r\n")
             self.generate_result_table(data_requirements_path, result_one, result_two, result_three, result_four, result_five, result_six, result_seven, result_eight, result_nine, result_ten, result_eleven)
 
