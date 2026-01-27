@@ -720,7 +720,7 @@ def debtSheetCal(stime, etime, df_debt, personConfigPath):
         lambda x: "商业分销" if x.startswith("HV") else "")
 
     # 初始化利率
-    df_debt["正常贷款费率"] = 0.055
+    df_debt["正常贷款费率"] = 0.049
     df_debt["超额贷款费率"] = 0.09
     df_debt["贴现利率"] = 0.055
 
@@ -765,7 +765,7 @@ def bankNotesOperateAndCal(baseDfDict, bankNotesPath):
     bankNotesDf = bankNotesDf.loc[~bankNotesDf["票号"].isin(existNumerList), bankNotesResultCol]
 
     bankNotesDf["票面金额"] = pd.to_numeric(bankNotesDf["票面金额"])
-    bankNotesDf["贴现利率"] = bankNotesDf["是否可贴"].apply(lambda x: 0.025 if x == "是" else 0.055 if x == "否" else np.nan)
+    bankNotesDf["贴现利率"] = bankNotesDf["是否可贴"].apply(lambda x: 0.022 if x == "是" else 0.055 if x == "否" else np.nan)
 
     # 获取设置公式时需要的列所在列标识
     indexDict = {}
@@ -820,7 +820,7 @@ def advanceOperateAndCal(sapFilePath, receivableFilePath, exportDate, lastCalTim
         advanceDf = pd.merge(sapDf, receivableTotalDf, how="left", on="索引temp", suffixes=("", "_re"))
 
         advanceDf["本币金额"] = pd.to_numeric(advanceDf["本币金额"])
-        advanceDf["利率"] = 0.055
+        advanceDf["利率"] = 0.049
         advanceDf["统计时间"] = exportDate
         advanceDf["上次统计时间"] = lastCalTimeDict["预收补费用"]
 
@@ -1178,18 +1178,18 @@ logger = None
 recordDict = {}
 
 if __name__ == "__main__":
-    g_dictGlobal = {"文件保存路径": r"D:\xc_files\账期费用",
-                    "销售员大区对应表路径": r"D:\xc_files\账期费用\外挂-华为SBU销售员大区对应表-21.xlsx",
-                    "银票记录表": r"D:\xc_files\账期费用\账期费用RPA模板-银票-23.xlsx",
+    g_dictGlobal = {"文件保存路径": r"D:\xc_files\账期费用\260127\结果",
+                    "销售员大区对应表路径": r"D:\xc_files\账期费用\260127\外挂-华为SBU销售员大区对应表-21.xlsx",
+                    "银票记录表": r"D:\xc_files\账期费用\260127\账期费用RPA模板-银票-23.xlsx",
                     }
-    g_inputDict = {"账期费用基础表路径": r"D:\xc_files\账期费用\3.6\账期费用_20250304.xlsx",
-                   "欠款明细开始日期": "2025-03-04", "欠款明细结束日期": "2025-03-05", "未清项目明细表下载日期": "2025-03-05"}
+    g_inputDict = {"账期费用基础表路径": r"D:\xc_files\账期费用\260127\账期费用_20260115.xlsx",
+                   "欠款明细开始日期": "2026-01-26", "欠款明细结束日期": "2026-01-27", "未清项目明细表下载日期": "2026-01-27"}
 
-    debtFileList = [r"D:\xc_files\账期费用\3.6\FY25欠款明细-0304.xlsx",
-                    r"D:\xc_files\账期费用\3.6\FY25欠款明细-0305.xlsx"]
-    saleFileList = [r"D:\xc_files\账期费用\3.6\FY25销售明细(3月)_0305.xlsx"]
-    sapFile = r"D:\xc_files\账期费用\3.6\未清项目明细20250305.MHTML"
-    receivableFileList = r"D:\xc_files\账期费用\3.6\FY25回款明细-0305.xlsx"
+    debtFileList = [r"D:\xc_files\账期费用\260127\FY26欠款明细-0115.xlsx",
+                    r"D:\xc_files\账期费用\260127\FY26欠款明细-0118.xlsx"]
+    saleFileList = [r"D:\xc_files\账期费用\260127\FY26销售明细(1月)_0126.xlsx"]
+    sapFile = r"D:\xc_files\账期费用\260127\未清项目明细20260118.MHTML"
+    receivableFileList = r"D:\xc_files\账期费用\260127\回款明细_20260119.xlsx"
     resultPath = os.path.join(g_dictGlobal["文件保存路径"], "账期费用.xlsx")
 
     # g_dictGlobal = {"文件保存路径": r"C:\Users\11598\Desktop",
