@@ -720,9 +720,9 @@ def debtSheetCal(stime, etime, df_debt, personConfigPath):
         lambda x: "商业分销" if x.startswith("HV") else "")
 
     # 初始化利率
-    df_debt["正常贷款费率"] = 0.049
-    df_debt["超额贷款费率"] = 0.09
-    df_debt["贴现利率"] = 0.055
+    df_debt["正常贷款费率"] = 0.046
+    df_debt["超额贷款费率"] = 0.0828
+    df_debt["贴现利率"] = 0.046
 
     # 获取设置公式时需要的列所在列标识
     indexDict = {}
@@ -765,7 +765,7 @@ def bankNotesOperateAndCal(baseDfDict, bankNotesPath):
     bankNotesDf = bankNotesDf.loc[~bankNotesDf["票号"].isin(existNumerList), bankNotesResultCol]
 
     bankNotesDf["票面金额"] = pd.to_numeric(bankNotesDf["票面金额"])
-    bankNotesDf["贴现利率"] = bankNotesDf["是否可贴"].apply(lambda x: 0.022 if x == "是" else 0.055 if x == "否" else np.nan)
+    bankNotesDf["贴现利率"] = bankNotesDf["是否可贴"].apply(lambda x: 0.019 if x == "是" else 0.046 if x == "否" else np.nan)
 
     # 获取设置公式时需要的列所在列标识
     indexDict = {}
@@ -820,7 +820,7 @@ def advanceOperateAndCal(sapFilePath, receivableFilePath, exportDate, lastCalTim
         advanceDf = pd.merge(sapDf, receivableTotalDf, how="left", on="索引temp", suffixes=("", "_re"))
 
         advanceDf["本币金额"] = pd.to_numeric(advanceDf["本币金额"])
-        advanceDf["利率"] = 0.049
+        advanceDf["利率"] = 0.046
         advanceDf["统计时间"] = exportDate
         advanceDf["上次统计时间"] = lastCalTimeDict["预收补费用"]
 
