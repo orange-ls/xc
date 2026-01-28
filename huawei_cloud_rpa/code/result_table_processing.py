@@ -368,9 +368,9 @@ def result_table_two(engine):
         SELECT 
             IFNULL(classified_region, '汇总') AS 区域,
             ROUND(SUM(national_num)/10000, 1) AS 全量业绩,
-            ROUND(SUM(national_num_h1)/10000, 1) AS 全量H2进度,
+            ROUND(SUM(national_num_h1)/10000, 1) AS 全量H1进度,
             ROUND(SUM(national_year_num)/10000, 1) AS 全量全年进度,
-            ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH2进度,
+            ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH1进度,
             ROUND(SUM(smb_sales_year)/10000, 1) AS SMB全年进度
         FROM (
             SELECT 
