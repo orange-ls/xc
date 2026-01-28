@@ -379,10 +379,10 @@ def result_table_two(engine):
                     ELSE '其他' 
                 END AS classified_region,
                 sales_amount AS national_num,
-                CASE WHEN performance_date >= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
+                CASE WHEN performance_date <= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
                 sales_amount AS national_year_num,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales,
-                CASE WHEN performance_date >= '2026-07-01' AND sales_team IN ('中长尾', '电网销') 
+                CASE WHEN performance_date <= '2026-07-01' AND sales_team IN ('中长尾', '电网销') 
                     THEN sales_amount ELSE 0 END AS smb_sales_h1,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales_year
             FROM hw_two_six_data
@@ -410,18 +410,18 @@ def result_table_three(engine):
         SELECT 
             IFNULL(classified, '汇总') AS 销售,
             ROUND(SUM(national_num)/10000, 1) AS 全量业绩,
-            ROUND(SUM(national_num_h1)/10000, 1) AS 全量H2进度,
+            ROUND(SUM(national_num_h1)/10000, 1) AS 全量H1进度,
             ROUND(SUM(national_year_num)/10000, 1) AS 全量全年进度,
-            ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH2进度,
+            ROUND(SUM(smb_sales_h1)/10000, 1) AS SMBH1进度,
             ROUND(SUM(smb_sales_year)/10000, 1) AS SMB全年进度
         FROM (
             SELECT 
                 salesperson AS classified,
                 sales_amount AS national_num,
-                CASE WHEN performance_date >= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
+                CASE WHEN performance_date <= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
                 sales_amount AS national_year_num,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales,
-                CASE WHEN performance_date >= '2026-07-01' AND sales_team IN ('中长尾', '电网销') 
+                CASE WHEN performance_date <= '2026-07-01' AND sales_team IN ('中长尾', '电网销') 
                     THEN sales_amount ELSE 0 END AS smb_sales_h1,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales_year
             FROM hw_two_six_data
