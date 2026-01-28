@@ -43,16 +43,16 @@ class App(object):
         root.title("华为云RPA")
         root.geometry('500x500')
 
-        self.two_five_data = tk.StringVar()
-        label02 = tk.Label(root, text="25年业绩表：")
+        self.two_six_data = tk.StringVar()
+        label02 = tk.Label(root, text="26年业绩表：")
         label02.grid(row=1, column=0)
-        entry02 = tk.Entry(root, textvariable=self.two_five_data, width=40)
+        entry02 = tk.Entry(root, textvariable=self.two_six_data, width=40)
         entry02.grid(row=1, column=1)
-        btn02 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_five_data))
+        btn02 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_six_data))
         btn02.grid(row=1, column=2)
 
         self.product_details = tk.StringVar()
-        label03 = tk.Label(root, text="2025产品明细：")
+        label03 = tk.Label(root, text="2026产品明细：")
         label03.grid(row=2, column=0)
         entry03 = tk.Entry(root, textvariable=self.product_details, width=40)
         entry03.grid(row=2, column=1)
@@ -75,12 +75,12 @@ class App(object):
         btn05 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.data_requirements))
         btn05.grid(row=4, column=2)
 
-        self.two_four_data = tk.StringVar()
-        label01 = tk.Label(root, text="24年数据：")
+        self.two_five_data = tk.StringVar()
+        label01 = tk.Label(root, text="25年数据：")
         label01.grid(row=5, column=0)
-        entry01 = tk.Entry(root, textvariable=self.two_four_data, width=40)
+        entry01 = tk.Entry(root, textvariable=self.two_five_data, width=40)
         entry01.grid(row=5, column=1)
-        btn01 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_four_data))
+        btn01 = tk.Button(root, text="选择", command=lambda: self.selectPath(self.two_five_data))
         btn01.grid(row=5, column=2)
 
         # 时间选择框
@@ -108,10 +108,10 @@ class App(object):
         )
         end_cal.grid(row=6, column=1, padx=(1, 0), sticky='e')
 
-        btn001 = tk.Button(root, text="导入24年数据", command=self.import_24_data_to_db)
+        btn001 = tk.Button(root, text="导入25年数据", command=self.import_25_data_to_db)
         btn001.grid(row=8, column=0)
 
-        btn002 = tk.Button(root, text="导出25年数据", command=self.export_25_year_data)
+        btn002 = tk.Button(root, text="导出26年数据", command=self.export_26_year_data)
         btn002.grid(row=8, column=1)
 
         btn005 = tk.Button(root, text="匹配", command=self.start)
@@ -121,9 +121,9 @@ class App(object):
         self.text = tk.Text(selectbackground="red", insertbackground="blue", spacing2=10, bd=0)
         self.text.grid(row=9, column=0, columnspan=10)
 
-        self.text.insert(tk.END, "24年数据导入一次即可，不用重复导入！\r\n")
-        self.text.insert(tk.END, "25年数据增量导入，全量导入会导致执行时间过长\r\n")
-        self.text.insert(tk.END, "2025产品明细、客户对应关系表、数据需求表 必须选择\r\n\r\n")
+        self.text.insert(tk.END, "25年数据导入一次即可，不用重复导入！\r\n")
+        self.text.insert(tk.END, "26年数据增量导入，全量导入会导致执行时间过长\r\n")
+        self.text.insert(tk.END, "2026产品明细、客户对应关系表、数据需求表 必须选择\r\n\r\n")
 
     def start(self):
         self.T = threading.Thread(target=self.data_handling)
@@ -137,7 +137,7 @@ class App(object):
     def data_handling(self):
         try:
             self.text.insert(tk.END, "开始...\r\n")
-            two_five_path = self.two_five_data.get()
+            two_six_path = self.two_six_data.get()
             product_details_path = self.product_details.get()
             customer_cor_path = self.customer_cor.get()
             data_requirements_path = self.data_requirements.get()
@@ -157,16 +157,16 @@ class App(object):
             # 基础表 数据入库
             self.common_excel_to_db(engine, product_details_path, customer_cor_path)
 
-            # 25年业绩表增加BI到BO列
-            if two_five_path:
-                self.text.insert(tk.END, "25年业绩表增加BI到BO列...\r\n")
-                self.add_bi_to_bo(engine, two_five_path)
+            # 26年业绩表增加BI到BO列
+            if two_six_path:
+                self.text.insert(tk.END, "26年业绩表增加BI到BO列...\r\n")
+                self.add_bi_to_bo(engine, two_six_path)
 
-            # 24年同期时间
-            start_date = '2024-01-01'
+            # 25年同期时间
+            start_date = '2025-01-01'
             max_date = self.get_max_date(engine)
             if not max_date:
-                raise Exception("找不到25年最晚日期！")
+                raise Exception("找不到26年最晚日期！")
             self.text.insert(tk.END, f"最晚的‘业绩形成时间’是：{max_date}\r\n")
             # 开始结果数据处理
             self.text.insert(tk.END, "数据第一部分...\r\n")
@@ -317,11 +317,11 @@ class App(object):
                     self.text.insert(tk.END, f"批量写入失败: {str(e)}\r\n")
                     raise e
 
-    # 24年数据入库
-    def import_24_data_to_db(self):
-        self.text.insert(tk.END, f"开始读取24年数据...\r\n")
-        two_four_path = self.two_four_data.get()
-        if not two_four_path:
+    # 25年数据入库
+    def import_25_data_to_db(self):
+        self.text.insert(tk.END, f"开始读取25年数据...\r\n")
+        two_five_path = self.two_five_data.get()
+        if not two_five_path:
             self.text.insert(tk.END, "文件路径不能为空！\r\n")
             return
         try:
@@ -329,7 +329,7 @@ class App(object):
             if not engine:
                 raise ConnectionError("数据库连接失败")
 
-            with CalamineWorkbook.from_path(two_four_path) as wb:
+            with CalamineWorkbook.from_path(two_five_path) as wb:
                 # 获取第一个工作表
                 sheet = wb.get_sheet_by_index(0)
                 # 读取所有数据（包含标题行）
@@ -337,8 +337,8 @@ class App(object):
                 selected_indices = [rows[0].index(col) for col in selected_columns]
                 # 转换为DataFrame
                 df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
-                self.text.insert(tk.END, f"开始导入24年数据！\r\n")
-                self.big_data_to_db('hw_two_four_data', engine, df)
+                self.text.insert(tk.END, f"开始导入25年数据！\r\n")
+                self.big_data_to_db('hw_two_five_data', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
                 del df
                 # 获取第二个工作表
@@ -348,8 +348,8 @@ class App(object):
                 selected_indices = [rows[0].index(col) for col in selected_columns]
                 # 转换为DataFrame
                 df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
-                self.text.insert(tk.END, f"开始导入24年SMBcore数据！\r\n")
-                self.big_data_to_db('hw_two_four_data_smbcore', engine, df)
+                self.text.insert(tk.END, f"开始导入25年SMBcore数据！\r\n")
+                self.big_data_to_db('hw_two_five_data_smbcore', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
                 del df
                 # 获取第三个工作表
@@ -359,32 +359,32 @@ class App(object):
                 selected_indices = [rows[0].index(col) for col in selected_columns]
                 # 转换为DataFrame
                 df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=selected_columns)
-                self.text.insert(tk.END, f"开始导入24年NA数据！\r\n")
-                self.big_data_to_db('hw_two_four_data_na', engine, df)
+                self.text.insert(tk.END, f"开始导入25年NA数据！\r\n")
+                self.big_data_to_db('hw_two_five_data_na', engine, df)
                 self.text.insert(tk.END, "数据导入成功！\r\n")
                 del df, rows
                 gc.collect()
         except Exception as e:
-            self.text.insert(tk.END, f"24年数据读取失败: {str(e)}\r\n")
+            self.text.insert(tk.END, f"25年数据读取失败: {str(e)}\r\n")
         finally:
             engine.dispose()
 
-    # 25年业绩表增加BI到BO列，含导出25年数据
-    def add_bi_to_bo(self, engine, two_five_path):
+    # 26年业绩表增加BI到BO列，含导出26年数据
+    def add_bi_to_bo(self, engine, two_six_path):
         # 1. Excel读取优化 使用calamine引擎读取数据
-        sel_columns_25 = ['业绩ID', '业绩金额(¥)', '业绩形成时间', '特殊返点类型', '二级经销商名称', '客户名称', '产品类型编码', '客户标签', '销售纵队']
+        sel_columns_26 = ['业绩ID', '业绩金额(¥)', '业绩形成时间', '特殊返点类型', '二级经销商名称', '客户名称', '产品类型编码', '客户标签', '销售纵队']
         try:
-            wb = CalamineWorkbook.from_path(two_five_path)
+            wb = CalamineWorkbook.from_path(two_six_path)
             # 获取第一个工作表
             sheet = wb.get_sheet_by_index(0)
             # 读取所有数据（包含标题行）
             rows = sheet.to_python()
-            selected_indices = [rows[0].index(col) for col in sel_columns_25]
+            selected_indices = [rows[0].index(col) for col in sel_columns_26]
             # 转换为DataFrame
-            two_five_df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=sel_columns_25)
+            two_six_df = pd.DataFrame([[row[i] for i in selected_indices] for row in rows[1:]], columns=sel_columns_26)
             wb.close()
         except Exception as e:
-            raise ValueError(f"25年数据读取失败: {str(e)}")
+            raise ValueError(f"26年数据读取失败: {str(e)}")
 
         # 2. 数据库查询
         with engine.connect() as conn:
@@ -405,34 +405,34 @@ class App(object):
             collaborate_map = dfs[3].set_index('cloud_services_code')['cloud_services_name']
             customer_relations = dfs[4][['customer_name', 'salesperson', 'region']]
 
-            two_five_df = two_five_df.merge(customer_relations, left_on='客户名称', right_on='customer_name',how='left')
+            two_six_df = two_six_df.merge(customer_relations, left_on='客户名称', right_on='customer_name',how='left')
 
         # 3. 数据加工
         try:
             # 服务产品部映射
-            two_five_df['服务产品部'] = two_five_df['产品类型编码'].map(cloud_services_map).fillna('')
+            two_six_df['服务产品部'] = two_six_df['产品类型编码'].map(cloud_services_map).fillna('')
             # 流量产品标记
-            two_five_df['是否流量型产品'] = np.where(two_five_df['产品类型编码'].isin(flow_products), '是', '否')
+            two_six_df['是否流量型产品'] = np.where(two_six_df['产品类型编码'].isin(flow_products), '是', '否')
             # 专线产品映射
-            two_five_df['专线产品'] = two_five_df['产品类型编码'].map(special_products_map).fillna('')
+            two_six_df['专线产品'] = two_six_df['产品类型编码'].map(special_products_map).fillna('')
             # 企业协同映射
-            two_five_df['企业协同'] = two_five_df['产品类型编码'].map(collaborate_map).fillna('')
+            two_six_df['企业协同'] = two_six_df['产品类型编码'].map(collaborate_map).fillna('')
             # 客户信息映射
-            two_five_df['销售员'] = two_five_df['salesperson'].fillna('').astype('category')
-            two_five_df['区域'] = two_five_df['region'].fillna('').astype('category')
+            two_six_df['销售员'] = two_six_df['salesperson'].fillna('').astype('category')
+            two_six_df['区域'] = two_six_df['region'].fillna('').astype('category')
             # 清理临时列
-            two_five_df.drop(['customer_name', 'salesperson', 'region'], axis=1, inplace=True)
+            two_six_df.drop(['customer_name', 'salesperson', 'region'], axis=1, inplace=True)
             # 季度
-            months = pd.to_datetime(two_five_df['业绩形成时间']).dt.month
-            two_five_df['季度'] = 'Q' + ((months - 1) // 3 + 1).astype(str)
+            months = pd.to_datetime(two_six_df['业绩形成时间']).dt.month
+            two_six_df['季度'] = 'Q' + ((months - 1) // 3 + 1).astype(str)
         except KeyError as e:
             raise ValueError(f"数据加工异常，缺少关键字段: {str(e)}")
         # 4. 数据入库
         try:
-            self.text.insert(tk.END, f"25年数据入库中...\r\n")
-            self.big_data_to_db('hw_two_five_data', engine, two_five_df)
+            self.text.insert(tk.END, f"26年数据入库中...\r\n")
+            self.big_data_to_db('hw_two_six_data', engine, two_six_df)
         except Exception as e:
-            self.text.insert(tk.END, f"25年数据入库失败: {str(e)}\r\n")
+            self.text.insert(tk.END, f"26年数据入库失败: {str(e)}\r\n")
         # # 5. 导出25年的数据
         # self.text.insert(tk.END, "正在导出25年数据...\r\n")
         # # 直接把two_five_df中的数据导出到Excel文件
@@ -461,9 +461,9 @@ class App(object):
         # except Exception as e:
         #     self.text.insert(tk.END, f"导出失败: {str(e)}\r\n")
 
-    # 找出24年同期时间
+    # 找出25年同期时间
     def get_max_date(self, engine):
-        sql_select = "SELECT DATE_SUB(MAX(performance_date), INTERVAL 1 YEAR) FROM hw_two_five_data"
+        sql_select = "SELECT DATE_SUB(MAX(performance_date), INTERVAL 1 YEAR) FROM hw_two_six_data"
         max_data = engine.connect().execute(text(sql_select)).fetchone()[0]
         return max_data
 
@@ -498,9 +498,9 @@ class App(object):
                         ws1.cell(row, 16, values.get('SMB业绩', ''))  # P列
                         ws1.cell(row, 17, values.get('SMBcore业绩', ''))
 
-                # 24年同期数据
-                data_24 = one.get('24年同期数据', {})
-                for region, values in data_24.items():
+                # 25年同期数据
+                data_25 = one.get('25年同期数据', {})
+                for region, values in data_25.items():
                     row = row_mapping.get(region)
                     if row:
                         ws1.cell(row, 18, values.get('整体业绩', ''))
@@ -513,9 +513,9 @@ class App(object):
                 # Sheet2的列映射（字典字段 -> Excel列字母）
                 column_map = {
                     '全量业绩': 'B',  # 全国业绩
-                    '全量H2进度': 'D',  # 全国H2进度
+                    '全量H1进度': 'D',  # 全国H2进度
                     '全量全年进度': 'F',  # 全国全年进度
-                    'SMBH2进度': 'H',  # SMBH2进度
+                    'SMBH1进度': 'H',  # SMBH2进度
                     'SMB全年进度': 'J'  # SMB全年进度
                 }
 
@@ -535,9 +535,9 @@ class App(object):
                 # 列名映射
                 column_map = {
                     '全量业绩': 'B',
-                    '全量H2进度': 'D',
+                    '全量H1进度': 'D',
                     '全量全年进度': 'F',
-                    'SMBH2进度': 'H',
+                    'SMBH1进度': 'H',
                     'SMB全年进度': 'J'
                 }
 
@@ -560,7 +560,7 @@ class App(object):
                 # 列名映射（字典字段 -> Excel列字母）
                 column_map = {
                     '1月': 'B', '2月': 'C', '3月': 'D', '4月': 'E', '5月': 'F', '6月': 'G', '7月': 'H', '8月': 'I',
-                    '9月': 'J', '10月': 'K', '11月': 'L', '12月': 'M', '合计': 'N', '24年同期': 'O', '增长率': 'P'
+                    '9月': 'J', '10月': 'K', '11月': 'L', '12月': 'M', '合计': 'N', '25年同期': 'O', '增长率': 'P'
                 }
 
                 # 填充SMBcore业绩
@@ -575,7 +575,7 @@ class App(object):
                     row = smb_row_mapping.get(region)
                     if not row:
                         continue
-                    # 填充月份、合计、24年同期、增长率
+                    # 填充月份、合计、25年同期、增长率
                     for field, col in column_map.items():
                         cell = ws4[f"{col}{row}"]
                         value = values.get(field)
@@ -635,7 +635,7 @@ class App(object):
                 ws6 = wb['六']
                 # 列映射
                 column_map = {
-                    '25年截止目前业绩': 'C', '24年同期业绩': 'D', '同期增长率': 'E', '同比24年正负值': 'F'
+                    '26年截止目前业绩': 'C', '25年同期业绩': 'D', '同期增长率': 'E', '同比25年正负值': 'F'
                 }
 
                 # 动态遍历A列所有行
@@ -656,7 +656,7 @@ class App(object):
                 ws7 = wb['七']
                 # 定义列映射
                 column_map = {
-                    '25Q1': 'F', '25Q2': 'G', '25Q3': 'H', '25Q4': 'I', '25年目前业绩': 'J', '24年同期业绩': 'K', '同比增长': 'L',
+                    '26Q1': 'F', '26Q2': 'G', '26Q3': 'H', '26Q4': 'I', '26年目前业绩': 'J', '25年同期业绩': 'K', '同比增长': 'L',
                 }
 
                 # 动态遍历A列所有有效行
@@ -674,7 +674,7 @@ class App(object):
                                 cell = ws7[f"{col}{product_cell.row}"]
                                 value = product_data[field]
                                 # 特殊处理数值类型
-                                if field in ['25Q1', '25Q2', '25Q3', '25Q4', '25年目前业绩', '24年同期业绩']:
+                                if field in ['26Q1', '26Q2', '26Q3', '26Q4', '26年目前业绩', '25年同期业绩']:
                                     cell.value = float(value) if isinstance(value, Decimal) else value
                                 else:
                                     cell.value = str(value)
@@ -690,7 +690,7 @@ class App(object):
                     ws8.cell(row=current_row, column=2, value=float(data.get('业绩金额', 0)))  # B列
                     ws8.cell(row=current_row, column=3, value=float(data.get('NA业绩', 0)))  # C列
                     ws8.cell(row=current_row, column=4, value=float(data.get('SMB业绩', 0)))  # D列
-                    ws8.cell(row=current_row, column=5, value=float(data.get('SMBcore业绩', 0)))  # E列
+                    ws8.cell(row=current_row, column=5, value=float(data.get('SMB-CORE', 0)))  # E列
                     ws8.cell(row=current_row, column=6, value=data.get('销售员', ''))  # F列
 
             if '九' in wb.sheetnames:
@@ -739,7 +739,7 @@ class App(object):
                 ws11 = wb['十一']
                 # 列映射
                 column_map = {
-                    '25年截止目前业绩': 'C', '24年同期业绩': 'D', '同期增长率': 'E', '同比24年正负值': 'F'
+                    '26年截止目前业绩': 'C', '25年同期业绩': 'D', '同期增长率': 'E', '同比25年正负值': 'F'
                 }
 
                 # 动态遍历A列所有行
@@ -763,12 +763,12 @@ class App(object):
             self.text.insert(tk.END, f"结果表生成失败：{e}\r\n")
             return False
 
-    # 导出数据库中的25年数据
-    def export_25_year_data(self):
+    # 导出数据库中的26年数据
+    def export_26_year_data(self):
         desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-        file_path = os.path.join(desktop_path, "25年数据_result.xlsx")
+        file_path = os.path.join(desktop_path, "26年数据_result.xlsx")
         try:
-            self.text.insert(tk.END, "开始导出25年数据...\r\n")
+            self.text.insert(tk.END, "开始导出26年数据...\r\n")
             start_time = self.start_time_var.get().strip()
             end_time = self.end_time_var.get().strip()
             if not start_time or not end_time:
@@ -782,7 +782,7 @@ class App(object):
             # 获取当前工作簿和工作表
             wb = openpyxl.Workbook()
             ws = wb.active
-            ws.title = "25年数据"
+            ws.title = "26年数据"
 
             # 定义每次读取的数据批量大小
             batch_size = 100000
@@ -795,14 +795,14 @@ class App(object):
             session = Session()
 
             # 获取总数据量
-            total_count = session.execute(text(f"SELECT COUNT(*) FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")).scalar()
+            total_count = session.execute(text(f"SELECT COUNT(*) FROM hw_two_six_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}'")).scalar()
             self.text.insert(tk.END, f"总数据量：{total_count} 条\r\n")
             current_row = 2
             if total_count > 0:
                 # 分批读取并写入 Excel
                 for offset in range(0, total_count, batch_size):
                     # 构建分页查询
-                    batch_query = text(f"SELECT * FROM hw_two_five_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}' LIMIT {batch_size} OFFSET {offset}")
+                    batch_query = text(f"SELECT * FROM hw_two_six_data WHERE performance_date BETWEEN '{start_time}' AND '{end_time}' LIMIT {batch_size} OFFSET {offset}")
                     batch_data = [dict(row) for row in session.execute(batch_query).mappings().fetchall()]
 
                     # 将数据批量写入 Excel
