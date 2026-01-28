@@ -1,11 +1,11 @@
 '''
-    第1个结果表是：各“区域”的“整体业绩”、“NA业绩”、“SMB业绩”、“SMBcore业绩”、“同期增长率”
-    第2个结果表是：各“区域”的“全量业绩”等
-    第3个结果表是：各“销售员”的“全量业绩”等
-    第4个结果表是：各“区域”各“月份”的“SMBcore业绩”和“NA业绩”
-    第5个结果表是：25年SMBcore业绩
-    第6个结果表是：各“二级经销商和客户”的SMBcore业绩
-    第7个结果表是：各“专线产品”季度业绩
+    第1个结果表是：各"区域"的"整体业绩"、"NA业绩"、"SMB业绩"、"SMBcore业绩"、"同期增长率"
+    第2个结果表是：各"区域"的"全量业绩"等
+    第3个结果表是：各"销售员"的"全量业绩"等
+    第4个结果表是：各"区域"各"月份"的"SMBcore业绩"和"NA业绩"
+    第5个结果表是：26年SMBcore业绩
+    第6个结果表是：各"二级经销商和客户"的SMBcore业绩
+    第7个结果表是：各"专线产品"季度业绩
     第8个结果表是：新增渠道
     第9个结果表是：新增客户
 '''
@@ -18,7 +18,7 @@ def result_table_one(engine, start_date, max_date):
     :param engine: 数据库连接
     :return: 结果表数据
     '''
-    # 构建查询sql,用于“整体业绩”、“NA业绩”、“SMB业绩”、“SMBcore业绩”
+    # 构建查询sql,用于"整体业绩"、"NA业绩"、"SMB业绩"、"SMBcore业绩"
     def select_sql(where_sql):
         select_sql = f'''
             -- 分地区统计渠道/直客金额并生成二维报表，强制显示"其他"行
@@ -44,7 +44,7 @@ def result_table_one(engine, start_date, max_date):
                     COALESCE(ROUND(SUM(d.sales_amount)/10000, 1), 0) AS total_sales
                 FROM all_regions ar
                 CROSS JOIN customer_types ct
-                LEFT JOIN hw_two_five_data d 
+                LEFT JOIN hw_two_six_data d 
                     ON d.region = ar.region
                     AND ct.customer_type = CASE 
                         WHEN d.secondary_dealer IS NULL OR d.secondary_dealer='' THEN '直客' 
@@ -94,16 +94,16 @@ def result_table_one(engine, start_date, max_date):
         'SMBcore业绩': "AND d.sales_team in ('中长尾','电网销') AND d.is_traffic_product IN ('否', '')"
     }
 
-    # 循环执行查询 “整体业绩”、“NA业绩”、“SMB业绩”、“SMBcore业绩” 并返回结果
+    # 循环执行查询 "整体业绩"、"NA业绩"、"SMB业绩"、"SMBcore业绩" 并返回结果
     result_data = {}
     for k, v in select_params.items():
         result = [dict(row) for row in conn.execute(text(select_sql(v))).mappings().fetchall()]
         result = {re['grouped_region']: re for re in result}
         result_data[k] = result
 
-    # 构建sql，查询“同期增长率”
+    # 构建sql，查询"同期增长率"
     growth_rate_sql = f'''
-        -- 分表统计24年与25年数据，计算增长率
+        -- 分表统计25年与26年数据，计算增长率
         WITH 
         -- 1. 定义所有地区
         all_regions AS (
@@ -132,36 +132,7 @@ def result_table_one(engine, start_date, max_date):
                 "AND sales_team IN ('中长尾','电网销') AND is_traffic_product IN ('否', '')"
         ),
         
-        -- 3. 计算24年各维度数据
-        data_2024 AS (
-            SELECT 
-                CASE 
-                    WHEN region IN ('北京','广州','深圳','上海','南京','成都') 
-                    THEN region 
-                    ELSE '其他' 
-                END AS grouped_region,
-                pt.ptype,
-                COALESCE(SUM(
-                    CASE
-                        WHEN pt.ptype = '整体业绩' THEN d.sales_amount
-                        WHEN pt.ptype = 'NA业绩' AND d.sales_team = '华为云NA' THEN d.sales_amount
-                        WHEN pt.ptype = 'SMB业绩' AND d.sales_team IN ('中长尾','电网销') THEN d.sales_amount
-                        WHEN pt.ptype = 'SMBcore业绩' AND d.sales_team IN ('中长尾','电网销') AND d.is_traffic_product IN ('否', '') THEN d.sales_amount
-                    END
-                ), 0) AS amount_2024
-            FROM hw_two_four_data d
-            CROSS JOIN performance_types pt
-                WHERE d.performance_date BETWEEN '{start_date}' AND '{max_date}'
-            GROUP BY 
-                CASE 
-                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
-                    THEN d.region 
-                    ELSE '其他' 
-                END, 
-                pt.ptype
-        ),
-        
-        -- 4. 计算25年各维度数据（结构相同）
+        -- 3. 计算25年各维度数据
         data_2025 AS (
             SELECT 
                 CASE 
@@ -180,6 +151,35 @@ def result_table_one(engine, start_date, max_date):
                 ), 0) AS amount_2025
             FROM hw_two_five_data d
             CROSS JOIN performance_types pt
+                WHERE d.performance_date BETWEEN '{start_date}' AND '{max_date}'
+            GROUP BY 
+                CASE 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    THEN d.region 
+                    ELSE '其他' 
+                END, 
+                pt.ptype
+        ),
+        
+        -- 4. 计算26年各维度数据（结构相同）
+        data_2026 AS (
+            SELECT 
+                CASE 
+                    WHEN region IN ('北京','广州','深圳','上海','南京','成都') 
+                    THEN region 
+                    ELSE '其他' 
+                END AS grouped_region,
+                pt.ptype,
+                COALESCE(SUM(
+                    CASE
+                        WHEN pt.ptype = '整体业绩' THEN d.sales_amount
+                        WHEN pt.ptype = 'NA业绩' AND d.sales_team = '华为云NA' THEN d.sales_amount
+                        WHEN pt.ptype = 'SMB业绩' AND d.sales_team IN ('中长尾','电网销') THEN d.sales_amount
+                        WHEN pt.ptype = 'SMBcore业绩' AND d.sales_team IN ('中长尾','电网销') AND d.is_traffic_product IN ('否', '') THEN d.sales_amount
+                    END
+                ), 0) AS amount_2026
+            FROM hw_two_six_data d
+            CROSS JOIN performance_types pt
             GROUP BY 
                 CASE 
                     WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
@@ -194,18 +194,18 @@ def result_table_one(engine, start_date, max_date):
             SELECT 
                 ar.region,
                 pt.ptype,
-                COALESCE(d24.amount_2024, 0) AS amount_2024,
                 COALESCE(d25.amount_2025, 0) AS amount_2025,
+                COALESCE(d26.amount_2026, 0) AS amount_2026,
                 CASE 
-                    WHEN COALESCE(d24.amount_2024, 0) = 0 THEN NULL  -- 处理除零
-                    ELSE ROUND((d25.amount_2025 - d24.amount_2024) / d24.amount_2024 * 100, 0)
+                    WHEN COALESCE(d25.amount_2025, 0) = 0 THEN NULL  -- 处理除零
+                    ELSE ROUND((d26.amount_2026 - d25.amount_2025) / d25.amount_2025 * 100, 0)
                 END AS growth_rate
             FROM all_regions ar
             CROSS JOIN performance_types pt
-            LEFT JOIN data_2024 d24 
-                ON ar.region = d24.grouped_region AND pt.ptype = d24.ptype
             LEFT JOIN data_2025 d25 
                 ON ar.region = d25.grouped_region AND pt.ptype = d25.ptype
+            LEFT JOIN data_2026 d26 
+                ON ar.region = d26.grouped_region AND pt.ptype = d26.ptype
         ),
         
         -- 6. 行列转换生成报表
@@ -225,24 +225,24 @@ def result_table_one(engine, start_date, max_date):
             SELECT 
                 '总计' AS region,
                 ROUND(
-                    (SUM(CASE WHEN ptype = '整体业绩' THEN amount_2025 END) - 
-                     SUM(CASE WHEN ptype = '整体业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = '整体业绩' THEN amount_2024 END), 0) * 100, 0
+                    (SUM(CASE WHEN ptype = '整体业绩' THEN amount_2026 END) - 
+                     SUM(CASE WHEN ptype = '整体业绩' THEN amount_2025 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = '整体业绩' THEN amount_2025 END), 0) * 100, 0
                 ) AS all_sales,
                 ROUND(
-                    (SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2025 END) - 
-                     SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2024 END), 0) * 100, 0
+                    (SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2026 END) - 
+                     SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2025 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = 'NA业绩' THEN amount_2025 END), 0) * 100, 0
                 ) AS na_sales,
                 ROUND(
-                    (SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2025 END) - 
-                     SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2024 END), 0) * 100, 0
+                    (SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2026 END) - 
+                     SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2025 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = 'SMB业绩' THEN amount_2025 END), 0) * 100, 0
                 ) AS smb_sales,
                 ROUND(
-                    (SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2025 END) - 
-                     SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END)) / 
-                    NULLIF(SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2024 END), 0) * 100, 0
+                    (SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2026 END) - 
+                     SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2025 END)) / 
+                    NULLIF(SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount_2025 END), 0) * 100, 0
                 ) AS smbcore_sales
             FROM combined_data
         )
@@ -265,8 +265,8 @@ def result_table_one(engine, start_date, max_date):
     result = {re['grouped_region']: re for re in result}
     result_data['同期增长率'] = result
 
-    # 构建sql，查询“24年同期数据”
-    data_24_sql = f'''
+    # 构建sql，查询"25年同期数据"
+    data_25_sql = f'''
         WITH 
         -- 1. 定义所有地区
         all_regions AS (
@@ -284,8 +284,8 @@ def result_table_one(engine, start_date, max_date):
             SELECT 'SMBcore业绩'
         ),
         
-        -- 3. 计算24年各维度数据
-        data_2024 AS (
+        -- 3. 计算25年各维度数据
+        data_2025 AS (
             SELECT 
                 ar.region AS grouped_region,
                 pt.ptype,
@@ -300,7 +300,7 @@ def result_table_one(engine, start_date, max_date):
                 )/10000,1), 0) AS amount
             FROM all_regions ar
             CROSS JOIN performance_types pt
-            LEFT JOIN hw_two_four_data d 
+            LEFT JOIN hw_two_five_data d 
                 ON ar.region = CASE 
                     WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
                     THEN d.region 
@@ -318,7 +318,7 @@ def result_table_one(engine, start_date, max_date):
                 SUM(CASE WHEN ptype = 'NA业绩' THEN amount ELSE 0 END) AS NA业绩,
                 SUM(CASE WHEN ptype = 'SMB业绩' THEN amount ELSE 0 END) AS SMB业绩,
                 SUM(CASE WHEN ptype = 'SMBcore业绩' THEN amount ELSE 0 END) AS SMBcore业绩
-            FROM data_2024
+            FROM data_2025
             GROUP BY grouped_region
         ),
         
@@ -355,9 +355,9 @@ def result_table_one(engine, start_date, max_date):
                 WHEN '总计' THEN 8
             END;
     '''
-    result_24 = [dict(row) for row in conn.execute(text(data_24_sql)).mappings().fetchall()]
-    result_24 = {re['grouped_region']: re for re in result_24}
-    result_data['24年同期数据'] = result_24
+    result_25 = [dict(row) for row in conn.execute(text(data_25_sql)).mappings().fetchall()]
+    result_25 = {re['grouped_region']: re for re in result_25}
+    result_data['25年同期数据'] = result_25
 
     conn.close()
     return result_data
@@ -379,13 +379,13 @@ def result_table_two(engine):
                     ELSE '其他' 
                 END AS classified_region,
                 sales_amount AS national_num,
-                CASE WHEN performance_date >= '2025-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
+                CASE WHEN performance_date >= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
                 sales_amount AS national_year_num,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales,
-                CASE WHEN performance_date >= '2025-07-01' AND sales_team IN ('中长尾', '电网销') 
+                CASE WHEN performance_date >= '2026-07-01' AND sales_team IN ('中长尾', '电网销') 
                     THEN sales_amount ELSE 0 END AS smb_sales_h1,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales_year
-            FROM hw_two_five_data
+            FROM hw_two_six_data
         ) AS sub
         GROUP BY classified_region WITH ROLLUP
         ORDER BY 
@@ -418,13 +418,13 @@ def result_table_three(engine):
             SELECT 
                 salesperson AS classified,
                 sales_amount AS national_num,
-                CASE WHEN performance_date >= '2025-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
+                CASE WHEN performance_date >= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
                 sales_amount AS national_year_num,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales,
-                CASE WHEN performance_date >= '2025-07-01' AND sales_team IN ('中长尾', '电网销') 
+                CASE WHEN performance_date >= '2026-07-01' AND sales_team IN ('中长尾', '电网销') 
                     THEN sales_amount ELSE 0 END AS smb_sales_h1,
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales_year
-            FROM hw_two_five_data
+            FROM hw_two_six_data
         ) AS sub
         GROUP BY classified WITH ROLLUP
     '''
@@ -450,19 +450,19 @@ def result_table_four(engine, start_date, max_date):
                     CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
                     MONTH(performance_date) AS month,
                     ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-                FROM hw_two_five_data
+                FROM hw_two_six_data
                 WHERE 
                     1=1
                     {where_sql}
                 GROUP BY 区域, month
             ),
             last_year_data AS (
-                -- 新增2024年同期数据部分
+                -- 新增2025年同期数据部分
                 SELECT 
                     CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
                     MONTH(performance_date) AS month,
                     ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-                FROM hw_two_four_data
+                FROM hw_two_five_data
                 WHERE 
                     performance_date BETWEEN '{start_date}' AND '{max_date}'
                     {where_sql}
@@ -483,7 +483,7 @@ def result_table_four(engine, start_date, max_date):
                 COALESCE(SUM(CASE WHEN d.month = 11 THEN d.sales_amount ELSE 0 END), 0) AS `11月`,
                 COALESCE(SUM(CASE WHEN d.month = 12 THEN d.sales_amount ELSE 0 END), 0) AS `12月`,
                 COALESCE(SUM(d.sales_amount), 0) AS 合计,
-                COALESCE(SUM(l.sales_amount), 0) AS `24年同期`
+                COALESCE(SUM(l.sales_amount), 0) AS `25年同期`
             FROM regions r
             LEFT JOIN filtered_data d ON r.区域 = d.区域
             LEFT JOIN last_year_data l ON r.区域 = l.区域 AND d.month = l.month
@@ -496,7 +496,7 @@ def result_table_four(engine, start_date, max_date):
                 SUM(`1月`), SUM(`2月`), SUM(`3月`), SUM(`4月`),
                 SUM(`5月`), SUM(`6月`), SUM(`7月`), SUM(`8月`),
                 SUM(`9月`), SUM(`10月`), SUM(`11月`), SUM(`12月`),
-                SUM(合计),SUM(`24年同期`)
+                SUM(合计),SUM(`25年同期`)
             FROM (
                 SELECT 
                     r.区域,
@@ -513,7 +513,7 @@ def result_table_four(engine, start_date, max_date):
                     COALESCE(SUM(CASE WHEN d.month = 11 THEN d.sales_amount ELSE 0 END), 0) AS `11月`,
                     COALESCE(SUM(CASE WHEN d.month = 12 THEN d.sales_amount ELSE 0 END), 0) AS `12月`,
                     COALESCE(SUM(d.sales_amount), 0) AS 合计,
-                    COALESCE(SUM(l.sales_amount), 0) AS `24年同期`
+                    COALESCE(SUM(l.sales_amount), 0) AS `25年同期`
                 FROM regions r
                 LEFT JOIN filtered_data d ON r.区域 = d.区域
                 LEFT JOIN last_year_data l ON r.区域 = l.区域 AND d.month = l.month
@@ -543,10 +543,10 @@ def result_table_four(engine, start_date, max_date):
         result = [dict(row) for row in conn.execute(text(select_sql(v, max_date))).mappings().fetchall()]
         for re in result:
             re_sum = float(re['合计'])
-            re_24 = float(re['24年同期'])
+            re_25 = float(re['25年同期'])
             re['增长率'] = '0'
-            if re_sum and re_24:
-                re['增长率'] = f'{int(round((re_sum - re_24)/re_24*100, 0))}%'
+            if re_sum and re_25:
+                re['增长率'] = f'{int(round((re_sum - re_25)/re_25*100, 0))}%'
         result = {re['区域']: re for re in result}
         result_data[k] = result
 
@@ -565,7 +565,7 @@ def result_table_five(engine):
                 region,
                 MONTH(performance_date) AS month_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE
                 sales_team IN ('中长尾', '电网销')
                 AND is_traffic_product IN ('否','')
@@ -601,48 +601,48 @@ def result_table_five(engine):
 def result_table_six(engine, start_date, max_date):
     sql = f'''
         WITH 
+        base_data_26 AS(
+            SELECT
+                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
+                    ELSE customer_name
+                END AS secondary_dealer_re,
+                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
+            FROM hw_two_six_data
+            WHERE
+                sales_team IN ('中长尾', '电网销')
+                AND is_traffic_product IN ('否','')
+            GROUP BY secondary_dealer_re
+        ),
         base_data_25 AS(
             SELECT
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
                     ELSE customer_name
                 END AS secondary_dealer_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-            FROM hw_two_five_data
-            WHERE
-                sales_team IN ('中长尾', '电网销')
-                AND is_traffic_product IN ('否','')
-            GROUP BY secondary_dealer_re
-        ),
-        base_data_24 AS(
-            SELECT
-                CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
-                    ELSE customer_name
-                END AS secondary_dealer_re,
-                ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-            FROM hw_two_four_data_smbcore
+            FROM hw_two_five_data_smbcore
             WHERE
                 performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY secondary_dealer_re
         ),
         all_dealers AS(
-            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            SELECT secondary_dealer_re FROM base_data_26 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
             UNION
-            SELECT secondary_dealer_re FROM base_data_24 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
         )
 
         SELECT
             ad.secondary_dealer_re AS `SMBcore业绩`,
-            COALESCE(bd25.sales_amount, 0) AS `25年截止目前业绩`,
-            COALESCE(bd24.sales_amount, 0) AS `24年同期业绩`,
+            COALESCE(bd26.sales_amount, 0) AS `26年截止目前业绩`,
+            COALESCE(bd25.sales_amount, 0) AS `25年同期业绩`,
             CASE 
-                WHEN COALESCE(bd24.sales_amount, 0) = 0 THEN NULL
-                ELSE CONCAT(ROUND((COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0)) / COALESCE(bd24.sales_amount, 0) * 100, 0), '%')
+                WHEN COALESCE(bd25.sales_amount, 0) = 0 THEN NULL
+                ELSE CONCAT(ROUND((COALESCE(bd26.sales_amount, 0) - COALESCE(bd25.sales_amount, 0)) / COALESCE(bd25.sales_amount, 0) * 100, 0), '%')
             END AS `同期增长率`,
-            COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0) AS `同比24年正负值`
+            COALESCE(bd26.sales_amount, 0) - COALESCE(bd25.sales_amount, 0) AS `同比25年正负值`
         FROM
             all_dealers ad
+            LEFT JOIN base_data_26 bd26 ON ad.secondary_dealer_re = bd26.secondary_dealer_re
             LEFT JOIN base_data_25 bd25 ON ad.secondary_dealer_re = bd25.secondary_dealer_re
-            LEFT JOIN base_data_24 bd24 ON ad.secondary_dealer_re = bd24.secondary_dealer_re
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     result = {re['SMBcore业绩']: re for re in result}
@@ -653,17 +653,17 @@ def result_table_seven(engine, start_date, max_date):
     sql = f'''
         SELECT
             main.product,
-            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 25Q1,
-            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q2' THEN sales_amount_q ELSE 0 END), 0) AS 25Q2,
-            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q3' THEN sales_amount_q ELSE 0 END), 0) AS 25Q3,
-            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q4' THEN sales_amount_q ELSE 0 END), 0) AS 25Q4,
-            COALESCE(SUM(sales_amount_q), 0) AS `25年目前业绩`,
-            COALESCE(last_year.same_performance_24, 0) AS `24年同期业绩`,
-            CONCAT(ROUND((COALESCE(SUM(sales_amount_q), 0) - COALESCE(last_year.same_performance_24, 0)) 
-                / NULLIF(COALESCE(last_year.same_performance_24, 0), 0) * 100, 0), '%') AS 同比增长
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 26Q1,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q2' THEN sales_amount_q ELSE 0 END), 0) AS 26Q2,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q3' THEN sales_amount_q ELSE 0 END), 0) AS 26Q3,
+            COALESCE(SUM(CASE WHEN current_year.quarter = 'Q4' THEN sales_amount_q ELSE 0 END), 0) AS 26Q4,
+            COALESCE(SUM(sales_amount_q), 0) AS `26年目前业绩`,
+            COALESCE(last_year.same_performance_25, 0) AS `25年同期业绩`,
+            CONCAT(ROUND((COALESCE(SUM(sales_amount_q), 0) - COALESCE(last_year.same_performance_25, 0)) 
+                / NULLIF(COALESCE(last_year.same_performance_25, 0), 0) * 100, 0), '%') AS 同比增长
         FROM (
             SELECT DISTINCT leased_line_product AS product 
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE leased_line_product IN ('EI', 'PaaS', '安全', '媒体', '数据库', '网络')
         ) AS main
         LEFT JOIN (
@@ -671,40 +671,40 @@ def result_table_seven(engine, start_date, max_date):
                 leased_line_product,
                 ROUND(SUM(sales_amount)/10000, 1) AS sales_amount_q,
                 quarter
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE sales_team IN ('中长尾', '电网销')
             GROUP BY leased_line_product,quarter
         ) AS current_year ON main.product = current_year.leased_line_product
         LEFT JOIN (
             SELECT 
                 leased_line_product,
-                ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
-            FROM hw_two_four_data
+                ROUND(SUM(sales_amount)/10000, 1) AS same_performance_25
+            FROM hw_two_five_data
             WHERE sales_team IN ('中长尾', '电网销')
                         AND performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY leased_line_product
         ) AS last_year ON main.product = last_year.leased_line_product
-        GROUP BY product, last_year.same_performance_24
+        GROUP BY product, last_year.same_performance_25
         
         UNION ALL
         
         SELECT 
             '企业协同' AS product,
-            COALESCE(SUM(CASE WHEN quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 25Q1,
-            COALESCE(SUM(CASE WHEN quarter = 'Q2' THEN sales_amount_q ELSE 0 END), 0) AS 25Q2,
-            COALESCE(SUM(CASE WHEN quarter = 'Q3' THEN sales_amount_q ELSE 0 END), 0) AS 25Q3,
-            COALESCE(SUM(CASE WHEN quarter = 'Q4' THEN sales_amount_q ELSE 0 END), 0) AS 25Q4,
-            COALESCE(SUM(sales_amount_q), 0) AS `25年目前业绩`,
-            COALESCE(same_performance_24, 0) AS `24年同期业绩`,
+            COALESCE(SUM(CASE WHEN quarter = 'Q1' THEN sales_amount_q ELSE 0 END), 0) AS 26Q1,
+            COALESCE(SUM(CASE WHEN quarter = 'Q2' THEN sales_amount_q ELSE 0 END), 0) AS 26Q2,
+            COALESCE(SUM(CASE WHEN quarter = 'Q3' THEN sales_amount_q ELSE 0 END), 0) AS 26Q3,
+            COALESCE(SUM(CASE WHEN quarter = 'Q4' THEN sales_amount_q ELSE 0 END), 0) AS 26Q4,
+            COALESCE(SUM(sales_amount_q), 0) AS `26年目前业绩`,
+            COALESCE(same_performance_25, 0) AS `25年同期业绩`,
             CONCAT(ROUND(
-                (COALESCE(SUM(sales_amount_q), 0) - COALESCE(same_performance_24, 0)) 
-                / NULLIF(COALESCE(same_performance_24, 0), 0) * 100, 0
+                (COALESCE(SUM(sales_amount_q), 0) - COALESCE(same_performance_25, 0)) 
+                / NULLIF(COALESCE(same_performance_25, 0), 0) * 100, 0
             ),'%') AS 同比增长
         FROM (
             SELECT 
                 quarter,
                 ROUND(SUM(sales_amount)/10000, 1) AS sales_amount_q
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE 
                 enterprise_coop IS NOT NULL AND enterprise_coop <> ''
                 AND special_rebate_type <> '特殊商务'
@@ -712,15 +712,15 @@ def result_table_seven(engine, start_date, max_date):
         ) AS current_year_coop
         LEFT JOIN (
             SELECT 
-                ROUND(SUM(sales_amount)/10000, 1) AS same_performance_24
-            FROM hw_two_four_data
+                ROUND(SUM(sales_amount)/10000, 1) AS same_performance_25
+            FROM hw_two_five_data
             WHERE 
                 enterprise_coop IS NOT NULL AND enterprise_coop <> ''
                 AND special_rebate_type <> '特殊商务'
                 AND performance_date BETWEEN '{start_date}' 
                 AND '{max_date}'
         ) AS last_year_coop ON 1=1
-        GROUP BY same_performance_24
+        GROUP BY same_performance_25
         
         ORDER BY FIELD(product, 'EI', 'PaaS', '安全', '媒体', '数据库', '网络', '企业协同');
     '''
@@ -737,12 +737,12 @@ def result_table_eight(engine):
             ROUND(SUM(IF(sales_team = '华为云NA', sales_amount, 0))/10000, 1) AS NA业绩,
             ROUND(SUM(IF(sales_team IN ('中长尾', '电网销'), sales_amount, 0))/10000, 1) AS SMB业绩,
             ROUND(SUM(IF(sales_team IN ('中长尾', '电网销') 
-                       AND is_traffic_product IN ('否',''), sales_amount, 0))/10000, 1) AS SMBcore业绩,
+                       AND is_traffic_product IN ('否',''), sales_amount, 0))/10000, 1) AS 'SMB-CORE',
             GROUP_CONCAT(DISTINCT salesperson) AS 销售员
-        FROM hw_two_five_data
+        FROM hw_two_six_data
         WHERE secondary_dealer NOT IN (
             SELECT DISTINCT secondary_dealer 
-            FROM hw_two_four_data
+            FROM hw_two_five_data
                 WHERE secondary_dealer IS NOT NULL
         )
         GROUP BY secondary_dealer
@@ -756,10 +756,10 @@ def result_table_nine(engine):
     sql = '''
         WITH new_customers AS (
             SELECT DISTINCT customer_name
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE customer_name NOT IN (
                 SELECT DISTINCT customer_name 
-                FROM hw_two_four_data
+                FROM hw_two_five_data
                         WHERE customer_name IS NOT NULL
             )
         ),
@@ -780,7 +780,7 @@ def result_table_nine(engine):
                         ORDER BY performance_date DESC
                     ) AS rn
                 FROM 
-                    hw_two_five_data
+                    hw_two_six_data
                 WHERE 
                     customer_name IN (SELECT customer_name FROM new_customers)
             ) t
@@ -788,26 +788,26 @@ def result_table_nine(engine):
                 rn = 1
         )
         SELECT
-            five.customer_name AS `新增客户`,
+            six.customer_name AS `新增客户`,
             ri.secondary_dealer AS `渠道名称`,
-            ROUND(SUM(five.sales_amount)/10000, 1) AS `业绩金额`,
-            ROUND(SUM(CASE WHEN five.sales_team = '华为云NA' THEN five.sales_amount ELSE 0 END)/10000, 1) AS `NA业绩`,
-            ROUND(SUM(CASE WHEN five.sales_team IN ('中长尾', '电网销') THEN five.sales_amount ELSE 0 END)/10000, 1) AS `SMB业绩`,
+            ROUND(SUM(six.sales_amount)/10000, 1) AS `业绩金额`,
+            ROUND(SUM(CASE WHEN six.sales_team = '华为云NA' THEN six.sales_amount ELSE 0 END)/10000, 1) AS `NA业绩`,
+            ROUND(SUM(CASE WHEN six.sales_team IN ('中长尾', '电网销') THEN six.sales_amount ELSE 0 END)/10000, 1) AS `SMB业绩`,
             ROUND(SUM(CASE 
-                    WHEN five.sales_team IN ('中长尾', '电网销') 
-                    AND five.is_traffic_product IN ('否','') 
-                    THEN five.sales_amount ELSE 0 
+                    WHEN six.sales_team IN ('中长尾', '电网销') 
+                    AND six.is_traffic_product IN ('否','') 
+                    THEN six.sales_amount ELSE 0 
                 END)/10000, 1) AS `SMB-CORE`,
             ri.salesperson AS `销售员`,
             ri.customer_tag AS `客户标签`
         FROM 
-            hw_two_five_data five
+            hw_two_six_data six
         INNER JOIN 
-            new_customers nc ON five.customer_name = nc.customer_name
+            new_customers nc ON six.customer_name = nc.customer_name
         LEFT JOIN 
-            recent_info ri ON five.customer_name = ri.customer_name
+            recent_info ri ON six.customer_name = ri.customer_name
         GROUP BY 
-            five.customer_name, 
+            six.customer_name, 
             ri.secondary_dealer, 
             ri.salesperson, 
             ri.customer_tag
@@ -829,7 +829,7 @@ def result_table_ten(engine):
                 region,
                 MONTH(performance_date) AS month_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE
                 sales_team = '华为云NA'
             GROUP BY secondary_dealer_re, customer_name, salesperson, region, month_re
@@ -864,47 +864,47 @@ def result_table_ten(engine):
 def result_table_eleven(engine, start_date, max_date):
     sql = f'''
         WITH 
-        base_data_25 AS(
+        base_data_26 AS(
             SELECT
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
                     ELSE customer_name
                 END AS secondary_dealer_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-            FROM hw_two_five_data
+            FROM hw_two_six_data
             WHERE
                 sales_team = '华为云NA'
             GROUP BY secondary_dealer_re
         ),
-        base_data_24 AS(
+        base_data_25 AS(
             SELECT
                 CASE WHEN secondary_dealer != '' AND secondary_dealer IS NOT NULL THEN secondary_dealer
                         ELSE customer_name
                 END AS secondary_dealer_re,
                 ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
-            FROM hw_two_four_data_na
+            FROM hw_two_five_data_na
             WHERE
                 performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY secondary_dealer_re
         ),
         all_dealers AS(
-            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            SELECT secondary_dealer_re FROM base_data_26 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
             UNION
-            SELECT secondary_dealer_re FROM base_data_24 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
+            SELECT secondary_dealer_re FROM base_data_25 WHERE secondary_dealer_re != '' AND secondary_dealer_re IS NOT NULL
         )
 
         SELECT
             ad.secondary_dealer_re AS `NA业绩`,
-            COALESCE(bd25.sales_amount, 0) AS `25年截止目前业绩`,
-            COALESCE(bd24.sales_amount, 0) AS `24年同期业绩`,
+            COALESCE(bd26.sales_amount, 0) AS `26年截止目前业绩`,
+            COALESCE(bd25.sales_amount, 0) AS `25年同期业绩`,
             CASE 
-                WHEN COALESCE(bd24.sales_amount, 0) = 0 THEN NULL
-                ELSE CONCAT(ROUND((COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0)) / COALESCE(bd24.sales_amount, 0) * 100, 0), '%')
+                WHEN COALESCE(bd25.sales_amount, 0) = 0 THEN NULL
+                ELSE CONCAT(ROUND((COALESCE(bd26.sales_amount, 0) - COALESCE(bd25.sales_amount, 0)) / COALESCE(bd25.sales_amount, 0) * 100, 0), '%')
             END AS `同期增长率`,
-            COALESCE(bd25.sales_amount, 0) - COALESCE(bd24.sales_amount, 0) AS `同比24年正负值`
+            COALESCE(bd26.sales_amount, 0) - COALESCE(bd25.sales_amount, 0) AS `同比25年正负值`
         FROM
             all_dealers ad
+            LEFT JOIN base_data_26 bd26 ON ad.secondary_dealer_re = bd26.secondary_dealer_re
             LEFT JOIN base_data_25 bd25 ON ad.secondary_dealer_re = bd25.secondary_dealer_re
-            LEFT JOIN base_data_24 bd24 ON ad.secondary_dealer_re = bd24.secondary_dealer_re
     '''
     result = [dict(row) for row in engine.connect().execute(text(sql)).mappings().fetchall()]
     result = {re['NA业绩']: re for re in result}
