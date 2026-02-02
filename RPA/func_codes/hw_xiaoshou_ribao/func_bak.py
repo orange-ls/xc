@@ -148,8 +148,8 @@ def match_HVdata(filepath, HV_path):
 
     # 筛选数据并写入 销售明细(HV)结果表
     # df_HV = df.query("分销渠道 == '15' and 产品组 == 'HV' and 客户编号 == ['200000041','200000201'] ")
-# 20240620修改：客户编号的数据不用单独筛选
-    df_HV = df.query("分销渠道 == '15' and 产品组 == 'HV'")
+# 20240620修改：客户编号是200000041的数据不用单独筛选
+    df_HV = df.query("分销渠道 == '15' and 产品组 == 'HV' and 客户编号 == ['200000201'] ")
     df_HV.to_excel(HV_path, index=False)
 
     # 设置销售明细(HV)结果表格式
@@ -438,11 +438,16 @@ def setStyle(finialPath, originalCols, allColumnsList):
 
 
 if __name__ == "__main__":
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售日报\1.1-1.30_销售日报export.MHTML",
+    # g_dictGlobal = {"销售日报": r"D:\Uibot项目文件\test\下载\08日_销售日报export.xlsx",
+    #                 "已销未提": r"D:\Uibot项目文件\test\下载\08日_已销未提export.xlsx",
+    #                 "销售员大区对应表路径": r"D:\Uibot项目文件\配置表\外挂-华为SBU销售员大区对应表-21.xlsx",
+    #                 "汇率换算表路径": r"D:\Uibot项目文件\配置表\人员划分&汇率换算.xlsx",
+    #                 "保存路径": r"D:\Uibot项目文件\test\保存"}
+    g_dictGlobal = {"销售日报": r"D:\xc_files\交接\zhangweno需求\华为销售日报流程\6.1-6.20_销售日报export.MHTML",
                     "已销未提": r"D:\Uibot项目文件\test\下载\08日_已销未提export.xlsx",
                     "销售员大区对应表路径": r"D:\Uibot项目文件\配置表\外挂-华为SBU销售员大区对应表-21.xlsx",
-                    "汇率换算表路径": r"D:\xc_files\销售日报\人员划分&汇率换算.xlsx",
-                    "保存路径": r"D:\xc_files\销售日报\结果"}
+                    "汇率换算表路径": r"D:\Uibot项目文件\配置表\人员划分&汇率换算.xlsx",
+                    "保存路径": r"D:\xc_files\交接\zhangweno需求\华为销售日报流程"}
     g_dictGlobal["销售日报HV"] = get_HVPath(g_dictGlobal["保存路径"])
     generateHVResult = match_HVdata(g_dictGlobal["销售日报"], g_dictGlobal["销售日报HV"])
     df = generateHVResult[0]
