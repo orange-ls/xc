@@ -777,8 +777,8 @@ def filterValidPayInfoCJB(x):
 # 匹配"贷款利率"
 def matchRate(series, flag):
     if flag != "鲲泰":
-        # if series["事业部"] in ["区域事业部", "行业事业部", "超聚变业务部", "商业分销及电商业务部"]:
-        if series["事业部"] in ["北区", "南区", "超聚变及商业分销", "新业务"]:
+        # if series["事业部"] in ["北区", "南区", "超聚变及商业分销", "新业务"]:
+        if series["事业部"] in ["北区事业部", "南区事业部", "产品部", "创新业务部"]:
             if series["付款天数差"] <= 15:
                 return 0.046
             else:
@@ -804,8 +804,8 @@ def matchCost(series, flag):
     if not isinstance(series["贷款利率"], float):
         return series["贷款利率"]
     if flag != "鲲泰":
-        # if series["事业部"] in ["区域事业部", "行业事业部", "超聚变业务部", "商业分销及电商业务部"]:
-        if series["事业部"] in ["北区", "南区", "超聚变及商业分销", "新业务"]:
+        # if series["事业部"] in ["北区", "南区", "超聚变及商业分销", "新业务"]:
+        if series["事业部"] in ["北区事业部", "南区事业部", "产品部", "创新业务部"]:
             return (series["付款天数差"] - 15) * series["付款金额"] * series["贷款利率"] / 365
         elif series["事业部"] == "服务事业部":
             return (series["付款天数差"] - 8) * series["付款金额"] * series["贷款利率"] / 365
