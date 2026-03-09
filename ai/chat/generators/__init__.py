@@ -1,0 +1,3 @@
+"""
+Response generation components
+"""

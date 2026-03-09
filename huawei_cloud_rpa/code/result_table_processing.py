@@ -33,25 +33,28 @@ def result_table_one(engine, start_date, max_date):
                 SELECT '直客'
             ),
             region_data AS (
-                SELECT 
-                    COALESCE(ar.region, 
-                        CASE 
-                            WHEN d.region NOT IN ('北京','广州','深圳','上海','南京','成都') 
-                            THEN '其他' 
-                        END
-                    ) AS grouped_region,
+                SELECT
+                    ar.region AS grouped_region,
                     ct.customer_type,
                     COALESCE(ROUND(SUM(d.sales_amount)/10000, 1), 0) AS total_sales
                 FROM all_regions ar
                 CROSS JOIN customer_types ct
-                LEFT JOIN hw_two_six_data d 
-                    ON d.region = ar.region
-                    AND ct.customer_type = CASE 
-                        WHEN d.secondary_dealer IS NULL OR d.secondary_dealer='' THEN '直客' 
-                        ELSE '渠道' 
-                    END
+                LEFT JOIN (
+                    SELECT
+                        CASE
+                            WHEN region IN ('北京','广州','深圳','上海','南京','成都')
+                            THEN region
+                            ELSE '其他'
+                        END AS region,
+                        sales_amount,
+                        CASE
+                            WHEN secondary_dealer IS NULL OR secondary_dealer='' THEN '直客'
+                            ELSE '渠道'
+                        END AS customer_type
+                    FROM hw_two_six_data
                     {where_sql}
-                GROUP BY grouped_region, ct.customer_type
+                ) d ON d.region = ar.region AND d.customer_type = ct.customer_type
+                GROUP BY ar.region, ct.customer_type
             ),
             pivot_data AS (
                 SELECT 
@@ -89,9 +92,9 @@ def result_table_one(engine, start_date, max_date):
     conn = engine.connect()
     select_params = {
         '整体业绩': "",
-        'NA业绩': "AND d.sales_team = '华为云NA'",
-        'SMB业绩': "AND d.sales_team in ('中长尾','电网销')",
-        'SMBcore业绩': "AND d.sales_team in ('中长尾','电网销') AND d.is_traffic_product IN ('否', '')"
+        'NA业绩': "where d.sales_team = '华为云NA'",
+        'SMB业绩': "where d.sales_team in ('中长尾','电网销')",
+        'SMBcore业绩': "where d.sales_team in ('中长尾','电网销') AND d.is_traffic_product IN ('否', '')"
     }
 
     # 循环执行查询 "整体业绩"、"NA业绩"、"SMB业绩"、"SMBcore业绩" 并返回结果

@@ -1,0 +1,26 @@
+# AI Chat Module Dependencies
+
+# Testing framework
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Property-based testing
+hypothesis>=6.0.0
+
+# Type checking
+mypy>=1.0.0
+
+# Code formatting and linting
+black>=22.0.0
+flake8>=5.0.0
+
+# Async support
+asyncio
+
+# Database support
+aiosqlite>=0.17.0
+
+# Optional dependencies for future features
+# aiofiles>=0.8.0  # For async file operations
+# aiohttp>=3.8.0   # For HTTP client functionality
+# sqlalchemy>=1.4.0  # For advanced database support
