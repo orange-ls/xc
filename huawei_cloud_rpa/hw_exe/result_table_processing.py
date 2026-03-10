@@ -92,9 +92,9 @@ def result_table_one(engine, start_date, max_date):
     conn = engine.connect()
     select_params = {
         '整体业绩': "",
-        'NA业绩': "where d.sales_team = '华为云NA'",
-        'SMB业绩': "where d.sales_team in ('中长尾','电网销')",
-        'SMBcore业绩': "where d.sales_team in ('中长尾','电网销') AND d.is_traffic_product IN ('否', '')"
+        'NA业绩': "where sales_team = '华为云NA'",
+        'SMB业绩': "where sales_team in ('中长尾','电网销')",
+        'SMBcore业绩': "where sales_team in ('中长尾','电网销') AND is_traffic_product IN ('否', '')"
     }
 
     # 循环执行查询 "整体业绩"、"NA业绩"、"SMB业绩"、"SMBcore业绩" 并返回结果
