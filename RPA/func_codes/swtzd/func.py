@@ -355,11 +355,44 @@ cols = ["PO", "物料编码", "物料型号", "物料描述", "数量", "成交�
 tzd_field = "服务品名"
 
 if __name__ == "__main__":
-    getNoticeFileContent(
-        r"D:\xc_files\商务通知单\商务通知单(进供货)20250907084904.xlsm",
-        r"D:\xc_files\商务通知单\【模板】- 合同清单 - V4.0.xlsx",
-        r"D:\xc_files\商务通知单\result",
-        r"D:\xc_files\商务通知单\服务物料【厂商物料编码】对应关系表.xlsx")
+    # getNoticeFileContent(
+    #     r"D:\xc_files\商务通知单\商务通知单(进供货)20250907084904.xlsm",
+    #     r"D:\xc_files\商务通知单\【模板】- 合同清单 - V4.0.xlsx",
+    #     r"D:\xc_files\商务通知单\result",
+    #     r"D:\xc_files\商务通知单\服务物料【厂商物料编码】对应关系表.xlsx")
+
+    """
+        notice_File: 商务通知单文件路径
+        save_Dir: 结果文件保存的文件夹（默认不变，可修改）
+        template_Path: 合同清单模板路径（默认不变）
+        relation_Path: 服务物料对应关系表路径（默认不变）
+    """
+    import sys
+
+    notice_File = ''
+    if sys.argv[1]:
+        notice_File = sys.argv[1]
+
+
+    save_Dir = r'D:\xc_files\商务通知单\result'
+    template_Path = r'D:\xc_files\商务通知单\【模板】- 合同清单 - V4.0.xlsx'
+    relation_Path = r'D:\xc_files\商务通知单\服务物料【厂商物料编码】对应关系表.xlsx'
+
+    # 检测文件是否存在
+    path_dict = {
+        '商务通知单路径': notice_File,
+        '结果保存路径': save_Dir,
+        '合同清单-模板': template_Path,
+        '服务物料【厂商物料编码】对应关系表': relation_Path
+    }
+    for name, path in path_dict.items():
+        if not os.path.exists(path):
+            print(f'{name} 路径不存在')
+
+    # 调用合同清单生成方法
+    result_path = getNoticeFileContent(notice_File, template_Path, save_Dir, relation_Path)
+    print(f'\n 合同清单已生成：{result_path}')
+
 
     # import glob
     #

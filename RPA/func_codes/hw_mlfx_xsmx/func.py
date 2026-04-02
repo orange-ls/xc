@@ -1082,8 +1082,8 @@ def matchCGLX(series):
     series = series.copy().fillna("")
     if "价外费用" in series["物料名称"]:
         return "价外费用"
-    elif (series["下单合同号"] == "外购" or series["批次"].startswith("WG") or "NCS" in series["批次"] or
-            "ECAS" in series["批次"] or series["批次"]==''):
+    elif (series["下单合同号"] == "外购" or series["批次"].startswith("WG") or "NCS" in series["批次"] or "ECAS" in series["批次"]
+          or (series["批次"]==''and (not series["下单合同号"].startswith("CY") or not series["下单合同号"].startswith("1Y")))):
         return "外购"
     elif series["下单合同号"] == "样机借转销":
         return "渠道分销"
@@ -1091,13 +1091,13 @@ def matchCGLX(series):
         return "折让"
     elif (series["下单合同号"] and not series["下单合同号"].startswith("CY") and not series["下单合同号"].startswith("1Y") and
           not '\u4e00' <= series["下单合同号"][0] <= '\u9fa5' and not series["采购类型"] == "外购"):
-        return "鲲泰"
+        return "内部采购"
     elif series["下单合同号"].startswith("CY"):
-        return "超聚变"
-    elif series["区域"] == "创新业务":
-        return "创新业务"
-    elif "公有云" in series["项目名称"]:
-        return "公有云"
+        return "内部采购"
+    # elif series["区域"] == "创新业务":
+    #     return "创新业务"
+    # elif "公有云" in series["项目名称"]:
+    #     return "公有云"
     else:
         return "原厂下单"
 
@@ -1119,6 +1119,11 @@ def matchCGLX_2(series):
             return "折旧费"
         else:
             return "价外费用"
+    elif (series["下单合同号"] and not series["下单合同号"].startswith("CY") and not series["下单合同号"].startswith("1Y") and
+          not '\u4e00' <= series["下单合同号"][0] <= '\u9fa5' and not series["采购类型"] == "外购"):
+        return "鲲泰"
+    elif series["下单合同号"].startswith("CY"):
+        return "超聚变"
     else:
         return ""
 
@@ -1134,7 +1139,7 @@ def matchYSFS(series, BoTransDict, HWOrderDict):
     """
     purchaseType = series["采购类型"]
     orderNum = series["下单合同号"]
-    if purchaseType == "鲲泰":
+    if purchaseType == "内部采购" or purchaseType == "外购":
         # return KTOrderDict.get(orderNum, "鲲泰外挂表未匹配到")
         # --20250429 参考"库存地"字段最后两个字符判断
         stock_last2 = series["库存地"][-2:]
@@ -1142,10 +1147,10 @@ def matchYSFS(series, BoTransDict, HWOrderDict):
             return "汽运"
         elif stock_last2 == "01" or stock_last2 == "XN" or stock_last2 == '':
             return "自提"
-    elif purchaseType in ["公有云", "服务", "服务预提", "渠道分销", "外购", "价外费用", "折让"]:
+    elif purchaseType in ["公有云", "服务", "服务预提", "渠道分销", "价外费用", "折让"]:
         return "自提"
-    if purchaseType == "超聚变":
-        return BoTransDict.get(orderNum, "自提")
+    # if purchaseType == "超聚变":
+    #     return BoTransDict.get(orderNum, "自提")
     else:  # todo:华为订单表未匹配到的默认值为"自提"
         return HWOrderDict.get(orderNum, "华为订单表未匹配到")
 
@@ -1249,26 +1254,26 @@ def calDataStep2(df, BO_file):
     # 去重（保留最后一条数据）并匹配到销售明细df中
     df_BO_pc = df_BO.drop_duplicates("批次", keep="last", ignore_index=True)
     matchDict = dict(zip(df_BO_pc["批次"], df_BO_pc[boMatchCol].values.tolist()))
-    # --20250813
-    df_BO_po = df_BO.drop_duplicates("华为_厂商PO号", keep="last", ignore_index=True)
-    po_matchDict = dict(zip(df_BO_po["华为_厂商PO号"], df_BO_po[["项目名称(查询 1 用 系统科技销售管理采购信息)", "签约客户名称"]].values.tolist()))
-
-    # logger.info(matchDict)
-    # df.loc[df["下单合同号"] == '', matchCol] = df['批次'].apply(matchProject2, args=(matchDict, matchCol,))
-    df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
-
-    # --20250807 下单合同号 新增批次和区域的匹配
-    df.loc[df["批次"] == '', ["下单合同号"]] = df.loc[df["批次"] == '', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    df.loc[df["区域"] == '创新业务', ["下单合同号"]] = df.loc[df["区域"] == '创新业务', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    # --20250429 新增”价外费用“的填充，然后替换”价外费用“，并删除”项目注释“列
-    # df.loc[df["下单合同号"] == '价外费用', ["项目名称", "评审二代"]] = df.loc[df["下单合同号"] == '价外费用', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
-    # df.loc[df["下单合同号"] == '价外费用', ["下单合同号"]] = df.loc[df["下单合同号"] == '价外费用', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    mask = df["下单合同号"] == '价外费用'
-    if mask.any():
-        df.loc[mask, ["项目名称", "评审二代"]] = df.loc[mask, "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
-        df.loc[mask, ["下单合同号"]] = df.loc[mask, "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
-    df.loc[df["项目名称"] == '', ["项目名称", "评审二代"]] = df.loc[df["项目名称"] == '', "下单合同号"].apply(lambda x: pd.Series(data=po_matchDict.get(x, ["", ""]), index=["项目名称", "评审二代"]))
-    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
+    # # --20250813
+    # df_BO_po = df_BO.drop_duplicates("华为_厂商PO号", keep="last", ignore_index=True)
+    # po_matchDict = dict(zip(df_BO_po["华为_厂商PO号"], df_BO_po[["项目名称(查询 1 用 系统科技销售管理采购信息)", "签约客户名称"]].values.tolist()))
+    #
+    # # logger.info(matchDict)
+    # # df.loc[df["下单合同号"] == '', matchCol] = df['批次'].apply(matchProject2, args=(matchDict, matchCol,))
+    # df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
+    #
+    # # --20250807 下单合同号 新增批次和区域的匹配
+    # df.loc[df["批次"] == '', ["下单合同号"]] = df.loc[df["批次"] == '', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
+    # df.loc[df["区域"] == '创新业务', ["下单合同号"]] = df.loc[df["区域"] == '创新业务', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
+    # # --20250429 新增”价外费用“的填充，然后替换”价外费用“，并删除”项目注释“列
+    # # df.loc[df["下单合同号"] == '价外费用', ["项目名称", "评审二代"]] = df.loc[df["下单合同号"] == '价外费用', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
+    # # df.loc[df["下单合同号"] == '价外费用', ["下单合同号"]] = df.loc[df["下单合同号"] == '价外费用', "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
+    # mask = df["下单合同号"] == '价外费用'
+    # if mask.any():
+    #     df.loc[mask, ["项目名称", "评审二代"]] = df.loc[mask, "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""])[1:], index=["项目名称", "评审二代"]))
+    #     df.loc[mask, ["下单合同号"]] = df.loc[mask, "项目注释"].apply(lambda x: str(x).split(';')[0] if pd.notna(x) else "")
+    # df.loc[df["项目名称"] == '', ["项目名称", "评审二代"]] = df.loc[df["项目名称"] == '', "下单合同号"].apply(lambda x: pd.Series(data=po_matchDict.get(x, ["", ""]), index=["项目名称", "评审二代"]))
+    # df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
     """生成{下单合同号：运输方式}字典"""
     dfBo_copy["发货方式"] = dfBo_copy["发货方式"].map(lambda x: BoDeliveryDict.get(x, ""))
@@ -1281,6 +1286,53 @@ def calDataStep2(df, BO_file):
     # 清理内存
     gc.collect()
     return df, matchDict, BoTransDict
+
+def calDataStep2_crm(df, crm_file, matchDict):
+    """
+    :param df: 需要处理的df
+    :param crm_file: CRM外挂表路径，包含"商机名称（必填）"和"关联的厂商PO号"两列
+    :param matchDict: BO采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
+    :return: 处理后的df
+    """
+    # 读取CRM外挂表，拆分"关联的厂商PO号"中用";"隔开的多个PO号
+    df_crm = pd.read_excel(crm_file, dtype=str).fillna("")
+    df_crm["关联的厂商PO号"] = df_crm["关联的厂商PO号"].str.replace("；", ";")  # 统一中英文分号
+    df_crm = df_crm.assign(**{"关联的厂商PO号": df_crm["关联的厂商PO号"].str.split(";")}).explode("关联的厂商PO号")
+    df_crm["关联的厂商PO号"] = df_crm["关联的厂商PO号"].str.strip()
+    df_crm = df_crm[df_crm["关联的厂商PO号"] != ""]
+    # 生成{PO号: 商机名称}字典，去重保留最后一条
+    df_crm = df_crm.drop_duplicates("关联的厂商PO号", keep="last", ignore_index=True)
+    crm_dict = dict(zip(df_crm["关联的厂商PO号"], df_crm["商机名称（必填）"]))
+    print(f"CRM外挂表拆分后大小为：{df_crm.shape}")
+
+    # "下单合同号"取值：用"项目注释"列填充
+    # 条件：物料名称包含价外费用 OR 批次空白 OR 批次WG开头 OR 批次含NCS OR 批次含ECAS OR 批次KT开头
+    fill_mask = (
+        df["物料名称"].str.contains("价外费用", na=False) |
+        (df["批次"] == '') |
+        df["批次"].str.startswith("WG", na=False) |
+        df["批次"].str.contains("NCS", na=False) |
+        df["批次"].str.contains("ECAS", na=False) |
+        df["批次"].str.startswith("KT", na=False)
+    )
+    df.loc[fill_mask, ["下单合同号"]] = df.loc[fill_mask, "项目注释"].apply(
+        lambda x: str(x).split(';')[0] if pd.notna(x) else "")
+
+    # 下单合同号还是空时，按BO表的批次来匹配
+    # df.loc[df["下单合同号"] == '', "下单合同号"] = df.loc[df["下单合同号"] == '', "批次"].apply(lambda x: matchDict.get(x, [""])[0])
+    df.loc[df["下单合同号"] == '', matchCol] = df.loc[df["下单合同号"] == '', "批次"].apply(lambda x: pd.Series(data=matchDict.get(x, ["", "", ""]), index=matchCol))
+
+    # "项目名称"和"评审二代"仅在fill_mask范围内取值
+    # "项目名称"：用"下单合同号"关联CRM的"关联的厂商PO号"匹配"商机名称（必填）"
+    df.loc[fill_mask, "项目名称"] = df.loc[fill_mask, "下单合同号"].map(crm_dict).fillna("")
+    # "评审二代"：直接取df中的"客户名称"
+    df.loc[fill_mask, "评审二代"] = df.loc[fill_mask, "客户名称"]
+
+    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
+
+    # 清理内存
+    gc.collect()
+    return df
 
 
 # @logfun
@@ -1389,9 +1441,11 @@ def calDataStep4(df: pd.DataFrame, BoTransDict, HWOrderPathList, KTconfigPath):
     # 匹配采购类型
     # df["采购类型"] = df.apply(matchCGLX, axis=1)
     df.loc[df["采购类型"] == '', "采购类型"] = df.loc[df["采购类型"] == ''].apply(matchCGLX, axis=1)
-    # 在"采购类型"后增加一列"采购类型-二级分类"，取值规则为matchCGLX_2
-    col_position = df.columns.get_loc("采购类型") + 1
-    df.insert(col_position, "采购类型-二级分类", df.apply(matchCGLX_2, axis=1))
+    # 在"采购类型"后增加一列"采购类型-二级分类"，仅对该列为空的行取值
+    if "采购类型-二级分类" not in df.columns:
+        col_position = df.columns.get_loc("采购类型") + 1
+        df.insert(col_position, "采购类型-二级分类", "")
+    df.loc[df["采购类型-二级分类"] == '', "采购类型-二级分类"] = df.loc[df["采购类型-二级分类"] == ''].apply(matchCGLX_2, axis=1)
 
     '''
     # 匹配销售类型
@@ -1725,6 +1779,7 @@ if __name__ == "__main__":
     g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY25销售明细(8月)_0806.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
+                    "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
                     "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
                     "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20250806.xlsx",
                     "OA预提表路径": r"D:\xc_files\销售明细\预提表_20250807.xlsx",
@@ -1733,6 +1788,7 @@ if __name__ == "__main__":
                     }
     g_selectPath = g_dictGlobal["销售日报"]
     BO_filePath = g_dictGlobal["BO下载路径"]
+    crm_file = g_dictGlobal["CRM外挂表路径"]
     ytPath = g_dictGlobal["OA预提表路径"]
     moveFilePath = g_dictGlobal["物料移动明细"]
     orderFileList = getSameFormatFile(g_dictGlobal["结果保存路径"], "订单表")
@@ -1757,6 +1813,9 @@ if __name__ == "__main__":
     # matchDict：BusinessObjects采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
     # BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     df, matchDict, BoTransDict = calDataStep2(df, BO_filePath)
+
+    # 通过”项目注释“匹配"下单合同号"、通过CRM外挂表匹配"项目名称"、"评审二代"
+    df = calDataStep2_crm(df, crm_file, matchDict)
 
     # 通过物料移动明细表匹配"下单合同号"、"项目名称"、"评审二代"
     df = calDataStep3(df, moveFilePath, matchDict)
