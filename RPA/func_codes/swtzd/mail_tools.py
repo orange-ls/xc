@@ -16,7 +16,11 @@ def sqlite_execute(sqlfile, sql_s, sql_params=None):
     con = sqlite3.connect(sqlfile)
     try:
         if sql_params:
-            ret = con.execute(sql_s, sql_params)
+            if isinstance(sql_params[0], (list, tuple)):
+                # 批量插入
+                ret = con.executemany(sql_s, sql_params)
+            else:
+                ret = con.execute(sql_s, sql_params)
         else:
             ret = con.execute(sql_s)
         con.commit()
@@ -38,20 +42,40 @@ def get_mails(server, user, pd, sqlfile):
         sqlite_execute(sqlfile, create_sql)
     with Imbox(server, user, pd, ssl=True) as imbox:
         all_messages = imbox.messages(unread=True)
-        for uid, message in all_messages:
+        mail_list = []
+        messages_iter = iter(all_messages)
+        while True:
+            try:
+                uid, message = next(messages_iter)
+            except StopIteration:
+                break
+            except ValueError as e:
+                print(f"跳过一封邮件，解析失败: {e}")
+                continue
             subject = message.subject
             received_date = datetime.datetime.strptime(message.date[:24],
                                                        "%a, %d %b %Y %H:%M:%S")
-            received_date = received_date.strftime('%Y-%m-%d %H:%M:%S')
+            received_date_str = received_date.strftime('%Y-%m-%d %H:%M:%S')
             body = message.body["html"]
             if len(body) < 1:
                 continue
-            sqlite_execute(sqlfile, insert_sql,
-                           (user, subject, received_date, body[0]))
-            # 已读标记，最后再开启
+            mail_list.append((user, subject, received_date_str, body[0], received_date, uid))
+
+        # 批量标记已读
+        for uid in [item[5] for item in mail_list]:
             imbox.mark_seen(uid)
+
+        # 按时间新旧顺序排序（旧->新）
+        mail_list.sort(key=lambda x: x[4], reverse=True)  # 按received_date排序（新->旧）
+
+        # 批量插入数据
+        batch_size = 100
+        for i in range(0, len(mail_list), batch_size):
+            batch = mail_list[i:i + batch_size]
+            batch_data = [(item[0], item[1], item[2], item[3]) for item in batch]
+            sqlite_execute(sqlfile, insert_sql, batch_data)
 
 
 if __name__ == "__main__":
     pass
-    get_mails("imap.feishu.cn", "zhengws@digitalchina-hw.com", "LRmLn2AAD2GmQnSj", r'C:\Users\user\Desktop\email.db')
+    # get_mails("imap.feishu.cn", "huaweirpa-hefei@digitalchina.com", "oCldgBwjN1USCsJ3", r'C:\Users\user\Desktop\email.db')
