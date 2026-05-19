@@ -345,6 +345,21 @@ def calTrunc(x, len_=2):
     value = float(value[:idx])
     return value
 
+# 从邮箱名获取所属华为账号名称
+def get_name_by_mail(mail_name):
+    if 'huaweirpa-hefei' in mail_name:
+        return '合神'
+    else:
+        return '北神'
+
+# 判断传入的参数是否为null或其他空值，如果是，默认设为''
+def is_null(x):
+    if x is None or x == '':
+        return ''
+    else:
+        return x
+
+
 
 """
 unNamedService: 商务通知单中【设备/服务】列 = 服务，但【服务品名】列为空时默认的"服务品名"
@@ -355,119 +370,33 @@ cols = ["PO", "物料编码", "物料型号", "物料描述", "数量", "成交�
 tzd_field = "服务品名"
 
 if __name__ == "__main__":
+    """
+        notice_File: 商务通知单文件路径
+        save_Dir: 结果文件保存的文件夹（默认不变，可修改）
+        template_Path: 合同清单模板路径（默认不变）
+        relation_Path: 服务物料对应关系表路径（默认不变）
+    """
+    # notice_File = r'D:\xc_files\商务通知单\商务通知单(进供货)20250907084904.xlsm'
     import sys
-    import json
-    import time
-    import tkinter as tk
-    from tkinter import filedialog, messagebox
+    notice_File = ''
+    if sys.argv[1]:
+        notice_File = sys.argv[1]
 
-    # 配置文件路径：放在exe同级目录下，打包后也能正常读写
-    if getattr(sys, 'frozen', False):
-        _APP_DIR = os.path.dirname(sys.executable)
-    else:
-        _APP_DIR = os.path.dirname(os.path.abspath(__file__))
-    _CONFIG_PATH = os.path.join(_APP_DIR, 'swtzd_config.json')
+    save_Dir = r'D:\xc_files\商务通知单\result'
+    template_Path = r'D:\xc_files\商务通知单\【模板】- 合同清单 - V4.0.xlsx'
+    relation_Path = r'D:\xc_files\商务通知单\服务物料【厂商物料编码】对应关系表.xlsx'
 
-    def load_config():
-        """读取上次保存的路径配置"""
-        if os.path.exists(_CONFIG_PATH):
-            try:
-                with open(_CONFIG_PATH, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        return {}
+    # 检测文件是否存在
+    path_dict = {
+        '商务通知单路径': notice_File,
+        '结果保存路径': save_Dir,
+        '合同清单-模板': template_Path,
+        '服务物料【厂商物料编码】对应关系表': relation_Path
+    }
+    for name, path in path_dict.items():
+        if not os.path.exists(path):
+            print(f'{name} 路径不存在')
 
-    def save_config(save_dir, template_path, relation_path):
-        """将后三个路径保存到配置文件，下次启动时自动填充"""
-        cfg = {
-            'save_dir': save_dir,
-            'template_path': template_path,
-            'relation_path': relation_path
-        }
-        try:
-            with open(_CONFIG_PATH, 'w', encoding='utf-8') as f:
-                json.dump(cfg, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
-
-    def browse_file(entry, filetypes=None):
-        if filetypes is None:
-            filetypes = [("Excel文件", "*.xlsm *.xlsx"), ("所有文件", "*.*")]
-        path = filedialog.askopenfilename(filetypes=filetypes)
-        if path:
-            entry.delete(0, tk.END)
-            entry.insert(0, path)
-
-    def browse_dir(entry):
-        path = filedialog.askdirectory()
-        if path:
-            entry.delete(0, tk.END)
-            entry.insert(0, path)
-
-    def run():
-        notice = os.path.normpath(ent_notice.get().strip()) if ent_notice.get().strip() else ''
-        save = os.path.normpath(ent_save.get().strip()) if ent_save.get().strip() else ''
-        template = os.path.normpath(ent_template.get().strip()) if ent_template.get().strip() else ''
-        relation = os.path.normpath(ent_relation.get().strip()) if ent_relation.get().strip() else ''
-
-        # 校验路径
-        check = {
-            '商务通知单': notice,
-            '结果保存目录': save,
-            '合同清单模板': template,
-            '服务物料对应关系表': relation
-        }
-        missing = [name for name, p in check.items() if not p or not os.path.exists(p)]
-        if missing:
-            messagebox.showerror("路径错误", "以下路径不存在：\n" + "\n".join(missing))
-            return
-
-        # 保存后三个路径供下次使用
-        save_config(save, template, relation)
-
-        # 先销毁tkinter窗口，避免与xlwings的COM调用冲突
-        root.destroy()
-        time.sleep(0.5)
-
-        try:
-            result_path = getNoticeFileContent(notice, template, save, relation)
-            if result_path:
-                print(f'\n合同清单已生成：{result_path}')
-            else:
-                print('\n未生成合同清单（可能是合同取消/基本信息变更/无有效数据）')
-        except Exception as e:
-            print(f'\n执行出错：{e}')
-            import traceback
-            traceback.print_exc()
-
-    # 读取上次保存的配置
-    cfg = load_config()
-
-    root = tk.Tk()
-    root.title("商务通知单 → 合同清单生成工具")
-    root.resizable(False, False)
-
-    labels = ["商务通知单文件：", "结果保存目录：", "合同清单模板：", "服务物料对应关系表："]
-    config_keys = [None, 'save_dir', 'template_path', 'relation_path']
-    entries = []
-
-    for i, (label, key) in enumerate(zip(labels, config_keys)):
-        tk.Label(root, text=label, anchor="w").grid(row=i, column=0, padx=(10, 5), pady=8, sticky="w")
-        ent = tk.Entry(root, width=65)
-        ent.grid(row=i, column=1, padx=5, pady=8)
-        # 商务通知单每次都需要重新选，后三个从配置读取
-        if key:
-            ent.insert(0, cfg.get(key, ''))
-        entries.append(ent)
-        if i == 1:
-            tk.Button(root, text="浏览", width=6, command=lambda e=ent: browse_dir(e)).grid(row=i, column=2, padx=(5, 10), pady=8)
-        else:
-            tk.Button(root, text="浏览", width=6, command=lambda e=ent: browse_file(e)).grid(row=i, column=2, padx=(5, 10), pady=8)
-
-    ent_notice, ent_save, ent_template, ent_relation = entries
-
-    btn_run = tk.Button(root, text="开始生成", width=20, height=2, command=run)
-    btn_run.grid(row=len(labels), column=0, columnspan=3, pady=15)
-
-    root.mainloop()
+    # 调用合同清单生成方法
+    result_path = getNoticeFileContent(notice_File, template_Path, save_Dir, relation_Path)
+    print(f'\n 合同清单已生成：{result_path}')

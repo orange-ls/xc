@@ -254,6 +254,8 @@ def generateRemark(series: pd.Series, dfConf: pd.DataFrame):
     indexList = dfConf.index.tolist()
     if "折让" in series["合同号（客户PO号）"] or "折让" in series["物料名称"]:
         return "返款抵欠款"
+    elif "预开冲红" in series["合同号（客户PO号）"] or "预开冲红" in series["物料名称"]:
+        return "已销未提"
     elif series.name in indexList:
         if series[["数量", "税前金额"]].tolist() == dfConf.loc[series.name, ["数量", "销售金额"]].tolist():
             return "已销未提"
