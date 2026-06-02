@@ -62,8 +62,8 @@ def get_mails(server, user, pd, sqlfile):
             mail_list.append((user, subject, received_date_str, body[0], received_date, uid))
 
         # 批量标记已读
-        for uid in [item[5] for item in mail_list]:
-            imbox.mark_seen(uid)
+        # for uid in [item[5] for item in mail_list]:
+        #     imbox.mark_seen(uid)
 
         # 按时间新旧顺序排序（旧->新）
         mail_list.sort(key=lambda x: x[4], reverse=True)  # 按received_date排序（新->旧）
@@ -78,4 +78,4 @@ def get_mails(server, user, pd, sqlfile):
 
 if __name__ == "__main__":
     pass
-    # get_mails("imap.feishu.cn", "huaweirpa-hefei@digitalchina.com", "oCldgBwjN1USCsJ3", r'C:\Users\user\Desktop\email.db')
+    get_mails("imap.feishu.cn", "huaweirpa-hefei@digitalchina.com", "oCldgBwjN1USCsJ3", r'D:\Workspace\xc\RPA\func_codes\swtzd\email.db')

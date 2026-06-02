@@ -229,7 +229,8 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
         # return filePath, startDate, endDate, lastFlag
 
         """ 变更：订单表不再是不断汇总的形式，每次直接下载近1年的表"""
-        startDay = datetime(year=nowday.year - 1, month=1, day=1)
+        # startDay = datetime(year=nowday.year - 1, month=1, day=1)
+        startDay = datetime(year=nowday.year - 1, month=nowday.month, day=nowday.day)
         startDate = startDay.strftime(timeFmtStr)
         endDate = nowday.strftime(timeFmtStr)
         return startDate, endDate
