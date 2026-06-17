@@ -202,7 +202,7 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
         else:
             lastFlag = False
         startDate = startDate.strftime(timeFmtStr)
-        endDate = endDate.strftime(timeFmtStr)
+        endDate = nowday.strftime(timeFmtStr)
         # yearRange：下载数据的年份跨度，用于替换汇总表该年份数据
         yearRange = list(pd.period_range(startDate, endDate, freq="Y").year)
         # return 预提汇总表路径，下载开始日期，下载结束日期， 文件最新标识，下载日期范围年份跨度
@@ -238,13 +238,13 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
     elif keyWord == "业绩表":
         """
         华为业绩表：文件名:账号_2020业绩表（20210203）.xlsx
-        1.每个账号华为业绩表均会下载2020-当年的数据，重新下载的年份的数据均需要替换
+        1.每个账号华为业绩表均会下载2021-当年的数据，重新下载的年份的数据均需要替换
         2.n年的数据需要在>n年下载才无需进行替换
         3.如有跨年情况，上次为20211228下载的2021年数据，本次需要下载到2022年数据，则2021年数据需要重新下载，在下次执行时即不需要
         """
-        fileList = glob.glob(f"{saveDir}\\{user}_*{keyWord}（*）.xlsx")
-        # totalYearList：从2020年到当年的所有年
-        totalYearList = list(pd.period_range(2020, nowday.year, freq="Y").year)
+        fileList = glob.glob(f"{saveDir}\\{user}_{keyWord}（*）.xlsx")
+        # totalYearList：从2021年到当年的所有年
+        totalYearList = list(pd.period_range(2021, nowday.year, freq="Y").year)
         totalYearList = [str(i) for i in totalYearList]
         # 汇总表目录中的业绩表已经存在的数据年份
         existYear = []
@@ -265,13 +265,13 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
                 if matchObj.group(2) < nowday.strftime("%Y%m%d"):
                     downYearList.append(matchObj.group(1))
                     deleteFileList.append(filePath)
-        # 汇总表目录中从2020-当年的数据，除去已经存在并校验的数据，缺失的年份需重新下载
+        # 汇总表目录中从2021-当年的数据，除去已经存在并校验的数据，缺失的年份需重新下载
         for i in existYear:
             totalYearList.remove(i)
         downYearList.extend(totalYearList)
         # return 下载的年份列表，需要删除的文件列表
         return downYearList, deleteFileList
-    elif keyWord == "订单全字段报表":  # todo：1.配置表中的每个账号必须已经有汇总数据，新账号先自行下载一部分数据按指定规则命名即可，否则不会下载改新账号数据 2.默认下载数据的开始截止时间为 01:00:00
+    elif keyWord == "订单全字段报表":  # todo：1.配置表中的每个账号必须已经有汇总数据，新账号先自行下载一部分数据按指定规则命名即可，否则不会下载改新账号
         """
         华为订单全字段报表：文件名:账号_订单全字段报表_20210728.xlsx
         1.日期表示文件保存的截止日期，华为订单全字段报表会下载截止到当天01:00:00的数据，再次下载时无需下载重复日期的数据
@@ -412,7 +412,7 @@ def addExtraData(df, extraPath):
     df = df.append(validDf)
 
     # 删除df中的”服务产品线“和”服务产品类别“列
-    cols_to_drop = [col for col in ["服务产品线", "服务产品线类别"] if col in df.columns]
+    cols_to_drop = [col for col in ["服务产品线", "服务产品类别"] if col in df.columns]
     if cols_to_drop:
         df.drop(columns=cols_to_drop, inplace=True)
 
@@ -454,7 +454,6 @@ def handleMovementDetail(addfilePath, finalPath, dateFlag, finalPathAdd, BO_file
     df_pivot["批次2"] = df_pivot["批次"]
     # 重新排序列顺序
     df_pivot = df_pivot[["批次", "Z29", "批次2", "Z30"]]
-
     # 修改列名
     newColumns = ["Z29批次", "Z29本位币金额", "Z30批次", "Z30本位币金额"]
     df_pivot.columns = newColumns
@@ -804,6 +803,10 @@ def matchProject1(series):
     :return: 返回"下单合同号"、"项目名称"、"评审二代"
     """
 
+    # 优先判断折让
+    if "折让" in series["合同号（客户PO号）"] or "折让" in series["物料名称"]:
+        return pd.Series(data=["折让", "", ""], index=matchCol)
+
     if "价外费用" in series["物料名称"]:
         if series["物料号"] in ["600-072584", "600-072588", "600-072592", "600-072596", "600-217668"]:
             return pd.Series(data=["罚息", "", ""], index=matchCol)
@@ -815,8 +818,6 @@ def matchProject1(series):
             return pd.Series(data=["折旧费", "", ""], index=matchCol)
         else:
             return pd.Series(data=["价外费用", "", ""], index=matchCol)  # 后面将"价外费用"替换成BO采购信息中的"下单合同号"
-    elif "折让" in series["合同号（客户PO号）"] or "折让" in series["物料名称"]:
-        return pd.Series(data=["折让", "", ""], index=matchCol)
     # elif series["批次"].startswith("WG"):
     #     return pd.Series(data=["外购", "", ""], index=matchCol)
     elif series["批次"].startswith("D") and re.match("[A-Z]{3}.*", series["批次"], re.I):
@@ -1075,30 +1076,27 @@ def matchingMovementTable(series, index_, df_Move, matchDict):
 
 
 # 匹配“采购类型”
+# 匹配"采购类型"
 def matchCGLX(series):
     """
     :param series: DataFrame行series
     :return: 返回"采购类型"
     """
     series = series.copy().fillna("")
-    if "价外费用" in series["物料名称"]:
+    if series["下单合同号"] == "折让":
+        return "折让"
+    elif "价外费用" in series["物料名称"]:
         return "价外费用"
     elif (series["下单合同号"] == "外购" or series["批次"].startswith("WG") or "NCS" in series["批次"] or "ECAS" in series["批次"]
           or (series["批次"]==''and (not series["下单合同号"].startswith("CY") or not series["下单合同号"].startswith("1Y")))):
         return "外购"
     elif series["下单合同号"] == "样机借转销":
         return "渠道分销"
-    elif series["下单合同号"] == "折让":
-        return "折让"
     elif (series["下单合同号"] and not series["下单合同号"].startswith("CY") and not series["下单合同号"].startswith("1Y") and
           not '\u4e00' <= series["下单合同号"][0] <= '\u9fa5' and not series["采购类型"] == "外购"):
         return "内部采购"
     elif series["下单合同号"].startswith("CY"):
         return "内部采购"
-    # elif series["区域"] == "创新业务":
-    #     return "创新业务"
-    # elif "公有云" in series["项目名称"]:
-    #     return "公有云"
     else:
         return "原厂下单"
 
@@ -1241,6 +1239,11 @@ def calDataStep2(df, BO_file):
     :param BO_file: BusinessObjects采购信息下载路径
     :return:处理后的df，BO采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}，BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     """
+        # 最小新增：折让数据隔离，不参与BO匹配避免覆盖
+    mask_zhe = df["下单合同号"] == "折让"
+    df_zhe = df[mask_zhe].copy()
+    df = df[~mask_zhe]
+    
     # reg = "|".join(ignoreCharsList)
     reg = "".join(ignoreCharsList)
     # 读取BO下载的采购信息，忽略“华为_厂商PO号”部分特殊字符，将长度过低的数据去除
@@ -1283,6 +1286,8 @@ def calDataStep2(df, BO_file):
 
     # # 判断是否有数据未匹配到
     # flag = df.query("下单合同号 == ''").empty
+    # 合并折让数据
+    df = pd.concat([df, df_zhe], ignore_index=True)
 
     # 清理内存
     gc.collect()
@@ -1295,6 +1300,10 @@ def calDataStep2_crm(df, crm_file, matchDict):
     :param matchDict: BO采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
     :return: 处理后的df
     """
+    mask_zhe = df["下单合同号"] == "折让"
+    df_zhe = df[mask_zhe].copy()
+    df = df[~mask_zhe]
+
     # 读取CRM外挂表，拆分"关联的厂商PO号"中用";"隔开的多个PO号
     df_crm = pd.read_excel(crm_file, dtype=str).fillna("")
     df_crm["关联的厂商PO号"] = df_crm["关联的厂商PO号"].str.replace("；", ";")  # 统一中英文分号
@@ -1331,6 +1340,8 @@ def calDataStep2_crm(df, crm_file, matchDict):
 
     df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
+    df = pd.concat([df, df_zhe], ignore_index=True)
+
     # 清理内存
     gc.collect()
     return df
@@ -1345,6 +1356,11 @@ def calDataStep3(df: pd.DataFrame, moveFilePath, matchDict):
     :param matchDict: BusinessObjects采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
     :return: 处理后的df
     """
+
+    mask_zhe = df["下单合同号"] == "折让"
+    df_zhe = df[mask_zhe].copy()
+    df = df[~mask_zhe]
+
     global addDataFrame, recordDict, df_Move
 
     addDataFrame = pd.DataFrame()  # 记录切割后的数据（需要插入到数据集中）、
@@ -1392,6 +1408,8 @@ def calDataStep3(df: pd.DataFrame, moveFilePath, matchDict):
     # # 判断是否有数据未匹配到
     # flag = df.query("下单合同号 == ''").empty
 
+    df = pd.concat([df, df_zhe], ignore_index=True)
+
     # 清理内存
     gc.collect()
 
@@ -1405,6 +1423,11 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
     :param initMatchDf:“销售明细补充”外挂表中人工新增的[下单合同号, 项目名称, 评审二代]的数据
     :return: 处理后的df
     """
+
+    mask_zhe = df["下单合同号"] == "折让"
+    df_zhe = df[mask_zhe].copy()
+    df = df[~mask_zhe]
+
     # 将数据集及人工匹配数据的calAmountCol列转为数字类型
     df[calAmountCol] = pd.to_numeric(df[calAmountCol], errors='coerce')
     initMatchDf[calAmountCol] = pd.to_numeric(initMatchDf[calAmountCol], errors='coerce')
@@ -1427,6 +1450,7 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
                 f"补充表数据为{df_Match_.values.tolist()},匹配到的数据为{df_Match[['销售订单号', '销售订单行项目', calAmountCol]].values.tolist()}\n"
                 f"销售明细表对应数据为{target_df_.values.tolist()}，匹配到的数据为{target_df[['销售订单号', '销售订单行项目', calAmountCol]].values.tolist()}")
         df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject) & (df[calAmountCol] == amount), matchCol] = df_Match[matchCol].values
+    df = pd.concat([df, df_zhe], ignore_index=True)
     return df
 
 
@@ -1806,6 +1830,16 @@ if __name__ == "__main__":
     # 增加销售明细补充表数据
     # initMatchDf: “销售明细补充”外挂表中人工新增的[下单合同号, 项目名称, 评审二代]的数据
     df, initMatchDf = addExtraData(df, g_dictGlobal["销售明细补充表路径"])
+
+    # ==============================================
+    # 【唯一修改：提前标记折让，不影响任何原有逻辑】
+    # ==============================================
+    mask_zhe = (
+        df["合同号（客户PO号）"].str.contains("折让", na=False) |
+        df["物料名称"].str.contains("折让", na=False) |
+        (df["销售订单号"] == "返款抵欠款")
+    )
+    df.loc[mask_zhe, matchCol] = ["折让", "", ""]
 
     # 依据"物料名称"、"批次"的内容初步匹配"下单合同号"、"项目名称"、"评审二代"
     df = calDataStep1(df)

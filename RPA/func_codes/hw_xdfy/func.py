@@ -189,8 +189,9 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
         # # return 华为订单汇总表路径，下载开始日期，下载结束日期， 文件最新标识
         # return filePath, startDate, endDate, lastFlag
 
-        """ 变更：订单表不再是不断汇总的形式，每次直接下载近2年的表"""
-        startDay = datetime(year=nowday.year - 2, month=1, day=1)
+        """ 变更：订单表不再是不断汇总的形式，每次直接下载近1年的表"""
+        # startDay = datetime(year=nowday.year - 1, month=1, day=1)
+        startDay = datetime(year=nowday.year - 1, month=nowday.month, day=nowday.day)
         startDate = startDay.strftime(timeFmtStr)
         endDate = nowday.strftime(timeFmtStr)
         return startDate, endDate
@@ -296,7 +297,7 @@ def initAnalyzeNoteText(HWOrderPathList, analyzePath):
     if os.path.exists(resltPath):
         return resltPath
     # 读取华为订单表，获取“合神”、“北神”、“城投”的下单合同号列表
-    hs, bs, ct = [], [], []
+    hs, bs, ct, kt_pm = [], [], [], []
     for path in HWOrderPathList:
         df_ = pd.read_excel(path, dtype=str)
         nameFlag = os.path.basename(path).split("_")[0]
@@ -306,6 +307,8 @@ def initAnalyzeNoteText(HWOrderPathList, analyzePath):
             hs = df_["华为订单号"].tolist()
         elif nameFlag == "szshbj":
             bs = df_["华为订单号"].tolist()
+        elif nameFlag == "kuntai":
+            kt_pm = df_["华为订单号"].tolist()
         else:
             pass
 
@@ -325,13 +328,13 @@ def initAnalyzeNoteText(HWOrderPathList, analyzePath):
         if orderNum is None:
             continue
 
-        # 备注不为"合神"、"北神"、"城投"就重新进行备注
+        # 备注不为"合神"、"北神"、"城投"、"鲲泰_pm"就重新进行备注
         noteTextFlag = True if noteText in companySimpleDict.keys() else False
         # 补充符合条件但备注为空的单元格
         if amount > 0 and saleType == "正常销售" and orderNum.startswith("1Y") \
                 and buyType in ['服务', '原厂下单'] and not noteTextFlag:
             ws[
-                f"U{row}"].value = "合神" if orderNum in hs else "北神" if orderNum in bs else "城投" if orderNum in ct else ""
+                f"U{row}"].value = "合神" if orderNum in hs else "北神" if orderNum in bs else "城投" if orderNum in ct else "鲲泰_pm" if orderNum in kt_pm else ""
 
     wb.save(resltPath)
     wb.close()
@@ -1415,7 +1418,7 @@ resultCol：下单费用结果表的列名列表
 matchFlag：用于防止df.apply对第一条数据重复操作
 logger：用于打印日志
 """
-companySimpleDict = {"城投": "广州城投信息科技有限公司", "合神": "合肥神州数码有限公司", "北神": "北京神州数码有限公司"}
+companySimpleDict = {"城投": "广州城投信息科技有限公司", "合神": "合肥神州数码有限公司", "北神": "北京神州数码有限公司", "鲲泰_pm": "北京神州鲲泰信息技术有限公司"}
 filterCol = ["备注", "下单合同号", "项目名称", "客户名称", "销售员", "销售员编码", "事业部", "区域", "平台",
              "出具发票日", "成本总价", "实际税率", "产品", "产品线"]
 renameColDict = {"备注": "供应商名称", "出具发票日": "开单日期", "成本总价": "开单金额", "产品": "产品类别"}
@@ -1440,9 +1443,9 @@ if __name__ == "__main__":
     #                 "超聚变付款外挂表路径": r"E:\Uibot项目文件\配置表\超聚变付款表2023.xlsx",
     #                 "授信付款外挂表路径": r"E:\Uibot项目文件\配置表\授信付款外挂表.xlsx",
     #                 }
-    g_orderCostPath = r"D:\xc_files\下单\20240903\结果文件\下单费用1724987780.xlsx"
-    g_analyzePath = r"D:\xc_files\下单\20240903\结果文件\毛利核算.xlsx"
-    g_dictGlobal = {"文件下载路径": r"D:\xc_files\下单\20240903",
+    g_orderCostPath = r"D:\xc_files\下单\20260602\结果文件\下单费用1780056202.xlsx"
+    g_analyzePath = r"D:\xc_files\下单\20260602\结果文件\毛利核算0530.xlsx"
+    g_dictGlobal = {"文件下载路径": r"D:\xc_files\下单\20260602",
                     "结果保存路径": r"D:\xc_files\下单",
                     "超聚变付款外挂表路径": r"D:\xc_files\下单\Uibot项目测试\配置表\超聚变付款表2023.xlsx",
                     "授信付款外挂表路径": r"D:\xc_files\下单\Uibot项目测试\配置表\授信付款外挂表.xlsx",
