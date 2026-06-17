@@ -242,7 +242,7 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
         2.n年的数据需要在>n年下载才无需进行替换
         3.如有跨年情况，上次为20211228下载的2021年数据，本次需要下载到2022年数据，则2021年数据需要重新下载，在下次执行时即不需要
         """
-        fileList = glob.glob(f"{saveDir}\\{user}_*{keyWord}（*）.xlsx")
+        fileList = glob.glob(f"{saveDir}\\{user}_{keyWord}（*）.xlsx")
         # totalYearList：从2021年到当年的所有年
         totalYearList = list(pd.period_range(2021, nowday.year, freq="Y").year)
         totalYearList = [str(i) for i in totalYearList]
@@ -267,10 +267,7 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
                     deleteFileList.append(filePath)
         # 汇总表目录中从2021-当年的数据，除去已经存在并校验的数据，缺失的年份需重新下载
         for i in existYear:
-            try:
-                totalYearList.remove(i)
-            except ValueError:
-                pass
+            totalYearList.remove(i)
         downYearList.extend(totalYearList)
         # return 下载的年份列表，需要删除的文件列表
         return downYearList, deleteFileList
@@ -1795,8 +1792,6 @@ logger = None
 calYearMonth = ""
 
 if __name__ == "__main__":
-    # result = getQryTimeRange(r'D:\xc_files\毛利分析\汇总表', "业绩表", "", 'hfszsm')
-    # print(result)
     # g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
     #                 "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
     #                 "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",

@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a0d1ac25-039b-42b2-a085-b5d3018f963b" name="Changes" comment="RPA修改">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py" beforeDir="false" afterPath="$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py" beforeDir="false" afterPath="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,16 +27,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.111.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.func (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.func.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.mail_tools.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.111.executor": "Debug",
+    "Python.func (1).executor": "Debug",
+    "Python.func (2).executor": "Debug",
+    "Python.func.executor": "Debug",
+    "Python.mail_tools.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true"
   }
-}</component>
-  <component name="RunManager" selected="Python.111">
+}]]></component>
+  <component name="RunManager" selected="Python.func (2)">
     <configuration name="111" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="xc" />
       <option name="ENV_FILES" value="" />
@@ -73,6 +74,28 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_xdfy/func.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="func (2)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="xc" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -127,6 +150,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.func (2)" />
         <item itemvalue="Python.111" />
         <item itemvalue="Python.func (1)" />
         <item itemvalue="Python.mail_tools" />
@@ -182,7 +206,23 @@
       <option name="project" value="LOCAL" />
       <updated>1780369631240</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="RPA修改">
+      <option name="closed" value="true" />
+      <created>1781690598681</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1781690598681</updated>
+    </task>
+    <task id="LOCAL-00006" summary="RPA修改">
+      <option name="closed" value="true" />
+      <created>1781691438747</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1781691438747</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -240,6 +280,11 @@
           <url>file://$USER_HOME$/Desktop/111.py</url>
           <line>148</line>
           <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/RPA/func_codes/hw_mlfx_xsmx/func.py</url>
+          <line>244</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
