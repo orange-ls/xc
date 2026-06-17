@@ -1239,11 +1239,6 @@ def calDataStep2(df, BO_file):
     :param BO_file: BusinessObjects采购信息下载路径
     :return:处理后的df，BO采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}，BO下单合同号对应的运输方式字典{下单合同号：运输方式}
     """
-        # 最小新增：折让数据隔离，不参与BO匹配避免覆盖
-    mask_zhe = df["下单合同号"] == "折让"
-    df_zhe = df[mask_zhe].copy()
-    df = df[~mask_zhe]
-    
     # reg = "|".join(ignoreCharsList)
     reg = "".join(ignoreCharsList)
     # 读取BO下载的采购信息，忽略“华为_厂商PO号”部分特殊字符，将长度过低的数据去除
@@ -1286,8 +1281,6 @@ def calDataStep2(df, BO_file):
 
     # # 判断是否有数据未匹配到
     # flag = df.query("下单合同号 == ''").empty
-    # 合并折让数据
-    df = pd.concat([df, df_zhe], ignore_index=True)
 
     # 清理内存
     gc.collect()
@@ -1300,10 +1293,6 @@ def calDataStep2_crm(df, crm_file, matchDict):
     :param matchDict: BO采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
     :return: 处理后的df
     """
-    mask_zhe = df["下单合同号"] == "折让"
-    df_zhe = df[mask_zhe].copy()
-    df = df[~mask_zhe]
-
     # 读取CRM外挂表，拆分"关联的厂商PO号"中用";"隔开的多个PO号
     df_crm = pd.read_excel(crm_file, dtype=str).fillna("")
     df_crm["关联的厂商PO号"] = df_crm["关联的厂商PO号"].str.replace("；", ";")  # 统一中英文分号
@@ -1340,8 +1329,6 @@ def calDataStep2_crm(df, crm_file, matchDict):
 
     df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
-    df = pd.concat([df, df_zhe], ignore_index=True)
-
     # 清理内存
     gc.collect()
     return df
@@ -1356,11 +1343,6 @@ def calDataStep3(df: pd.DataFrame, moveFilePath, matchDict):
     :param matchDict: BusinessObjects采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
     :return: 处理后的df
     """
-
-    mask_zhe = df["下单合同号"] == "折让"
-    df_zhe = df[mask_zhe].copy()
-    df = df[~mask_zhe]
-
     global addDataFrame, recordDict, df_Move
 
     addDataFrame = pd.DataFrame()  # 记录切割后的数据（需要插入到数据集中）、
@@ -1408,8 +1390,6 @@ def calDataStep3(df: pd.DataFrame, moveFilePath, matchDict):
     # # 判断是否有数据未匹配到
     # flag = df.query("下单合同号 == ''").empty
 
-    df = pd.concat([df, df_zhe], ignore_index=True)
-
     # 清理内存
     gc.collect()
 
@@ -1423,11 +1403,6 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
     :param initMatchDf:“销售明细补充”外挂表中人工新增的[下单合同号, 项目名称, 评审二代]的数据
     :return: 处理后的df
     """
-
-    mask_zhe = df["下单合同号"] == "折让"
-    df_zhe = df[mask_zhe].copy()
-    df = df[~mask_zhe]
-
     # 将数据集及人工匹配数据的calAmountCol列转为数字类型
     df[calAmountCol] = pd.to_numeric(df[calAmountCol], errors='coerce')
     initMatchDf[calAmountCol] = pd.to_numeric(initMatchDf[calAmountCol], errors='coerce')
@@ -1450,7 +1425,6 @@ def matchExtraData(df: pd.DataFrame, initMatchDf: pd.DataFrame):
                 f"补充表数据为{df_Match_.values.tolist()},匹配到的数据为{df_Match[['销售订单号', '销售订单行项目', calAmountCol]].values.tolist()}\n"
                 f"销售明细表对应数据为{target_df_.values.tolist()}，匹配到的数据为{target_df[['销售订单号', '销售订单行项目', calAmountCol]].values.tolist()}")
         df.loc[(df["销售订单号"] == orderNum) & (df["销售订单行项目"] == oneProject) & (df[calAmountCol] == amount), matchCol] = df_Match[matchCol].values
-    df = pd.concat([df, df_zhe], ignore_index=True)
     return df
 
 
