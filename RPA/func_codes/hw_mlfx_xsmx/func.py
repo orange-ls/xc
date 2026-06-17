@@ -238,13 +238,15 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
     elif keyWord == "业绩表":
         """
         华为业绩表：文件名:账号_2020业绩表（20210203）.xlsx
-        1.每个账号华为业绩表均会下载2021-当年的数据，重新下载的年份的数据均需要替换
+        1.每个账号华为业绩表均会下载近三年的数据，重新下载的年份的数据均需要替换
         2.n年的数据需要在>n年下载才无需进行替换
         3.如有跨年情况，上次为20211228下载的2021年数据，本次需要下载到2022年数据，则2021年数据需要重新下载，在下次执行时即不需要
         """
         fileList = glob.glob(f"{saveDir}\\{user}_*{keyWord}（*）.xlsx")
-        # totalYearList：从2021年到当年的所有年
-        totalYearList = list(pd.period_range(2021, nowday.year, freq="Y").year)
+        # startYear：当前年前两年，例如2026年则为2024年
+        startYear = nowday.year - 2
+        # totalYearList：从startYear年到当年的所有年
+        totalYearList = list(pd.period_range(startYear, nowday.year, freq="Y").year)
         totalYearList = [str(i) for i in totalYearList]
         # 汇总表目录中的业绩表已经存在的数据年份
         existYear = []
@@ -1795,8 +1797,6 @@ logger = None
 calYearMonth = ""
 
 if __name__ == "__main__":
-    # result = getQryTimeRange(r'D:\xc_files\毛利分析\汇总表', "业绩表", "", 'hfszsm')
-    # print(result)
     # g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
     #                 "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
     #                 "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",
