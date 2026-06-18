@@ -149,6 +149,8 @@ def updateAllFieldFile(addfilePath, finalPath, dateFlag):
 
     # 更新文件名
     fileUser = os.path.basename(finalPath).split("_")[0]
+    if fileUser == "kuntai":
+        fileUser = "kuntai_pm"
     newFileName = f"{fileUser}_订单全字段报表_" + dateFlag.replace("-", "")[:8] + ".xlsx"
     newFilePath = os.path.join(os.path.dirname(finalPath), newFileName)
     os.rename(finalPath, newFilePath)

@@ -1763,6 +1763,41 @@ def setStyle(finalPath, originalCols):
     wb.close()
     app.quit()
 
+# 遍历文件夹，获取最新的FY26销售明细(*月)_****.xlsx 文件
+def findLatestSalesDetailFile(baseDir, maxBackDays=90):
+    """
+    从今天日期的文件夹开始，向前回溯查找销售明细Excel文件。
+    文件夹结构：baseDir\2026年\6月\18日
+    文件名格式：FY**销售明细(*月)_****.xlsx（如 FY26销售明细(6月)_0617.xlsx）
+
+    :param baseDir: 基础目录路径，如 F:/Uibot项目文件/result
+    :param maxBackDays: 最大回溯天数，默认90天，超过此范围仍未找到则返回None
+    :return: 找到的文件完整路径，若未找到返回None
+    """
+    today = datetime.today()
+
+    for i in range(maxBackDays):
+        checkDate = today - timedelta(days=i)
+        yearStr = str(checkDate.year)
+        monthStr = str(checkDate.month)
+        dayStr = str(checkDate.day)
+
+        targetDir = os.path.join(baseDir, f'{yearStr}年', f'{monthStr}月', f'{dayStr}日')
+
+        if not os.path.exists(targetDir):
+            continue
+
+        prevDate = checkDate - timedelta(days=1)
+        prevMonthStr = str(prevDate.month).zfill(2)
+        prevDayStr = str(prevDate.day).zfill(2)
+        file_name = f'FY{yearStr[2:4]}销售明细({monthStr}月)_{prevMonthStr}{prevDayStr}.xlsx'
+        filePath = os.path.join(targetDir, file_name)
+
+        if os.path.exists(filePath):
+            return filePath
+
+    return ''
+
 
 """
 extraOrderList:销售明细补充表中增加数据“销售订单号”值的列表
@@ -1797,6 +1832,8 @@ logger = None
 calYearMonth = ""
 
 if __name__ == "__main__":
+    # aa = getQryTimeRange(r'D:\xc_files\毛利分析\汇总表', "订单全字段报表", "%Y-%m-%d", 'kuntai_pm')
+    bb = findLatestSalesDetailFile(r'F:\Uibot项目文件\result')
     # g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
     #                 "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
     #                 "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",
