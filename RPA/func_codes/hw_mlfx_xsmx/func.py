@@ -1784,13 +1784,13 @@ def findLatestSalesDetailFile(baseDir, maxBackDays=90):
 
         targetDir = os.path.join(baseDir, f'{yearStr}年', f'{monthStr}月', f'{dayStr}日')
 
-        # if not os.path.exists(targetDir):
-        #     continue
+        if not os.path.exists(targetDir):
+            continue
 
         prevDate = checkDate - timedelta(days=1)
         prevMonthStr = str(prevDate.month).zfill(2)
         prevDayStr = str(prevDate.day).zfill(2)
-        file_name = f'FY{yearStr[2:4]}销售明细({monthStr}月)_{prevMonthStr}{prevDayStr}.xlsx'
+        file_name = f'FY{yearStr[2:4]}销售明细({int(prevMonthStr)}月)_{prevMonthStr}{prevDayStr}.xlsx'
         filePath = os.path.join(targetDir, file_name)
 
         if os.path.exists(filePath):
