@@ -1784,8 +1784,8 @@ def findLatestSalesDetailFile(baseDir, maxBackDays=90):
 
         targetDir = os.path.join(baseDir, f'{yearStr}年', f'{monthStr}月', f'{dayStr}日')
 
-        if not os.path.exists(targetDir):
-            continue
+        # if not os.path.exists(targetDir):
+        #     continue
 
         prevDate = checkDate - timedelta(days=1)
         prevMonthStr = str(prevDate.month).zfill(2)
