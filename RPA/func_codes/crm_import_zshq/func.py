@@ -258,10 +258,33 @@ def process_crm_data(main_path, dl_path, fail_result_path):
         # 用 openpyxl 写入数据（从 A2 开始，表头已存在）
         wb = load_workbook(output_path)
         ws = wb["厂商PO号导入模版"]
+        # 将 pandas 的 NaT/NaN/NA 等特殊空值转为 None，否则 openpyxl 写入时会报错：
+        # <class 'pandas._libs.tslibs.nattype.NaTType'>
+        import numpy as np
+        result_df = result_df.astype(object).where(pd.notnull(result_df), None)
+        # 处理 numpy 类型的标量，确保 openpyxl 能识别
+        def _normalize_val(v):
+            if v is None:
+                return None
+            if isinstance(v, float) and np.isnan(v):
+                return None
+            if isinstance(v, (pd.Timestamp,)):
+                return v.to_pydatetime()
+            if v is pd.NaT:
+                return None
+            # numpy 标量转 Python 原生类型
+            if isinstance(v, (np.integer,)):
+                return int(v)
+            if isinstance(v, (np.floating,)):
+                return float(v) if not np.isnan(v) else None
+            if isinstance(v, (np.bool_,)):
+                return bool(v)
+            return v
+
         data_rows = result_df.values.tolist()
         for i, row in enumerate(data_rows, start=2):
             for j, val in enumerate(row, start=1):
-                ws.cell(row=i, column=j, value=val)
+                ws.cell(row=i, column=j, value=_normalize_val(val))
         wb.save(output_path)
         wb.close()
 
@@ -289,6 +312,7 @@ if __name__ == '__main__':
 
 
     main = r'D:\xc_files\钻石货期CRM导入\crm导入流程'
-    dl = r'D:\xc_files\钻石货期CRM导入\项目数据\24'
-    fail = r'D:\xc_files\钻石货期CRM导入\项目数据\24\厂商PO号对象导入结果_20260623.xlsx'
-    process_crm_data(main, dl, fail)
+    dl = r'D:\xc_files\钻石货期CRM导入\项目数据\715'
+    fail = r'D:\xc_files\钻石货期CRM导入\项目数据\715\厂商PO号对象导入结果_20260715.xlsx'
+    aa = process_crm_data(main, dl, fail)
+
