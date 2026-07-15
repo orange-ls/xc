@@ -21,12 +21,14 @@ def result_table_one(engine, start_date, max_date):
     # 构建查询sql,用于"整体业绩"、"NA业绩"、"SMB业绩"、"SMBcore业绩"
     def select_sql(where_sql):
         select_sql = f'''
-            -- 分地区统计渠道/直客金额并生成二维报表，强制显示"其他"行
+            -- 分地区统计渠道/直客金额并生成二维报表
             WITH all_regions AS (
                 SELECT '北京' AS region UNION ALL
                 SELECT '广州' UNION ALL SELECT '深圳' UNION ALL 
                 SELECT '上海' UNION ALL SELECT '南京' UNION ALL 
-                SELECT '成都' UNION ALL SELECT '其他'
+                SELECT '成都' UNION ALL SELECT '辽宁' UNION ALL
+                SELECT '甘肃' UNION ALL SELECT '新疆' UNION ALL
+                SELECT '吉林'
             ),
             customer_types AS (
                 SELECT '渠道' AS customer_type UNION ALL
@@ -42,9 +44,9 @@ def result_table_one(engine, start_date, max_date):
                 LEFT JOIN (
                     SELECT
                         CASE
-                            WHEN region IN ('北京','广州','深圳','上海','南京','成都')
+                            WHEN region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林')
                             THEN region
-                            ELSE '其他'
+                            ELSE NULL
                         END AS region,
                         sales_amount,
                         CASE
@@ -85,7 +87,7 @@ def result_table_one(engine, start_date, max_date):
             ) AS final_data
             WHERE grouped_region IS NOT NULL  -- 过滤空值
             ORDER BY
-                FIELD(grouped_region,'北京','广州','深圳','上海','南京','成都','其他','总计');
+                FIELD(grouped_region,'北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林','总计');
         '''
         return select_sql
 
@@ -113,7 +115,9 @@ def result_table_one(engine, start_date, max_date):
             SELECT '北京' AS region UNION ALL
             SELECT '广州' UNION ALL SELECT '深圳' UNION ALL
             SELECT '上海' UNION ALL SELECT '南京' UNION ALL
-            SELECT '成都' UNION ALL SELECT '其他'
+            SELECT '成都' UNION ALL SELECT '辽宁' UNION ALL
+            SELECT '甘肃' UNION ALL SELECT '新疆' UNION ALL
+            SELECT '吉林'
         ),
         
         -- 2. 定义业绩类型及对应条件
@@ -139,9 +143,9 @@ def result_table_one(engine, start_date, max_date):
         data_2025 AS (
             SELECT 
                 CASE 
-                    WHEN region IN ('北京','广州','深圳','上海','南京','成都') 
+                    WHEN region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') 
                     THEN region 
-                    ELSE '其他' 
+                    ELSE NULL
                 END AS grouped_region,
                 pt.ptype,
                 COALESCE(SUM(
@@ -157,9 +161,9 @@ def result_table_one(engine, start_date, max_date):
                 WHERE d.performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY 
                 CASE 
-                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') 
                     THEN d.region 
-                    ELSE '其他' 
+                    ELSE NULL
                 END, 
                 pt.ptype
         ),
@@ -168,9 +172,9 @@ def result_table_one(engine, start_date, max_date):
         data_2026 AS (
             SELECT 
                 CASE 
-                    WHEN region IN ('北京','广州','深圳','上海','南京','成都') 
+                    WHEN region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') 
                     THEN region 
-                    ELSE '其他' 
+                    ELSE NULL
                 END AS grouped_region,
                 pt.ptype,
                 COALESCE(SUM(
@@ -185,9 +189,9 @@ def result_table_one(engine, start_date, max_date):
             CROSS JOIN performance_types pt
             GROUP BY 
                 CASE 
-                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') 
                     THEN d.region 
-                    ELSE '其他' 
+                    ELSE NULL
                 END, 
                 pt.ptype
         ),
@@ -262,7 +266,7 @@ def result_table_one(engine, start_date, max_date):
             UNION ALL
             SELECT * FROM total_row
         ) AS final
-        ORDER BY FIELD(region, '北京','广州','深圳','上海','南京','成都','其他','总计');
+        ORDER BY FIELD(region, '北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林','总计');
     '''
     result = [dict(row) for row in conn.execute(text(growth_rate_sql)).mappings().fetchall()]
     result = {re['grouped_region']: re for re in result}
@@ -276,7 +280,9 @@ def result_table_one(engine, start_date, max_date):
             SELECT '北京' AS region UNION ALL
             SELECT '广州' UNION ALL SELECT '深圳' UNION ALL
             SELECT '上海' UNION ALL SELECT '南京' UNION ALL
-            SELECT '成都' UNION ALL SELECT '其他'
+            SELECT '成都' UNION ALL SELECT '辽宁' UNION ALL
+            SELECT '甘肃' UNION ALL SELECT '新疆' UNION ALL
+            SELECT '吉林'
         ),
         
         -- 2. 定义业绩类型及对应条件
@@ -305,9 +311,9 @@ def result_table_one(engine, start_date, max_date):
             CROSS JOIN performance_types pt
             LEFT JOIN hw_two_five_data d 
                 ON ar.region = CASE 
-                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都') 
+                    WHEN d.region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') 
                     THEN d.region 
-                    ELSE '其他' 
+                    ELSE NULL
                 END
                 AND d.performance_date BETWEEN '{start_date}' AND '{max_date}'
             GROUP BY ar.region, pt.ptype
@@ -354,8 +360,11 @@ def result_table_one(engine, start_date, max_date):
                 WHEN '上海' THEN 4
                 WHEN '南京' THEN 5
                 WHEN '成都' THEN 6
-                WHEN '其他' THEN 7
-                WHEN '总计' THEN 8
+                WHEN '辽宁' THEN 7
+                WHEN '甘肃' THEN 8
+                WHEN '新疆' THEN 9
+                WHEN '吉林' THEN 10
+                WHEN '总计' THEN 11
             END;
     '''
     result_25 = [dict(row) for row in conn.execute(text(data_25_sql)).mappings().fetchall()]
@@ -378,8 +387,8 @@ def result_table_two(engine):
         FROM (
             SELECT 
                 CASE 
-                    WHEN region IN ('北京','广州','深圳','上海','南京') THEN region
-                    ELSE '其他' 
+                    WHEN region IN ('北京','广州','深圳','上海','南京','粤西','辽宁','甘肃','新疆') THEN region
+                    ELSE NULL
                 END AS classified_region,
                 sales_amount AS national_num,
                 CASE WHEN performance_date <= '2026-07-01' THEN sales_amount ELSE 0 END AS national_num_h1,
@@ -390,6 +399,7 @@ def result_table_two(engine):
                 CASE WHEN sales_team IN ('中长尾', '电网销') THEN sales_amount ELSE 0 END AS smb_sales_year
             FROM hw_two_six_data
         ) AS sub
+        WHERE classified_region IS NOT NULL
         GROUP BY classified_region WITH ROLLUP
         ORDER BY 
             CASE classified_region
@@ -397,9 +407,12 @@ def result_table_two(engine):
                 WHEN '广州' THEN 2
                 WHEN '深圳' THEN 3
                 WHEN '上海' THEN 4
-                WHEN '南京' THEN 5
-                WHEN '其他' THEN 6
-                ELSE 7
+                WHEN '粤西' THEN 5
+                WHEN '辽宁' THEN 6
+                WHEN '南京' THEN 7
+                WHEN '甘肃' THEN 8
+                WHEN '新疆' THEN 9
+                ELSE 10
             END;
     '''
 
@@ -445,12 +458,15 @@ def result_table_four(engine, start_date, max_date):
                 UNION ALL SELECT '深圳'
                 UNION ALL SELECT '上海'
                 UNION ALL SELECT '南京'
-                UNION ALL SELECT '长春'
-                UNION ALL SELECT '其他'
+                UNION ALL SELECT '成都'
+                UNION ALL SELECT '辽宁'
+                UNION ALL SELECT '甘肃'
+                UNION ALL SELECT '新疆'
+                UNION ALL SELECT '吉林'
             ),
             filtered_data AS (
                   SELECT 
-                    CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
+                    CASE WHEN region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') THEN region ELSE NULL END AS 区域,
                     MONTH(performance_date) AS month,
                     ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
                 FROM hw_two_six_data
@@ -462,7 +478,7 @@ def result_table_four(engine, start_date, max_date):
             last_year_data AS (
                 -- 新增2025年同期数据部分
                 SELECT 
-                    CASE WHEN region IN ('北京','广州','深圳','上海','南京','长春') THEN region ELSE '其他' END AS 区域,
+                    CASE WHEN region IN ('北京','广州','深圳','上海','南京','成都','辽宁','甘肃','新疆','吉林') THEN region ELSE NULL END AS 区域,
                     MONTH(performance_date) AS month,
                     ROUND(COALESCE(SUM(sales_amount),0)/10000, 1) AS sales_amount
                 FROM hw_two_five_data
@@ -529,9 +545,12 @@ def result_table_four(engine, start_date, max_date):
                     WHEN '深圳' THEN 3
                     WHEN '上海' THEN 4
                     WHEN '南京' THEN 5
-                    WHEN '长春' THEN 6
-                    WHEN '其他' THEN 7
-                    ELSE 8
+                    WHEN '成都' THEN 6
+                    WHEN '辽宁' THEN 7
+                    WHEN '甘肃' THEN 8
+                    WHEN '新疆' THEN 9
+                    WHEN '吉林' THEN 10
+                    ELSE 11
                 END;
         '''
         return sql

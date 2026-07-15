@@ -475,7 +475,7 @@ class App(object):
             if '一' in wb.sheetnames:
                 ws1 = wb['一']
                 # Sheet1的填充逻辑
-                row_mapping = {'北京': 3, '广州': 4, '深圳': 5, '上海': 6, '南京': 7, '成都': 8, '其他': 9, '总计': 10}
+                row_mapping = {'北京': 3, '广州': 4, '深圳': 5, '上海': 6, '南京': 7, '成都': 8, '辽宁': 9, '甘肃': 10, '新疆': 11, '吉林': 12, '总计': 13}
                 category_columns = {'整体业绩': 2, 'NA业绩': 5, 'SMB业绩': 8, 'SMBcore业绩': 11}
 
                 for category in ['整体业绩', 'NA业绩', 'SMB业绩', 'SMBcore业绩']:
@@ -564,9 +564,9 @@ class App(object):
                 }
 
                 # 填充SMBcore业绩
-                # SMBcore业绩数据范围：标题在行2，数据从行3到行10，汇总在行10
+                # SMBcore业绩数据范围：标题在行2，数据从行3到行12，汇总在行13
                 smb_start_row = 3
-                smb_regions = ["北京", "广州", "深圳", "上海", "南京", "长春", "其他", "汇总"]
+                smb_regions = ["北京", "广州", "深圳", "上海", "南京", "成都", "辽宁", "甘肃", "新疆", "吉林", "汇总"]
                 smb_row_mapping = {region: smb_start_row + idx for idx, region in enumerate(smb_regions)}
 
                 # 遍历SMBcore业绩数据
@@ -585,9 +585,9 @@ class App(object):
                             cell.value = value
 
                 # 填充NA业绩
-                # NA业绩数据范围：标题在行13，数据从行14到行21，汇总在行21
-                na_start_row = 14
-                na_regions = ["北京", "广州", "深圳", "上海", "南京", "长春", "其他", "汇总"]
+                # NA业绩数据范围：标题在行16，数据从行17到行26，汇总在行27
+                na_start_row = 17
+                na_regions = ["北京", "广州", "深圳", "上海", "南京", "成都", "辽宁", "甘肃", "新疆", "吉林", "汇总"]
                 na_row_mapping = {region: na_start_row + idx for idx, region in enumerate(na_regions)}
 
                 # 遍历NA业绩数据
