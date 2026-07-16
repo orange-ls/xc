@@ -355,7 +355,7 @@ def match_validData(filepath, excludeCode: list, delPath):
     df = df.query("备注 not in ['已销未提', '部分已销未提']")
 
     # 筛选数据需要的列 --20250429 增加“项目注释”列，用于填充”价外费用“（后面删除这一列）
-    df = df[usedCol+['项目注释']]
+    df = df[usedCol+['项目注释']+['订单类型备注']]
 
     # 获取排除不参与计算的销售员编码后的数据
     df = df.query("销售员编码 not in @excludeCode")
@@ -364,8 +364,8 @@ def match_validData(filepath, excludeCode: list, delPath):
     dfConf = pd.read_excel(delPath, dtype=str)
     delList = dfConf["人员编号"].tolist()
 
-    # 筛选出”产品组”列为PU、HI、HT、HV、QJ且QJ不在"分销销售名单中"的数据
-    df = df.query("产品组 in ['PU', 'HI', 'HT', 'HV'] or (产品组 == 'QJ' and 销售员编码 not in @delList)")
+    # 筛选出”产品组”列为PU、HI、HT、QJ且QJ不在"分销销售名单中"的数据
+    df = df.query("产品组 in ['PU', 'HI', 'HT'] or (产品组 == 'QJ' and 销售员编码 not in @delList) or 订单类型备注 == '政企分销'")
     # 筛选出“事业部”不为“商业业务部”的数据
     # df = df.query("事业部 != '商业业务部'")
 
@@ -1633,31 +1633,6 @@ def calDataStep5(df: pd.DataFrame, fwyrPath):
     return df
 
 
-# 计算“订单类型备注”:
-def calOrderTypeRemark(series):
-    """
-    依据“产品组”、“批次”第三位、“区域”计算“订单类型备注”：
-    1、产品组=HV 且 批次第三位=N 且 区域≠商业分销 标注“数字能源分销”
-    2、产品组=HV 且 批次第三位≠N 且 区域≠商业分销 标注“政企分销”
-    其他情况留空
-    :param series: 销售明细df的一行数据
-    :return: 订单类型备注字符串
-    """
-    productGroup = str(series.get("产品组", ""))
-    batch = str(series.get("批次", ""))
-    region = str(series.get("区域", ""))
-
-    if productGroup != "HV":
-        return ""
-    if region == "商业分销":
-        return ""
-
-    # 批次长度不足3位时视为“批次第三位≠N”
-    if len(batch) >= 3 and batch[2].upper() == "N":
-        return "数字能源分销"
-    return "政企分销"
-
-
 # 匹配”产品”、”产品线”:
 def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     """
@@ -1696,12 +1671,6 @@ def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     # 数据整理：对于“下单合同号”已匹配到的数据，“合并前批次”列数据变为""
     df.loc[df[addCol[-1]] != "", addCol[-1]] = df.loc[df[addCol[-1]] != ""].apply(
         lambda x: x[addCol[-1]] if x["下单合同号"] == "未匹配原因：采购信息表无该批次" else "", axis=1)
-
-    # 最后一列增加“订单类型备注”：
-    # 1、产品组=HV 且 批次第三位=N 且 区域≠商业分销 标注“数字能源分销”
-    # 2、产品组=HV 且 批次第三位≠N 且 区域≠商业分销 标注“政企分销”
-    df["订单类型备注"] = df.apply(calOrderTypeRemark, axis=1)
-
     # 数据写入文件
     finalPath = os.path.join(saveDir, "销售明细.xlsx")
     df.to_excel(finalPath, sheet_name="销售明细", index=False)
@@ -1733,17 +1702,15 @@ def setStyle(finalPath, originalCols):
     batchCol = get_column_letter(allColumnsList.index("批次") + 1)
     contractCol = get_column_letter(allColumnsList.index("下单合同号") + 1)
 
-    # 计算标志列（原表数据列终止位置-3、新增数据开始位置-3）（"事业部"、"区域"、"平台"作为新增数据列进行颜色处理）
+    # 计算标志列（原表数据列终止位置-3、新增数据开始位置-3和结束位置）（"事业部"、"区域"、"平台"作为新增数据列进行颜色处理）
     colIndex1 = get_column_letter(originalCols - 3)
     colIndex2 = get_column_letter(originalCols - 2)
-    # “合并前批次”列（倒数第二列）单独应用红色背景，“订单类型备注”为最后一列（橙色新增样式）
-    colIndex3 = get_column_letter(cols - 1)
-    colIndex4 = get_column_letter(cols)
+    colIndex3 = get_column_letter(cols)
 
     # 全表格式改成常规格式、表头字体为微软雅黑9号、内容字体为微软雅黑9号
-    ws.range(f"A:{colIndex4}").number_format = "G/通用格式"
-    ws.range(f"A:{colIndex4}").font.size = 9
-    ws.range(f"A:{colIndex4}").font.name = "微软雅黑"
+    ws.range(f"A:{colIndex3}").number_format = "G/通用格式"
+    ws.range(f"A:{colIndex3}").font.size = 9
+    ws.range(f"A:{colIndex3}").font.name = "微软雅黑"
     ws.range(f"{personCol}:{personCol}").number_format = "@"  # "销售员编码"列为文本格式
     ws.range(f"{batchCol}:{batchCol}").number_format = "@"  # "批次"列为文本格式
     ws.range(f"{contractCol}:{contractCol}").number_format = "@"  # "下单合同号"列为文本格式
@@ -1769,10 +1736,10 @@ def setStyle(finalPath, originalCols):
     ws.range("A1:%s1" % colIndex1).font.color = (255, 255, 255)
     ws.range("A1:%s1" % colIndex1).font.bold = False
 
-    # 新增的数据标题设置背景色、字体颜色、加粗、数字格式（包含最后一列“订单类型备注”）
-    ws.range("%s1:%s1" % (colIndex2, colIndex4)).color = (255, 192, 0)
-    ws.range("%s1:%s1" % (colIndex2, colIndex4)).font.color = (0, 0, 0)
-    ws.range("%s1:%s1" % (colIndex2, colIndex4)).font.bold = True
+    # 新增的数据标题设置背景色、字体颜色、加粗、数字格式
+    ws.range("%s1:%s1" % (colIndex2, colIndex3)).color = (255, 192, 0)
+    ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.color = (0, 0, 0)
+    ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.bold = True
     # "合并前批次"列背景色变为红色
     ws.range("%s1" % colIndex3).color = (255, 0, 0)
 
@@ -1876,7 +1843,7 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY25销售明细(8月)_0806.xlsx",
+    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY26销售明细(7月)_0715.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
                     "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
