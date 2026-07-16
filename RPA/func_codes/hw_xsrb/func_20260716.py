@@ -254,8 +254,6 @@ def generateRemark(series: pd.Series, dfConf: pd.DataFrame):
     indexList = dfConf.index.tolist()
     if "折让" in series["合同号（客户PO号）"] or "折让" in series["物料名称"]:
         return "返款抵欠款"
-    elif "预开冲红" in series["合同号（客户PO号）"] or "预开冲红" in series["物料名称"]:
-        return "已销未提"
     elif series.name in indexList:
         if series[["数量", "税前金额"]].tolist() == dfConf.loc[series.name, ["数量", "销售金额"]].tolist():
             return "已销未提"
@@ -290,29 +288,6 @@ def calSaleWeek(x):
         return value
     else:
         return ""
-
-
-# 生成订单类型备注
-def calOrderTypeRemark(series: pd.Series):
-    """
-    :param series: DataFrame行series
-    :return: 订单类型备注
-    规则：
-        1、产品组=HV 且 批次第三位=N 且 区域≠商业分销 标注"数字能源分销"
-        2、产品组=HV 且 批次第三位≠N 且 区域≠商业分销 标注"政企分销"
-    批次第三位不区分大小写；批次长度不足3位或为空按"≠N"处理。
-    """
-    if series.get("产品组") != "HV":
-        return ""
-    if series.get("区域") == "商业分销":
-        return ""
-    batch = series.get("批次")
-    batch = "" if pd.isna(batch) else str(batch)
-    thirdChar = batch[2].upper() if len(batch) >= 3 else ""
-    if thirdChar == "N":
-        return "数字能源分销"
-    else:
-        return "政企分销"
 
 
 # 计算销售员、销售员编码、合同含税金额、实际税率(初始)
@@ -381,7 +356,6 @@ def calDataStep3(df: pd.DataFrame, personConfigPath, filepath, HV_path, BO_path)
     df["备注"] = df.apply(generateRemark, args=(dfConf,), axis=1)
     df["月份"] = df["出具发票日"].map(calSaleMonth)
     df["销售分布"] = df["出具发票日"].map(calSaleWeek)
-    df["订单类型备注"] = df.apply(calOrderTypeRemark, axis=1)
 
     # 读取BO下载的客户省份表，并在“客户名称”列后新增“客户省份”列
     df_BO = pd.read_excel(BO_path, dtype=str, header=3).fillna("")
