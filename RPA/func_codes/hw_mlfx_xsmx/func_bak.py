@@ -355,7 +355,7 @@ def match_validData(filepath, excludeCode: list, delPath):
     df = df.query("备注 not in ['已销未提', '部分已销未提']")
 
     # 筛选数据需要的列 --20250429 增加“项目注释”列，用于填充”价外费用“（后面删除这一列）
-    df = df[usedCol+['项目注释']]
+    df = df[usedCol+['项目注释']+['订单类型备注']]
 
     # 获取排除不参与计算的销售员编码后的数据
     df = df.query("销售员编码 not in @excludeCode")
@@ -365,7 +365,7 @@ def match_validData(filepath, excludeCode: list, delPath):
     delList = dfConf["人员编号"].tolist()
 
     # 筛选出”产品组”列为PU、HI、HT、QJ且QJ不在"分销销售名单中"的数据
-    df = df.query("产品组 in ['PU', 'HI', 'HT'] or (产品组 == 'QJ' and 销售员编码 not in @delList)")
+    df = df.query("产品组 in ['PU', 'HI', 'HT'] or (产品组 == 'QJ' and 销售员编码 not in @delList) or 订单类型备注 == '政企分销'")
     # 筛选出“事业部”不为“商业业务部”的数据
     # df = df.query("事业部 != '商业业务部'")
 
@@ -1843,7 +1843,7 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY25销售明细(8月)_0806.xlsx",
+    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY26销售明细(7月)_0715.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
                     "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",

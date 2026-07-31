@@ -411,6 +411,8 @@ def addExtraData(df, extraPath):
     # “销售明细补充”外挂表中“销售订单号”列为extraOrderList中的值时为补充数据，其他数据为人工添加的matchCol未匹配到的数据
     df_extra = pd.read_excel(extraPath, dtype=str, parse_dates=dateColList,
                              date_parser=lambda x: myDateParser(x))
+    # 删除表头为空的多余列（如“Unnamed: 38”），避免随append进入结果表
+    df_extra = df_extra.loc[:, ~df_extra.columns.str.startswith("Unnamed")]
     df_extra["销售订单号"] = df_extra["销售订单号"].str.strip()
     validDf = df_extra.query("销售订单号.isin(@extraOrderList)")
     initMatchDf = df_extra.query("~销售订单号.isin(@extraOrderList)")
@@ -1343,9 +1345,10 @@ def calDataStep2_crm(df, crm_file, matchDict):
     # "评审二代"：直接取df中的"客户名称"
     df.loc[fill_mask, "评审二代"] = df.loc[fill_mask, "客户名称"]
 
-    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
-
     df = pd.concat([df, df_zhe], ignore_index=True)
+
+    # 合并折让数据后再删除“项目注释”列，避免df_zhe将该列重新引入
+    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
     # 清理内存
     gc.collect()
@@ -1672,6 +1675,11 @@ def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     df.loc[df[addCol[-1]] != "", addCol[-1]] = df.loc[df[addCol[-1]] != ""].apply(
         lambda x: x[addCol[-1]] if x["下单合同号"] == "未匹配原因：采购信息表无该批次" else "", axis=1)
     # 数据写入文件
+    # 兜底删除多余列（表头为空的Unnamed列、“项目注释”列）
+    df = df.loc[:, ~df.columns.str.startswith("Unnamed")]
+    df = df.drop(columns=["项目注释"], errors="ignore")
+    # 将“订单类型备注”移到最后一列
+    df = df[[c for c in df.columns if c != "订单类型备注"] + ["订单类型备注"]]
     finalPath = os.path.join(saveDir, "销售明细.xlsx")
     df.to_excel(finalPath, sheet_name="销售明细", index=False)
 
@@ -1740,8 +1748,9 @@ def setStyle(finalPath, originalCols):
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).color = (255, 192, 0)
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.color = (0, 0, 0)
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.bold = True
-    # "合并前批次"列背景色变为红色
-    ws.range("%s1" % colIndex3).color = (255, 0, 0)
+    # "合并前批次"列背景色变为红色（按列名定位，避免“订单类型备注”移到末列后被误标红）
+    mergeCol = get_column_letter(allColumnsList.index("合并前批次") + 1)
+    ws.range(f"{mergeCol}1").color = (255, 0, 0)
 
     # 新增数据设置格式, "实际税率"保留两位小数，其他数字列为千分位显示整数
     for col in ["订单成本（利润中心货币）", "实际税率", "合同金额", "合同不含税金额", "成本总价"]:
@@ -1843,13 +1852,13 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY26销售明细(7月)_0715.xlsx",
+    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(7月)_0730.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
                     "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
                     "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
-                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20250806.xlsx",
-                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20250807.xlsx",
+                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260730.xlsx",
+                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260731.xlsx",
                     "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
                     "结果保存路径": r"D:\xc_files\销售明细\result",
                     }
