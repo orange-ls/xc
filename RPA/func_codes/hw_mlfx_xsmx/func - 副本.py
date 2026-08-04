@@ -238,13 +238,15 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
     elif keyWord == "业绩表":
         """
         华为业绩表：文件名:账号_2020业绩表（20210203）.xlsx
-        1.每个账号华为业绩表均会下载2021-当年的数据，重新下载的年份的数据均需要替换
+        1.每个账号华为业绩表均会下载近三年的数据，重新下载的年份的数据均需要替换
         2.n年的数据需要在>n年下载才无需进行替换
         3.如有跨年情况，上次为20211228下载的2021年数据，本次需要下载到2022年数据，则2021年数据需要重新下载，在下次执行时即不需要
         """
-        fileList = glob.glob(f"{saveDir}\\{user}_{keyWord}（*）.xlsx")
-        # totalYearList：从2021年到当年的所有年
-        totalYearList = list(pd.period_range(2021, nowday.year, freq="Y").year)
+        fileList = glob.glob(f"{saveDir}\\{user}_*{keyWord}（*）.xlsx")
+        # startYear：当前年前两年，例如2026年则为2024年
+        startYear = nowday.year - 2
+        # totalYearList：从startYear年到当年的所有年
+        totalYearList = list(pd.period_range(startYear, nowday.year, freq="Y").year)
         totalYearList = [str(i) for i in totalYearList]
         # 汇总表目录中的业绩表已经存在的数据年份
         existYear = []
@@ -267,7 +269,10 @@ def getQryTimeRange(saveDir, keyWord, timeFmtStr, user=""):
                     deleteFileList.append(filePath)
         # 汇总表目录中从2021-当年的数据，除去已经存在并校验的数据，缺失的年份需重新下载
         for i in existYear:
-            totalYearList.remove(i)
+            try:
+                totalYearList.remove(i)
+            except ValueError:
+                pass
         downYearList.extend(totalYearList)
         # return 下载的年份列表，需要删除的文件列表
         return downYearList, deleteFileList
@@ -350,7 +355,7 @@ def match_validData(filepath, excludeCode: list, delPath):
     df = df.query("备注 not in ['已销未提', '部分已销未提']")
 
     # 筛选数据需要的列 --20250429 增加“项目注释”列，用于填充”价外费用“（后面删除这一列）
-    df = df[usedCol+['项目注释']]
+    df = df[usedCol+['项目注释']+['订单类型备注']]
 
     # 获取排除不参与计算的销售员编码后的数据
     df = df.query("销售员编码 not in @excludeCode")
@@ -360,7 +365,7 @@ def match_validData(filepath, excludeCode: list, delPath):
     delList = dfConf["人员编号"].tolist()
 
     # 筛选出”产品组”列为PU、HI、HT、QJ且QJ不在"分销销售名单中"的数据
-    df = df.query("产品组 in ['PU', 'HI', 'HT'] or (产品组 == 'QJ' and 销售员编码 not in @delList)")
+    df = df.query("产品组 in ['PU', 'HI', 'HT'] or (产品组 == 'QJ' and 销售员编码 not in @delList) or 订单类型备注 == '政企分销'")
     # 筛选出“事业部”不为“商业业务部”的数据
     # df = df.query("事业部 != '商业业务部'")
 
@@ -406,6 +411,8 @@ def addExtraData(df, extraPath):
     # “销售明细补充”外挂表中“销售订单号”列为extraOrderList中的值时为补充数据，其他数据为人工添加的matchCol未匹配到的数据
     df_extra = pd.read_excel(extraPath, dtype=str, parse_dates=dateColList,
                              date_parser=lambda x: myDateParser(x))
+    # 删除表头为空的多余列（如“Unnamed: 38”），避免随append进入结果表
+    df_extra = df_extra.loc[:, ~df_extra.columns.str.startswith("Unnamed")]
     df_extra["销售订单号"] = df_extra["销售订单号"].str.strip()
     validDf = df_extra.query("销售订单号.isin(@extraOrderList)")
     initMatchDf = df_extra.query("~销售订单号.isin(@extraOrderList)")
@@ -1338,9 +1345,10 @@ def calDataStep2_crm(df, crm_file, matchDict):
     # "评审二代"：直接取df中的"客户名称"
     df.loc[fill_mask, "评审二代"] = df.loc[fill_mask, "客户名称"]
 
-    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
-
     df = pd.concat([df, df_zhe], ignore_index=True)
+
+    # 合并折让数据后再删除“项目注释”列，避免df_zhe将该列重新引入
+    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
     # 清理内存
     gc.collect()
@@ -1667,6 +1675,11 @@ def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     df.loc[df[addCol[-1]] != "", addCol[-1]] = df.loc[df[addCol[-1]] != ""].apply(
         lambda x: x[addCol[-1]] if x["下单合同号"] == "未匹配原因：采购信息表无该批次" else "", axis=1)
     # 数据写入文件
+    # 兜底删除多余列（表头为空的Unnamed列、“项目注释”列）
+    df = df.loc[:, ~df.columns.str.startswith("Unnamed")]
+    df = df.drop(columns=["项目注释"], errors="ignore")
+    # 将“订单类型备注”移到最后一列
+    df = df[[c for c in df.columns if c != "订单类型备注"] + ["订单类型备注"]]
     finalPath = os.path.join(saveDir, "销售明细.xlsx")
     df.to_excel(finalPath, sheet_name="销售明细", index=False)
 
@@ -1735,8 +1748,9 @@ def setStyle(finalPath, originalCols):
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).color = (255, 192, 0)
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.color = (0, 0, 0)
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.bold = True
-    # "合并前批次"列背景色变为红色
-    ws.range("%s1" % colIndex3).color = (255, 0, 0)
+    # "合并前批次"列背景色变为红色（按列名定位，避免“订单类型备注”移到末列后被误标红）
+    mergeCol = get_column_letter(allColumnsList.index("合并前批次") + 1)
+    ws.range(f"{mergeCol}1").color = (255, 0, 0)
 
     # 新增数据设置格式, "实际税率"保留两位小数，其他数字列为千分位显示整数
     for col in ["订单成本（利润中心货币）", "实际税率", "合同金额", "合同不含税金额", "成本总价"]:
@@ -1757,6 +1771,41 @@ def setStyle(finalPath, originalCols):
     wb.save(finalPath)
     wb.close()
     app.quit()
+
+# 遍历文件夹，获取最新的FY26销售明细(*月)_****.xlsx 文件
+def findLatestSalesDetailFile(baseDir, maxBackDays=90):
+    """
+    从今天日期的文件夹开始，向前回溯查找销售明细Excel文件。
+    文件夹结构：baseDir\2026年\6月\18日
+    文件名格式：FY**销售明细(*月)_****.xlsx（如 FY26销售明细(6月)_0617.xlsx）
+
+    :param baseDir: 基础目录路径，如 F:/Uibot项目文件/result
+    :param maxBackDays: 最大回溯天数，默认90天，超过此范围仍未找到则返回None
+    :return: 找到的文件完整路径，若未找到返回None
+    """
+    today = datetime.today()
+
+    for i in range(maxBackDays):
+        checkDate = today - timedelta(days=i)
+        yearStr = str(checkDate.year)
+        monthStr = str(checkDate.month)
+        dayStr = str(checkDate.day)
+
+        targetDir = os.path.join(baseDir, f'{yearStr}年', f'{monthStr}月', f'{dayStr}日')
+
+        if not os.path.exists(targetDir):
+            continue
+
+        prevDate = checkDate - timedelta(days=1)
+        prevMonthStr = str(prevDate.month).zfill(2)
+        prevDayStr = str(prevDate.day).zfill(2)
+        file_name = f'FY{yearStr[2:4]}销售明细({int(prevMonthStr)}月)_{prevMonthStr}{prevDayStr}.xlsx'
+        filePath = os.path.join(targetDir, file_name)
+
+        if os.path.exists(filePath):
+            return filePath
+
+    return ''
 
 
 """
@@ -1792,6 +1841,8 @@ logger = None
 calYearMonth = ""
 
 if __name__ == "__main__":
+    # aa = getQryTimeRange(r'D:\xc_files\毛利分析\汇总表', "订单全字段报表", "%Y-%m-%d", 'kuntai_pm')
+    bb = findLatestSalesDetailFile(r'F:\Uibot项目文件\result')
     # g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
     #                 "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
     #                 "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",
@@ -1801,13 +1852,13 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY25销售明细(8月)_0806.xlsx",
+    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(7月)_0730.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
                     "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
                     "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
-                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20250806.xlsx",
-                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20250807.xlsx",
+                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260730.xlsx",
+                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260731.xlsx",
                     "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
                     "结果保存路径": r"D:\xc_files\销售明细\result",
                     }

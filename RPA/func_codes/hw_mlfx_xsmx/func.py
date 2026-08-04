@@ -413,6 +413,11 @@ def addExtraData(df, extraPath):
                              date_parser=lambda x: myDateParser(x))
     # 删除表头为空的多余列（如“Unnamed: 38”），避免随append进入结果表
     df_extra = df_extra.loc[:, ~df_extra.columns.str.startswith("Unnamed")]
+    # 删除因表头重复被pandas自动加".1/.2"后缀的重名列（如“市场类型.1”、“合并前批次.1”），避免随append进入结果表
+    dupeSuffixCols = [c for c in df_extra.columns if re.fullmatch(r".+\.\d+", c)]
+    if dupeSuffixCols:
+        print(f"警告：销售明细补充表存在重复表头，已剔除列：{dupeSuffixCols}，请检查该表表头")
+        df_extra = df_extra.drop(columns=dupeSuffixCols)
     df_extra["销售订单号"] = df_extra["销售订单号"].str.strip()
     validDf = df_extra.query("销售订单号.isin(@extraOrderList)")
     initMatchDf = df_extra.query("~销售订单号.isin(@extraOrderList)")
@@ -1202,13 +1207,15 @@ def matchProduct(series, confDict):
     purchaseType = series["采购类型"]
     contractNum = series["下单合同号"]
     productGroup = series["产品组"]
+    # 显式指定返回Series的index，避免依赖pandas版本差异下的按位置对齐行为
+    resultIndex = ["产品", "产品线", "市场类型"]
 
     if purchaseType == "鲲泰":
-        return pd.Series(data=["鲲泰", "鲲泰", ""])
+        return pd.Series(data=["鲲泰", "鲲泰", ""], index=resultIndex)
     elif productGroup == "QJ":
-        return pd.Series(data=["超聚变", "超聚变", ""])
+        return pd.Series(data=["超聚变", "超聚变", ""], index=resultIndex)
     else:
-        return pd.Series(data=confDict.get(contractNum, ["不计入业绩", "不计入业绩", ""]))
+        return pd.Series(data=confDict.get(contractNum, ["不计入业绩", "不计入业绩", ""]), index=resultIndex)
 
 
 # 生成月份（不对na和空值处理）
@@ -1678,6 +1685,11 @@ def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     # 兜底删除多余列（表头为空的Unnamed列、“项目注释”列）
     df = df.loc[:, ~df.columns.str.startswith("Unnamed")]
     df = df.drop(columns=["项目注释"], errors="ignore")
+    # 兜底删除重复列（如外部表带入的“市场类型.1”、“合并前批次.1”），仅保留第一列
+    if df.columns.duplicated().any():
+        dupCols = df.columns[df.columns.duplicated()].tolist()
+        print(f"警告：结果数据存在重复列，已剔除：{dupCols}")
+        df = df.loc[:, ~df.columns.duplicated()]
     # 将“订单类型备注”移到最后一列
     df = df[[c for c in df.columns if c != "订单类型备注"] + ["订单类型备注"]]
     finalPath = os.path.join(saveDir, "销售明细.xlsx")
@@ -1852,13 +1864,13 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(7月)_0730.xlsx",
+    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(8月)_0803.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
                     "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
                     "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
-                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260730.xlsx",
-                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260731.xlsx",
+                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260803.xlsx",
+                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260804.xlsx",
                     "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
                     "结果保存路径": r"D:\xc_files\销售明细\result",
                     }
