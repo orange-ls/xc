@@ -28,10 +28,10 @@
     "nmtp": 10
   },
   "meta": {
-    "timeStart": 1785925660213,
-    "time": 40,
+    "timeStart": 1786341374444,
+    "time": 34,
     "domFp": "ready",
-    "domFpStart": 1785925660308,
-    "domFpTime": 51
+    "domFpStart": 1786341374524,
+    "domFpTime": 53
   }
 }
