@@ -7,6 +7,7 @@ import glob
 import logging.config
 import os
 import re
+import shutil
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import wraps
@@ -413,6 +414,11 @@ def addExtraData(df, extraPath):
                              date_parser=lambda x: myDateParser(x))
     # 删除表头为空的多余列（如“Unnamed: 38”），避免随append进入结果表
     df_extra = df_extra.loc[:, ~df_extra.columns.str.startswith("Unnamed")]
+    # 删除因表头重复被pandas自动加".1/.2"后缀的重名列（如“市场类型.1”、“合并前批次.1”），避免随append进入结果表
+    dupeSuffixCols = [c for c in df_extra.columns if re.fullmatch(r".+\.\d+", c)]
+    if dupeSuffixCols:
+        print(f"警告：销售明细补充表存在重复表头，已剔除列：{dupeSuffixCols}，请检查该表表头")
+        df_extra = df_extra.drop(columns=dupeSuffixCols)
     df_extra["销售订单号"] = df_extra["销售订单号"].str.strip()
     validDf = df_extra.query("销售订单号.isin(@extraOrderList)")
     initMatchDf = df_extra.query("~销售订单号.isin(@extraOrderList)")
@@ -448,6 +454,16 @@ def handleMovementDetail(addfilePath, finalPath, dateFlag, finalPathAdd, BO_file
     """
     # 读取物料移动明细表
     df_wl = pd.read_html(addfilePath, header=0)[0].fillna("").astype(str)
+    # 当表格仅为表头（无数据行）或缺少“参照”列时，无需处理数据，仅重命名文件并返回
+    if df_wl.empty or "参照" not in df_wl.columns:
+        newFileName = "物料移动明细汇总_" + dateFlag.replace("/", "") + ".xlsx"
+        newFileName_add = "物料移动明细汇总(新增列)_" + dateFlag.replace("/", "") + ".xlsx"
+        newFilePath = os.path.join(os.path.dirname(finalPath), newFileName)
+        newFilePathAdd = os.path.join(os.path.dirname(finalPathAdd), newFileName_add)
+        os.rename(finalPath, newFilePath)
+        os.rename(finalPathAdd, newFilePathAdd)
+        gc.collect()
+        return newFilePath
     # 删除后面的空记录行
     df_wl.drop(df_wl[df_wl["参照"] == ""].index, inplace=True)
     # 将“本位币金额列”转为float类型
@@ -1202,13 +1218,15 @@ def matchProduct(series, confDict):
     purchaseType = series["采购类型"]
     contractNum = series["下单合同号"]
     productGroup = series["产品组"]
+    # 显式指定返回Series的index，避免依赖pandas版本差异下的按位置对齐行为
+    resultIndex = ["产品", "产品线", "市场类型"]
 
     if purchaseType == "鲲泰":
-        return pd.Series(data=["鲲泰", "鲲泰", ""])
+        return pd.Series(data=["鲲泰", "鲲泰", ""], index=resultIndex)
     elif productGroup == "QJ":
-        return pd.Series(data=["超聚变", "超聚变", ""])
+        return pd.Series(data=["超聚变", "超聚变", ""], index=resultIndex)
     else:
-        return pd.Series(data=confDict.get(contractNum, ["不计入业绩", "不计入业绩", ""]))
+        return pd.Series(data=confDict.get(contractNum, ["不计入业绩", "不计入业绩", ""]), index=resultIndex)
 
 
 # 生成月份（不对na和空值处理）
@@ -1678,6 +1696,11 @@ def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     # 兜底删除多余列（表头为空的Unnamed列、“项目注释”列）
     df = df.loc[:, ~df.columns.str.startswith("Unnamed")]
     df = df.drop(columns=["项目注释"], errors="ignore")
+    # 兜底删除重复列（如外部表带入的“市场类型.1”、“合并前批次.1”），仅保留第一列
+    if df.columns.duplicated().any():
+        dupCols = df.columns[df.columns.duplicated()].tolist()
+        print(f"警告：结果数据存在重复列，已剔除：{dupCols}")
+        df = df.loc[:, ~df.columns.duplicated()]
     # 将“订单类型备注”移到最后一列
     df = df[[c for c in df.columns if c != "订单类型备注"] + ["订单类型备注"]]
     finalPath = os.path.join(saveDir, "销售明细.xlsx")
@@ -1808,6 +1831,17 @@ def findLatestSalesDetailFile(baseDir, maxBackDays=90):
     return ''
 
 
+# 将模板文件复制为目标文件
+def copyFile(templatePath, targetPath):
+    """
+    :param templatePath: 模板文件路径
+    :param targetPath: 目标文件路径
+    :return: 目标文件路径
+    """
+    shutil.copyfile(templatePath, targetPath)
+    return targetPath
+
+
 """
 extraOrderList:销售明细补充表中增加数据“销售订单号”值的列表
 BoDeliveryDict:BO采购信息表发货方式字典
@@ -1842,7 +1876,17 @@ calYearMonth = ""
 
 if __name__ == "__main__":
     # aa = getQryTimeRange(r'D:\xc_files\毛利分析\汇总表', "订单全字段报表", "%Y-%m-%d", 'kuntai_pm')
-    bb = findLatestSalesDetailFile(r'F:\Uibot项目文件\result')
+    # bb = findLatestSalesDetailFile(r'F:\Uibot项目文件\result')
+
+    addfilePath = r"D:\xc_files\毛利分析\0831\物料移动明细（20260830-20260830）.MHTML"
+    # addfilePath = r"D:\xc_files\毛利分析\物料移动明细（20240604-20240604）.MHTML"
+    finalPath = r"D:\xc_files\毛利分析\0831\物料移动明细汇总_20260829.xlsx"
+    dateFlag = "2026/08/30"
+    finalPathAdd = r"D:\xc_files\毛利分析\0831\物料移动明细汇总(新增列)_20260829.xlsx"
+    BO_file = r"D:\xc_files\毛利分析\BO采购信息表.xls"
+    cc = handleMovementDetail(addfilePath, finalPath, dateFlag, finalPathAdd, BO_file)
+    print(cc)
+
     # g_dictGlobal = {"销售日报": r"C:\Users\11598\Desktop\测试文件\FY23销售明细(2月)_0205.xlsx",
     #                 "分销销售名单": r"C:\Users\11598\Desktop\测试文件\分销销售名单.xlsx",
     #                 "BO下载路径": r"C:\Users\11598\Desktop\测试文件\BO采购信息表.xls",
@@ -1852,72 +1896,72 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(7月)_0730.xlsx",
-                    "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
-                    "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
-                    "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
-                    "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
-                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260730.xlsx",
-                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260731.xlsx",
-                    "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
-                    "结果保存路径": r"D:\xc_files\销售明细\result",
-                    }
-    g_selectPath = g_dictGlobal["销售日报"]
-    BO_filePath = g_dictGlobal["BO下载路径"]
-    crm_file = g_dictGlobal["CRM外挂表路径"]
-    ytPath = g_dictGlobal["OA预提表路径"]
-    moveFilePath = g_dictGlobal["物料移动明细"]
-    orderFileList = getSameFormatFile(g_dictGlobal["结果保存路径"], "订单表")
-    yjFileList = getSameFormatFile(g_dictGlobal["结果保存路径"], "业绩表")
-
-    # initWriteLog(r"C:\Users\11598\Desktop\test\log(exe_cmd)\202207")
-
-    # 初始化func中的全局变量calYearMonth（处理日期: yyyymm）
-    initOperateDate(g_selectPath)
-
-    # 筛选销售日报有效数据, 返回df：筛选后的的df；colNum：原始数据列数
-    df, colNum = match_validData(g_selectPath, ["00049539", "00074453"], g_dictGlobal["分销销售名单"])
-
-    # 增加销售明细补充表数据
-    # initMatchDf: “销售明细补充”外挂表中人工新增的[下单合同号, 项目名称, 评审二代]的数据
-    df, initMatchDf = addExtraData(df, g_dictGlobal["销售明细补充表路径"])
-
-    # ==============================================
-    # 【唯一修改：提前标记折让，不影响任何原有逻辑】
-    # ==============================================
-    mask_zhe = (
-        df["合同号（客户PO号）"].str.contains("折让", na=False) |
-        df["物料名称"].str.contains("折让", na=False) |
-        (df["销售订单号"] == "返款抵欠款")
-    )
-    df.loc[mask_zhe, matchCol] = ["折让", "", ""]
-
-    # 依据"物料名称"、"批次"的内容初步匹配"下单合同号"、"项目名称"、"评审二代"
-    df = calDataStep1(df)
-
-    # 通过批次匹配BO采购信息表的"下单合同号"、"项目名称"、"评审二代"
-    # matchDict：BusinessObjects采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
-    # BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
-    df, matchDict, BoTransDict = calDataStep2(df, BO_filePath)
-
-    # 通过”项目注释“匹配"下单合同号"、通过CRM外挂表匹配"项目名称"、"评审二代"
-    df = calDataStep2_crm(df, crm_file, matchDict)
-
-    # 通过物料移动明细表匹配"下单合同号"、"项目名称"、"评审二代"
-    df = calDataStep3(df, moveFilePath, matchDict)
-    # "下单合同号"、"项目名称"、"评审二代"初步匹配完成后，再写入人工补充的数据
-    df = matchExtraData(df, initMatchDf)
-
-    allOrderList = glob.glob(r"E:\Uibot项目文件\汇总表\*订单表*.xlsx")
-    # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
-    df = calDataStep4(df, BoTransDict, orderFileList, KTconfigPath='')
-
-    # 匹配”成本总价”、“月份”
-    df = calDataStep5(df, ytPath)
-
-    HWYJPathList = glob.glob(r"E:\Uibot项目文件\汇总表\*业绩表*.xlsx")
-    # 匹配”产品”、”产品线”,返回finalPath：销售明细结果文件路径
-    finalPath = calDataStep6(df, yjFileList, g_dictGlobal["产品线"], g_dictGlobal["结果保存路径"])
-
-    # 设置格式
-    setStyle(finalPath, colNum)
+    # g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(8月)_0803.xlsx",
+    #                 "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
+    #                 "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
+    #                 "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
+    #                 "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
+    #                 "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260803.xlsx",
+    #                 "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260804.xlsx",
+    #                 "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
+    #                 "结果保存路径": r"D:\xc_files\销售明细\result",
+    #                 }
+    # g_selectPath = g_dictGlobal["销售日报"]
+    # BO_filePath = g_dictGlobal["BO下载路径"]
+    # crm_file = g_dictGlobal["CRM外挂表路径"]
+    # ytPath = g_dictGlobal["OA预提表路径"]
+    # moveFilePath = g_dictGlobal["物料移动明细"]
+    # orderFileList = getSameFormatFile(g_dictGlobal["结果保存路径"], "订单表")
+    # yjFileList = getSameFormatFile(g_dictGlobal["结果保存路径"], "业绩表")
+    #
+    # # initWriteLog(r"C:\Users\11598\Desktop\test\log(exe_cmd)\202207")
+    #
+    # # 初始化func中的全局变量calYearMonth（处理日期: yyyymm）
+    # initOperateDate(g_selectPath)
+    #
+    # # 筛选销售日报有效数据, 返回df：筛选后的的df；colNum：原始数据列数
+    # df, colNum = match_validData(g_selectPath, ["00049539", "00074453"], g_dictGlobal["分销销售名单"])
+    #
+    # # 增加销售明细补充表数据
+    # # initMatchDf: “销售明细补充”外挂表中人工新增的[下单合同号, 项目名称, 评审二代]的数据
+    # df, initMatchDf = addExtraData(df, g_dictGlobal["销售明细补充表路径"])
+    #
+    # # ==============================================
+    # # 【唯一修改：提前标记折让，不影响任何原有逻辑】
+    # # ==============================================
+    # mask_zhe = (
+    #     df["合同号（客户PO号）"].str.contains("折让", na=False) |
+    #     df["物料名称"].str.contains("折让", na=False) |
+    #     (df["销售订单号"] == "返款抵欠款")
+    # )
+    # df.loc[mask_zhe, matchCol] = ["折让", "", ""]
+    #
+    # # 依据"物料名称"、"批次"的内容初步匹配"下单合同号"、"项目名称"、"评审二代"
+    # df = calDataStep1(df)
+    #
+    # # 通过批次匹配BO采购信息表的"下单合同号"、"项目名称"、"评审二代"
+    # # matchDict：BusinessObjects采购信息字典{批次：[下单合同号, 项目名称, 评审二代]}
+    # # BoTransDict: BO下单合同号对应的运输方式字典{下单合同号：运输方式}
+    # df, matchDict, BoTransDict = calDataStep2(df, BO_filePath)
+    #
+    # # 通过”项目注释“匹配"下单合同号"、通过CRM外挂表匹配"项目名称"、"评审二代"
+    # df = calDataStep2_crm(df, crm_file, matchDict)
+    #
+    # # 通过物料移动明细表匹配"下单合同号"、"项目名称"、"评审二代"
+    # df = calDataStep3(df, moveFilePath, matchDict)
+    # # "下单合同号"、"项目名称"、"评审二代"初步匹配完成后，再写入人工补充的数据
+    # df = matchExtraData(df, initMatchDf)
+    #
+    # allOrderList = glob.glob(r"E:\Uibot项目文件\汇总表\*订单表*.xlsx")
+    # # 匹配“采购类型”、“销售类型”、“运输方式”、“是否直发”
+    # df = calDataStep4(df, BoTransDict, orderFileList, KTconfigPath='')
+    #
+    # # 匹配”成本总价”、“月份”
+    # df = calDataStep5(df, ytPath)
+    #
+    # HWYJPathList = glob.glob(r"E:\Uibot项目文件\汇总表\*业绩表*.xlsx")
+    # # 匹配”产品”、”产品线”,返回finalPath：销售明细结果文件路径
+    # finalPath = calDataStep6(df, yjFileList, g_dictGlobal["产品线"], g_dictGlobal["结果保存路径"])
+    #
+    # # 设置格式
+    # setStyle(finalPath, colNum)

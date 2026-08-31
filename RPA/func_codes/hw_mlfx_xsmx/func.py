@@ -7,6 +7,7 @@ import glob
 import logging.config
 import os
 import re
+import shutil
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import wraps
@@ -453,6 +454,16 @@ def handleMovementDetail(addfilePath, finalPath, dateFlag, finalPathAdd, BO_file
     """
     # 读取物料移动明细表
     df_wl = pd.read_html(addfilePath, header=0)[0].fillna("").astype(str)
+    # 当表格仅为表头（无数据行）或缺少“参照”列时，无需处理数据，仅重命名文件并返回
+    if df_wl.empty or "参照" not in df_wl.columns:
+        newFileName = "物料移动明细汇总_" + dateFlag.replace("/", "") + ".xlsx"
+        newFileName_add = "物料移动明细汇总(新增列)_" + dateFlag.replace("/", "") + ".xlsx"
+        newFilePath = os.path.join(os.path.dirname(finalPath), newFileName)
+        newFilePathAdd = os.path.join(os.path.dirname(finalPathAdd), newFileName_add)
+        os.rename(finalPath, newFilePath)
+        os.rename(finalPathAdd, newFilePathAdd)
+        gc.collect()
+        return newFilePath
     # 删除后面的空记录行
     df_wl.drop(df_wl[df_wl["参照"] == ""].index, inplace=True)
     # 将“本位币金额列”转为float类型
@@ -1818,6 +1829,17 @@ def findLatestSalesDetailFile(baseDir, maxBackDays=90):
             return filePath
 
     return ''
+
+
+# 将模板文件复制为目标文件
+def copyFile(templatePath, targetPath):
+    """
+    :param templatePath: 模板文件路径
+    :param targetPath: 目标文件路径
+    :return: 目标文件路径
+    """
+    shutil.copyfile(templatePath, targetPath)
+    return targetPath
 
 
 """
