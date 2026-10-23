@@ -1167,8 +1167,12 @@ def matchYSFS(series, BoTransDict, HWOrderDict):
         stock_last2 = series["库存地"][-2:]
         if stock_last2 == "99":
             return "汽运"
-        elif stock_last2 == "01" or stock_last2 == "XN" or stock_last2 == '':
+        else:
+            # 调整：库存地末两位非“99”的一律自提
             return "自提"
+        # 原自提逻辑（仅末两位为01/XN/空时判定自提），已被上面的else取代，保留备查
+        # elif stock_last2 == "01" or stock_last2 == "XN" or stock_last2 == '':
+        #     return "自提"
     elif purchaseType in ["公有云", "服务", "服务预提", "渠道分销", "价外费用", "折让"]:
         return "自提"
     # if purchaseType == "超聚变":
@@ -1218,10 +1222,14 @@ def matchProduct(series, confDict):
     purchaseType = series["采购类型"]
     contractNum = series["下单合同号"]
     productGroup = series["产品组"]
+    batchNum = series["批次"]
     # 显式指定返回Series的index，避免依赖pandas版本差异下的按位置对齐行为
     resultIndex = ["产品", "产品线", "市场类型"]
 
-    if purchaseType == "鲲泰":
+    # 前置规则：“批次”以“BJ”结尾的订单，产品、产品线均标记为“XPN产品”（不再走业绩表匹配）
+    if str(batchNum).strip().endswith("BJ"):
+        return pd.Series(data=["XPN产品", "XPN产品", ""], index=resultIndex)
+    elif purchaseType == "鲲泰":
         return pd.Series(data=["鲲泰", "鲲泰", ""], index=resultIndex)
     elif productGroup == "QJ":
         return pd.Series(data=["超聚变", "超聚变", ""], index=resultIndex)

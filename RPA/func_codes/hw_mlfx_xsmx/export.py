@@ -208,6 +208,9 @@ def init_PivotData(filepath, costAdjustPath):
                        date_parser=lambda x: myDateParser(x)).fillna("")
     for col in pivotVal + ["实际税率"]:
         df[col] = pd.to_numeric(df[col], errors='coerce')
+    # 兜底：销售明细表缺少“订单类型备注”列时补空列，供后续拼接到“备注”列
+    if "订单类型备注" not in df.columns:
+        df["订单类型备注"] = ""
 
     # 筛选出销售类型不为冲红的数据进行透视(pivotVal列为求和，产品、产品线、市场类型列取第一个值)
     # df = df.query("销售类型 != '冲红'")
@@ -218,8 +221,8 @@ def init_PivotData(filepath, costAdjustPath):
         # " and not (采购类型 == '价外费用' and `采购类型-二级分类` in ['罚息','物流费','诉讼费&律师费'])"  # 剔除价外费用的特定分类
     )
     funDict = {col: "sum" for col in pivotVal}
-    funDict.update({col: "first" for col in ["销售类型", "产品", "产品线", "市场类型"]})
-    df = df.pivot_table(index=pivotIndex, values=pivotVal + ["销售类型", "产品", "产品线", "市场类型"], aggfunc=funDict)
+    funDict.update({col: "first" for col in ["销售类型", "产品", "产品线", "市场类型", "订单类型备注"]})
+    df = df.pivot_table(index=pivotIndex, values=pivotVal + ["销售类型", "产品", "产品线", "市场类型", "订单类型备注"], aggfunc=funDict)
     # 重置索引，将index变为列
     df.reset_index(inplace=True)
 
@@ -230,6 +233,8 @@ def init_PivotData(filepath, costAdjustPath):
         df_add[col] = pd.to_numeric(df_add[col], errors='coerce')
     df = df.append(df_add)
     df.reset_index(drop=True, inplace=True)
+    # “成本调整”外挂表无“订单类型备注”列时，append后为NaN，统一转为空字符串
+    df["订单类型备注"] = df["订单类型备注"].fillna("").astype(str)
 
     # “采购类型”为“折让”，不参与核算；或“采购类型”为“价外费用“，合同号为“罚息”、“物流费“、“诉讼费&律师费”、“价外费用”的数据，不参与核算
     dropIndex = df.loc[
@@ -337,6 +342,19 @@ def matchProject1(series, originalDict, originalDictCJB, hisRecordDict):
             return pd.Series(data=[""] * 3, index=matchCol + ["备注"])
 
 
+# 将“订单类型备注”拼接到“备注”列
+def mergeRemark(series):
+    """
+    :param series: DataFrame行series
+    :return: 返回拼接后的“备注”，格式为“原备注-订单类型备注”，任一方为空时取另一方
+    """
+    remarkText = "" if pd.isna(series["备注"]) else str(series["备注"]).strip()
+    typeRemark = "" if pd.isna(series["订单类型备注"]) else str(series["订单类型备注"]).strip()
+    if remarkText and typeRemark:
+        return f"{remarkText}-{typeRemark}"
+    return remarkText or typeRemark
+
+
 # @logfun
 # 计算"运费", "现金返点"并更新记录表
 def calDataStep1(df: pd.DataFrame, allFieldfpList, cjbFp, recordfp, historyRecordfp):
@@ -421,6 +439,8 @@ def calDataStep1(df: pd.DataFrame, allFieldfpList, cjbFp, recordfp, historyRecor
     df[matchCol + ["备注"]] = df.apply(matchProject1,
                                      args=(originalDict, originalDictCJB, hisRecordDict),
                                      axis=1)
+    # 将“订单类型备注”拼接至“备注”列，如“合神”+“政企分销”->“合神-政企分销”
+    df["备注"] = df.apply(mergeRemark, axis=1)
 
     # 更新记录
     updateRecordDetail(recordfp, recordDict, recordDictCJB)
@@ -454,8 +474,8 @@ def calDataStep2(df):
     # 向df写入"实际总成本"、"实际毛利"、"实际毛利率"的公式
     for idx in df.index:
         row = idx + 2
-        # 备注“城投”的数据，"实际总成本"公式与普通情况不同
-        if df.loc[idx, "备注"] == "城投":
+        # 备注以“城投”开头的数据（可能已拼接“订单类型备注”，如“城投-政企分销”），“实际总成本”公式与普通情况不同
+        if str(df.loc[idx, "备注"]).startswith("城投"):
             df.loc[idx, "实际总成本"] = f"={letter2}{row}/1.016+{letter3}{row}+{letter4}{row}"
         else:
             df.loc[idx, "实际总成本"] = f"={letter2}{row}+{letter3}{row}+{letter4}{row}"
