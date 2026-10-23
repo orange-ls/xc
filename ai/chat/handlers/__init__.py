@@ -1,3 +1,0 @@
-"""
-Message and request handlers
-"""

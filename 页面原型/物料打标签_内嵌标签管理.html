@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<!-- saved from url=(0102)file:///C:/Users/user/WorkBuddy/2026-08-27-15-24-31/%E7%89%A9%E6%96%99%E6%89%93%E6%A0%87%E7%AD%BE.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>物料打标签</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
+    background: #f0f2f5; color: #303133; height: 100vh;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .topbar {
+    height: 56px; background: #fff; border-bottom: 1px solid #e4e7ed;
+    display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0;
+  }
+  .topbar .logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg,#409eff,#7b5cff);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: bold; font-size: 16px;
+  }
+  .topbar h1 { font-size: 17px; font-weight: 600; }
+  .topbar .sub { font-size: 12px; color: #909399; }
+  .topbar .right { margin-left: auto; display: flex; gap: 10px; align-items: center; font-size: 13px; color: #909399; }
+
+  /* ===== 主区域 ===== */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 14px 20px 0; }
+
+  .toolbar {
+    background: #fff; border: 1px solid #ebeef5; border-radius: 10px 10px 0 0;
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0; flex-wrap: wrap;
+  }
+  .toolbar .filter-tabs { display: flex; gap: 4px; }
+  .filter-tabs button {
+    font-size: 13px; padding: 5px 14px; border-radius: 6px;
+    border: 1px solid #dcdfe6; background: #fff; color: #606266; cursor: pointer;
+  }
+  .filter-tabs button.active { background: #409eff; color: #fff; border-color: #409eff; }
+  .toolbar .spacer { flex: 1; }
+  .btn {
+    font-size: 13px; padding: 6px 14px; border-radius: 6px;
+    border: 1px solid #dcdfe6; background: #fff; color: #606266; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px; transition: all .15s;
+  }
+  .btn:hover { border-color: #409eff; color: #409eff; }
+  .btn.primary { background: #409eff; color: #fff; border-color: #409eff; }
+  .btn.primary:hover { background: #66b1ff; border-color: #66b1ff; color: #fff; }
+  .btn.danger { color: #f56c6c; }
+  .btn.danger:hover { border-color: #f56c6c; color: #f56c6c; }
+
+  .table-wrap { flex: 1; overflow: auto; background: #fff; border: 1px solid #ebeef5; border-top: none; min-height: 120px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: #f5f7fa; padding: 12px; text-align: left;
+    font-weight: 600; color: #303133; border-bottom: 1px solid #ebeef5;
+    position: sticky; top: 0; z-index: 1;
+  }
+  tbody td { padding: 12px; border-bottom: 1px solid #f0f2f5; vertical-align: top; }
+  tbody tr:hover { background: #fafbfc; }
+  tbody tr.selected { background: #ecf5ff; }
+
+  .sap { font-family: Consolas, monospace; font-size: 13px; color: #303133; font-weight: 600; }
+  .cat-cell .lv1 { color: #909399; font-size: 12px; }
+  .cat-cell .lv3 { color: #409eff; font-size: 13px; font-weight: 600; }
+
+  .tags-cell { display: flex; flex-wrap: wrap; gap: 5px; max-width: 480px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; padding: 2px 8px; border-radius: 4px;
+    background: #f0f9eb; color: #67c23a; border: 1px solid #e1f3d8;
+  }
+  .tag .del { cursor: pointer; color: #b3e19d; font-size: 12px; line-height: 1; }
+  .tag .del:hover { color: #f56c6c; }
+  .tag .attr { color: #a0c46c; font-size: 11px; margin-right: 2px; }
+  .no-tag { color: #c0c4cc; font-style: italic; font-size: 12px; }
+
+  .row-act { white-space: nowrap; }
+  .row-act a { color: #409eff; cursor: pointer; font-size: 13px; margin-right: 8px; }
+  .row-act a:hover { text-decoration: underline; }
+  .row-act a.danger { color: #f56c6c; }
+
+  .check { width: 16px; height: 16px; cursor: pointer; }
+
+  .summary {
+    background: #fff; border: 1px solid #ebeef5; border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 10px 16px; font-size: 12.5px; color: #606266;
+    display: flex; gap: 18px; align-items: center; flex-shrink: 0; flex-wrap: wrap;
+  }
+  .summary b { color: #409eff; font-size: 14px; }
+  .summary .sep { color: #dcdfe6; }
+
+  /* ===== 打标签大弹窗（内嵌物料标签管理） ===== */
+  .mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: center; justify-content: center; z-index: 99;
+  }
+  .mask.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 10px; width: 980px; max-width: 96vw; max-height: 88vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  .modal-head {
+    padding: 14px 20px; border-bottom: 1px solid #ebeef5;
+    display: flex; align-items: center; flex-shrink: 0;
+  }
+  .modal-head h3 { font-size: 16px; font-weight: 600; }
+  .modal-head .sap { margin-left: 10px; color: #909399; font-size: 13px; }
+  .modal-head .close { margin-left: auto; cursor: pointer; color: #909399; font-size: 20px; }
+  .modal-head .close:hover { color: #f56c6c; }
+
+  .modal-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+
+  /* 弹窗左侧：物料类型树（来自物料标签管理） */
+  .dlg-side {
+    width: 250px; flex-shrink: 0; border-right: 1px solid #ebeef5;
+    display: flex; flex-direction: column; background: #fafbfc;
+  }
+  .dlg-side .side-head {
+    padding: 12px 14px 8px; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; color: #303133;
+  }
+  .dlg-side .side-head .icon { color: #409eff; }
+  .dlg-side .search-box { padding: 0 10px 10px; }
+  .dlg-side .search-box input {
+    width: 100%; height: 30px; border: 1px solid #dcdfe6; border-radius: 6px;
+    padding: 0 9px; font-size: 12.5px; outline: none; background: #fff;
+  }
+  .dlg-side .search-box input:focus { border-color: #409eff; }
+  .dlg-tree { flex: 1; overflow-y: auto; padding: 2px 6px 16px; }
+  .dnode { user-select: none; }
+  .dnode-row {
+    display: flex; align-items: center; height: 30px; padding: 0 7px;
+    border-radius: 6px; cursor: pointer; font-size: 13px; color: #606266;
+    gap: 4px; margin: 1px 0;
+  }
+  .dnode-row:hover { background: #f0f2f5; }
+  .dnode-row.active { background: #ecf5ff; color: #409eff; font-weight: 600; }
+  .dnode-row .arrow {
+    width: 13px; height: 13px; flex-shrink: 0; transition: transform .15s;
+    color: #909399; font-size: 9px; text-align: center; line-height: 13px;
+  }
+  .dnode-row .arrow.open { transform: rotate(90deg); }
+  .dnode-row .arrow.leaf { visibility: hidden; }
+  .dnode-row .folder { font-size: 14px; flex-shrink: 0; }
+  .dnode-row .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dnode-row .cnt {
+    margin-left: auto; font-size: 10.5px; color: #a8abb2;
+    background: #f0f2f5; border-radius: 8px; padding: 0 6px; line-height: 15px; flex-shrink: 0;
+  }
+  .dnode-row.active .cnt { background: #d9ecff; color: #409eff; }
+  .dlv1 > .dnode-row { font-weight: 600; color: #303133; }
+  .dlv1 > .dnode-row.active { color: #409eff; }
+  .dchildren { margin-left: 16px; border-left: 1px dashed #e4e7ed; padding-left: 4px; }
+  .dhighlight { color: #e6a23c; font-weight: bold; }
+
+  /* 弹窗右侧：规格属性（来自物料标签管理） */
+  .dlg-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .picked-bar {
+    background: #ecf5ff; border-bottom: 1px solid #d9ecff;
+    padding: 8px 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
+  }
+  .picked-bar .pb-label { font-size: 12.5px; color: #409eff; font-weight: 600; flex-shrink: 0; }
+  .picked-bar .p-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; padding: 2px 8px; border-radius: 4px;
+    background: #fff; color: #409eff; border: 1px solid #b3d8ff;
+  }
+  .picked-bar .p-tag .del { cursor: pointer; color: #a0cfff; }
+  .picked-bar .p-tag .del:hover { color: #f56c6c; }
+  .picked-bar .p-tag .attr { font-size: 11px; color: #8cc5ff; margin-right: 2px; }
+  .picked-bar .none { font-size: 12px; color: #a0cfff; font-style: italic; }
+
+  .attr-scroll { flex: 1; overflow-y: auto; padding: 14px 16px 20px; }
+  .section-title { display: flex; align-items: center; margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+  .section-title::before {
+    content: ""; width: 4px; height: 15px; background: #409eff;
+    border-radius: 2px; margin-right: 8px;
+  }
+  .section-title .leaf-path { font-size: 12px; color: #909399; font-weight: 400; margin-left: 8px; }
+  .section-title .add-attr-btn {
+    margin-left: auto; font-size: 12px; font-weight: 400; color: #409eff;
+    border: 1px solid #b3d8ff; background: #ecf5ff; border-radius: 6px;
+    padding: 3px 10px; cursor: pointer; transition: all .2s;
+  }
+  .section-title .add-attr-btn:hover { background: #409eff; color: #fff; border-color: #409eff; }
+
+  .attr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+  .attr-card {
+    background: #fff; border: 1px solid #ebeef5; border-radius: 8px;
+    padding: 12px 14px; box-shadow: 0 1px 2px rgba(0,0,0,.03);
+  }
+  .attr-head { display: flex; align-items: center; margin-bottom: 10px; }
+  .attr-name { font-size: 13.5px; font-weight: 600; }
+  .badge {
+    font-size: 10.5px; border-radius: 4px; padding: 1px 6px; margin-left: 7px; line-height: 16px;
+  }
+  .badge.enum { background: #f0f9eb; color: #67c23a; border: 1px solid #e1f3d8; }
+  .badge.text  { background: #fdf6ec; color: #e6a23c; border: 1px solid #faecd8; }
+  .badge.required { background: #fef0f0; color: #f56c6c; border: 1px solid #fde2e2; }
+  .badge.optional { background: #f4f4f5; color: #909399; border: 1px solid #e9e9eb; }
+  .attr-desc { font-size: 11.5px; color: #a8abb2; margin-left: auto; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+  .tag-lib {
+    display: inline-flex; align-items: center;
+    background: #fafbfc; color: #606266; border: 1px solid #dcdfe6;
+    border-radius: 4px; padding: 3px 9px; font-size: 12.5px; line-height: 19px;
+    cursor: pointer; transition: all .15s;
+  }
+  .tag-lib:hover { border-color: #409eff; color: #409eff; }
+  .tag-lib.selected { background: #409eff; color: #fff; border-color: #409eff; }
+  .tag-lib .del { margin-left: 5px; color: #c0c4cc; cursor: pointer; font-size: 12px; line-height: 1; }
+  .tag-lib .del:hover { color: #f56c6c; }
+  .tag-lib.selected .del { color: #d9ecff; }
+  .tag-add {
+    display: inline-flex; align-items: center; gap: 4px;
+    border: 1px dashed #c0c4cc; border-radius: 4px; padding: 3px 9px;
+    font-size: 12.5px; color: #909399; background: transparent;
+    cursor: pointer; line-height: 19px; transition: all .15s;
+  }
+  .tag-add:hover { color: #409eff; border-color: #409eff; }
+  .tag-add input { border: none; outline: none; width: 100px; font-size: 12.5px; background: transparent; }
+
+  .modal-foot {
+    padding: 12px 20px; border-top: 1px solid #ebeef5;
+    display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-shrink: 0;
+  }
+  .modal-foot .hint { margin-right: auto; font-size: 12px; color: #e6a23c; }
+
+  /* ===== 批量打标签：增量模式 ===== */
+  .mode-bar {
+    display: none; align-items: center; gap: 12px; padding: 10px 16px;
+    border-bottom: 1px solid #ebeef5; background: #fafbfc; flex-shrink: 0; flex-wrap: wrap;
+  }
+  .mode-tabs { display: flex; border: 1px solid #dcdfe6; border-radius: 7px; overflow: hidden; }
+  .mode-tab {
+    font-size: 13px; padding: 5px 16px; border: none; cursor: pointer;
+    background: #fff; color: #606266; line-height: 19px;
+  }
+  .mode-tab + .mode-tab { border-left: 1px solid #dcdfe6; }
+  .mode-tab.active { background: #409eff; color: #fff; }
+  .mode-tab[data-mode="remove"].active { background: #f56c6c; }
+  .mode-tip { font-size: 12px; color: #909399; }
+  .tag-lib .stat {
+    margin-left: 6px; font-size: 10.5px; color: #a8abb2;
+    background: #f0f2f5; border-radius: 8px; padding: 0 5px; line-height: 15px;
+  }
+  .tag-lib.selected .stat { background: rgba(255,255,255,.35); color: #fff; }
+  .tag-lib.noeffect { opacity: .45; cursor: not-allowed; }
+  .tag-lib.noeffect:hover { border-color: #dcdfe6; color: #606266; }
+  .btn.primary.danger-save { background: #f56c6c; border-color: #f56c6c; }
+  .btn.primary.danger-save:hover { background: #f78989; border-color: #f78989; color: #fff; }
+  .dnode-row .inv {
+    font-size: 10.5px; color: #e6a23c; background: #fdf6ec;
+    border: 1px solid #faecd8; border-radius: 8px; padding: 0 5px; line-height: 14px; flex-shrink: 0;
+  }
+  .batch-tip {
+    font-size: 12px; color: #e6a23c; background: #fdf6ec; border: 1px solid #faecd8;
+    border-radius: 6px; padding: 7px 10px; margin-bottom: 12px; line-height: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">标</div>
+  <h1>物料打标签</h1>
+  <span class="sub">Material Master Tagging</span>
+  <div class="right">
+    <span id="rightInfo"></span>
+    <button class="btn" id="exportBtn">导出 JSON</button>
+    <button class="btn" id="clearAllBtn">清空全部标签</button>
+  </div>
+</div>
+
+<main class="main">
+  <div class="toolbar">
+    <div class="filter-tabs" id="filterTabs">
+      <button data-f="all" class="active">全部</button>
+      <button data-f="untagged">未打标签</button>
+      <button data-f="tagged">已打标签</button>
+    </div>
+    <input id="matSearch" placeholder="搜索 SAP.No 或分类..." style="height:32px;border:1px solid #dcdfe6;border-radius:6px;padding:0 10px;font-size:13px;outline:none;width:200px;background:#fff;">
+    <div class="spacer"></div>
+    <span style="font-size:12.5px;color:#909399;" id="selInfo">未选择</span>
+    <button class="btn primary" id="tagBtn">🏷 打标签</button>
+    <button class="btn danger" id="batchClearBtn">批量清空</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34px;"><input type="checkbox" class="check" id="checkAll"></th>
+          <th style="width:140px;">SAP.No</th>
+          <th>物料分类</th>
+          <th>已打标签</th>
+          <th style="width:140px;">操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="69-002464"></td><td><span class="sap">69-002464</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR5内存</div></td><td><div class="tags-cell"><span class="tag"><span class="attr">代际</span>DDR5<span class="del" data-sap="69-002464" data-i="0" title="删除">×</span></span></div></td><td class="row-act"><a class="open-tag" data-sap="69-002464">打标签</a><a class="danger clear-row" data-sap="69-002464">清空</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200142"></td><td><span class="sap">302-200142</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200142">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200141"></td><td><span class="sap">302-200141</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200141">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200140"></td><td><span class="sap">302-200140</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200140">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200139"></td><td><span class="sap">302-200139</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200139">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200117"></td><td><span class="sap">302-200117</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR5内存</div></td><td><div class="tags-cell"><span class="tag"><span class="attr">代际</span>DDR5<span class="del" data-sap="302-200117" data-i="0" title="删除">×</span></span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200117">打标签</a><a class="danger clear-row" data-sap="302-200117">清空</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200105"></td><td><span class="sap">302-200105</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200105">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="69-002463"></td><td><span class="sap">69-002463</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR5内存</div></td><td><div class="tags-cell"><span class="tag"><span class="attr">代际</span>DDR5<span class="del" data-sap="69-002463" data-i="0" title="删除">×</span></span></div></td><td class="row-act"><a class="open-tag" data-sap="69-002463">打标签</a><a class="danger clear-row" data-sap="69-002463">清空</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200076"></td><td><span class="sap">302-200076</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR5内存</div></td><td><div class="tags-cell"><span class="tag"><span class="attr">代际</span>DDR5<span class="del" data-sap="302-200076" data-i="0" title="删除">×</span></span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200076">打标签</a><a class="danger clear-row" data-sap="302-200076">清空</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200053"></td><td><span class="sap">302-200053</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200053">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200052"></td><td><span class="sap">302-200052</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200052">打标签</a></td></tr><tr class=""><td><input type="checkbox" class="check row-chk" data-sap="302-200051"></td><td><span class="sap">302-200051</span></td><td class="cat-cell"><div class="lv1">服务器配件 / 内存</div><div class="lv3">DDR4内存</div></td><td><div class="tags-cell"><span class="no-tag">未打标签</span></div></td><td class="row-act"><a class="open-tag" data-sap="302-200051">打标签</a></td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <span>物料总数：<b id="sumTotal">12</b></span><span class="sep">|</span>
+    <span>已打标签：<b id="sumTagged">4</b></span><span class="sep">|</span>
+    <span>未打标签：<b id="sumUntag">8</b></span><span class="sep">|</span>
+    <span>已选：<b id="sumSel">0</b></span><span class="sep">|</span>
+    <span>标签使用总次数：<b id="sumUse">NaN</b></span>
+  </div>
+</main>
+
+<!-- 打标签弹窗：内嵌"物料标签管理"（左侧分类树 + 右侧规格属性管理） -->
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>打标签</h3>
+      <span class="sap" id="mSap">69-002464 · 服务器配件 / 内存 / DDR5内存</span>
+      <span class="close" id="mClose">×</span>
+    </div>
+    <div class="modal-body">
+      <!-- 左侧：物料类型树 -->
+      <div class="dlg-side">
+        <div class="side-head"><span class="icon">▤</span>物料类型</div>
+        <div class="search-box">
+          <input id="dlgSearch" type="text" placeholder="搜索物料分类..." autocomplete="off">
+        </div>
+        <div class="dlg-tree" id="dlgTree"><div class="dnode dlv1"><div class="dnode-row"><span class="arrow open">▶</span><span class="folder">🖥</span><span class="label">服务器配件</span><span class="cnt">12</span></div><div class="dchildren"><div class="dnode dlv2"><div class="dnode-row"><span class="arrow">▶</span><span class="folder">🔧</span><span class="label">主板</span></div></div><div class="dnode dlv2"><div class="dnode-row"><span class="arrow open">▶</span><span class="folder">💾</span><span class="label">内存</span><span class="cnt">12</span></div><div class="dchildren"><div class="dnode dlv3"><div class="dnode-row"><span class="arrow leaf">▶</span><span class="folder">🏷</span><span class="label">DDR4内存</span><span class="cnt">8</span></div></div><div class="dnode dlv3"><div class="dnode-row active"><span class="arrow leaf">▶</span><span class="folder">🏷</span><span class="label">DDR5内存</span><span class="cnt">4</span></div></div></div></div><div class="dnode dlv2"><div class="dnode-row"><span class="arrow">▶</span><span class="folder">📦</span><span class="label">机箱</span></div></div><div class="dnode dlv2"><div class="dnode-row"><span class="arrow">▶</span><span class="folder">💽</span><span class="label">硬盘</span></div></div></div></div></div>
+      </div>
+      <!-- 右侧：已选标签 + 规格属性 -->
+      <div class="dlg-main">
+        <div class="mode-bar" id="modeBar">
+          <div class="mode-tabs" id="modeTabs">
+            <button class="mode-tab active" data-mode="add">＋ 追加标签</button>
+            <button class="mode-tab" data-mode="remove">－ 移除标签</button>
+          </div>
+          <span class="mode-tip" id="modeTip"></span>
+        </div>
+        <div class="picked-bar" id="pickedBar"><span class="pb-label">已选标签：</span><span class="p-tag"><span class="attr">代际</span>DDR5<span class="del" data-attr="代际" data-val="DDR5">×</span></span></div>
+        <div class="attr-scroll" id="attrScroll"><div class="section-title">规格属性<span class="leaf-path">服务器配件/内存/DDR5内存</span><button class="add-attr-btn" id="dlgAddAttr">＋ 新增属性</button></div><div class="attr-grid"><div class="attr-card"><div class="attr-head"><span class="attr-name">代际</span><span class="badge enum">枚举</span><span class="badge required">必填</span><span class="attr-desc">1 个值</span></div><div class="tags"><span class="tag-lib selected" data-a="0" data-v="0">DDR5<span class="del" data-a="0" data-v="0" title="删除">×</span></span><button class="tag-add" data-a="0">＋ 添加</button></div></div><div class="attr-card"><div class="attr-head"><span class="attr-name">型号</span><span class="badge text">文本</span><span class="badge required">必填</span><span class="attr-desc">3 个值</span></div><div class="tags"><span class="tag-lib" data-a="1" data-v="0">M321R4GA3PB0-CWMOD<span class="del" data-a="1" data-v="0" title="删除">×</span></span><span class="tag-lib" data-a="1" data-v="1">HMCG88AGBRA109N<span class="del" data-a="1" data-v="1" title="删除">×</span></span><span class="tag-lib" data-a="1" data-v="2">CT32G55Z<span class="del" data-a="1" data-v="2" title="删除">×</span></span><button class="tag-add" data-a="1">＋ 添加</button></div></div><div class="attr-card"><div class="attr-head"><span class="attr-name">内存容量</span><span class="badge enum">枚举</span><span class="badge required">必填</span><span class="attr-desc">6 个值</span></div><div class="tags"><span class="tag-lib" data-a="2" data-v="0">16GB<span class="del" data-a="2" data-v="0" title="删除">×</span></span><span class="tag-lib" data-a="2" data-v="1">32GB<span class="del" data-a="2" data-v="1" title="删除">×</span></span><span class="tag-lib" data-a="2" data-v="2">64GB<span class="del" data-a="2" data-v="2" title="删除">×</span></span><span class="tag-lib" data-a="2" data-v="3">96GB<span class="del" data-a="2" data-v="3" title="删除">×</span></span><span class="tag-lib" data-a="2" data-v="4">128GB<span class="del" data-a="2" data-v="4" title="删除">×</span></span><span class="tag-lib" data-a="2" data-v="5">256GB<span class="del" data-a="2" data-v="5" title="删除">×</span></span><button class="tag-add" data-a="2">＋ 添加</button></div></div><div class="attr-card"><div class="attr-head"><span class="attr-name">内存频率</span><span class="badge enum">枚举</span><span class="badge required">必填</span><span class="attr-desc">5 个值</span></div><div class="tags"><span class="tag-lib" data-a="3" data-v="0">4800MHz<span class="del" data-a="3" data-v="0" title="删除">×</span></span><span class="tag-lib" data-a="3" data-v="1">5600MHz<span class="del" data-a="3" data-v="1" title="删除">×</span></span><span class="tag-lib" data-a="3" data-v="2">6400MHz<span class="del" data-a="3" data-v="2" title="删除">×</span></span><span class="tag-lib" data-a="3" data-v="3">7200MHz<span class="del" data-a="3" data-v="3" title="删除">×</span></span><span class="tag-lib" data-a="3" data-v="4">8000MHz<span class="del" data-a="3" data-v="4" title="删除">×</span></span><button class="tag-add" data-a="3">＋ 添加</button></div></div><div class="attr-card"><div class="attr-head"><span class="attr-name">品牌</span><span class="badge enum">枚举</span><span class="badge required">必填</span><span class="attr-desc">6 个值</span></div><div class="tags"><span class="tag-lib" data-a="4" data-v="0">三星<span class="del" data-a="4" data-v="0" title="删除">×</span></span><span class="tag-lib" data-a="4" data-v="1">SK海力士<span class="del" data-a="4" data-v="1" title="删除">×</span></span><span class="tag-lib" data-a="4" data-v="2">镁光<span class="del" data-a="4" data-v="2" title="删除">×</span></span><span class="tag-lib" data-a="4" data-v="3">金士顿<span class="del" data-a="4" data-v="3" title="删除">×</span></span><span class="tag-lib" data-a="4" data-v="4">威刚<span class="del" data-a="4" data-v="4" title="删除">×</span></span><span class="tag-lib" data-a="4" data-v="5">英睿达<span class="del" data-a="4" data-v="5" title="删除">×</span></span><button class="tag-add" data-a="4">＋ 添加</button></div></div></div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="hint" id="mHint"></span>
+      <button class="btn" id="mClear">清空该行</button>
+      <button class="btn" id="mCancel">取消</button>
+      <button class="btn primary" id="mSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 数据定义 ================= */
+
+// 物料类型树（三级分类叶子挂 attrs，与"物料标签管理"页面一致，可编辑、持久化）
+const defaultTree = [
+  {
+    name: '服务器配件', icon: '🖥',
+    children: [
+      {
+        name: '主板', icon: '🔧',
+        children: [
+          {
+            name: '通用服务器主板', icon: '🧩',
+            attrs: [
+              { name: '芯片组', type: 'enum', required: true, values: ['Intel C621', 'Intel C741', 'AMD SP5', 'AMD B650'] },
+              { name: 'CPU插座', type: 'enum', required: true, values: ['LGA4189', 'LGA4677', 'sTR5', 'SP3'] },
+              { name: '板型规格', type: 'enum', required: true, values: ['E-ATX', 'ATX', 'EEB', 'CEB'] },
+              { name: '品牌', type: 'enum', required: true, values: ['超微', '华硕', '技嘉', 'Intel', '浪潮'] }
+            ]
+          },
+          {
+            name: '高密度服务器主板', icon: '🧩',
+            attrs: [
+              { name: '芯片组', type: 'enum', required: true, values: ['Intel C741', 'AMD SP5'] },
+              { name: '节点密度', type: 'enum', required: true, values: ['2节点/U', '4节点/2U', '8节点/2U'] },
+              { name: '品牌', type: 'enum', required: true, values: ['超微', '超聚变', '新华三'] }
+            ]
+          }
+        ]
+      },
+      {
+        name: '内存', icon: '💾',
+        children: [
+          {
+            name: 'DDR4内存', icon: '💾',
+            attrs: [
+              { name: '代际', type: 'enum', required: true, values: ['DDR4'] },
+              { name: '型号', type: 'text', required: true, values: ['M393A4K40DB1-CWE', 'HMAA8GL7AMR4N-UH', '36ASF4G72PZ-2G3D1'] },
+              { name: '内存容量', type: 'enum', required: true, values: ['16GB', '32GB', '64GB', '128GB'] },
+              { name: '内存频率', type: 'enum', required: true, values: ['2133MHz', '2400MHz', '2666MHz', '2933MHz', '3200MHz'] },
+              { name: '品牌', type: 'enum', required: true, values: ['三星', 'SK海力士', '镁光', '金士顿', '英睿达'] }
+            ]
+          },
+          {
+            name: 'DDR5内存', icon: '💾',
+            attrs: [
+              { name: '代际', type: 'enum', required: true, values: ['DDR5'] },
+              { name: '型号', type: 'text', required: true, values: ['M321R4GA3PB0-CWMOD', 'HMCG88AGBRA109N', 'CT32G55Z'] },
+              { name: '内存容量', type: 'enum', required: true, values: ['16GB', '32GB', '64GB', '96GB', '128GB', '256GB'] },
+              { name: '内存频率', type: 'enum', required: true, values: ['4800MHz', '5600MHz', '6400MHz', '7200MHz', '8000MHz'] },
+              { name: '品牌', type: 'enum', required: true, values: ['三星', 'SK海力士', '镁光', '金士顿', '威刚', '英睿达'] }
+            ]
+          }
+        ]
+      },
+      {
+        name: '机箱', icon: '📦',
+        children: [
+          {
+            name: '塔式机箱', icon: '📦',
+            attrs: [
+              { name: '机箱规格', type: 'enum', required: true, values: ['4U塔式', '5U塔式', '全塔'] },
+              { name: '3.5寸硬盘位', type: 'enum', required: false, values: ['8个', '12个', '16个', '24个'] },
+              { name: '品牌', type: 'enum', required: true, values: ['超微', '联力', '酷冷至尊'] }
+            ]
+          },
+          {
+            name: '机架式机箱', icon: '📦',
+            attrs: [
+              { name: '机箱规格', type: 'enum', required: true, values: ['1U', '2U', '3U', '4U', '8U'] },
+              { name: '电源冗余', type: 'enum', required: true, values: ['单电源', '1+1冗余', '2+2冗余', 'CRPS'] },
+              { name: '散热风道', type: 'enum', required: false, values: ['前置进风', '侧置进风', '被动散热'] },
+              { name: '品牌', type: 'enum', required: true, values: ['超微', 'DELL', 'HPE', '浪潮', '曙光'] }
+            ]
+          }
+        ]
+      },
+      {
+        name: '硬盘', icon: '💽',
+        children: [
+          {
+            name: '机械硬盘', icon: '💽',
+            attrs: [
+              { name: '容量', type: 'enum', required: true, values: ['1TB', '2TB', '4TB', '8TB', '12TB', '16TB', '20TB'] },
+              { name: '转速', type: 'enum', required: true, values: ['5400rpm', '7200rpm', '10000rpm', '15000rpm'] },
+              { name: '接口类型', type: 'enum', required: true, values: ['SATA 6Gb/s', 'SAS 12Gb/s'] },
+              { name: '品牌', type: 'enum', required: true, values: ['希捷', '西部数据', '东芝', 'HGST'] }
+            ]
+          },
+          {
+            name: 'SATA固态硬盘', icon: '💽',
+            attrs: [
+              { name: '容量', type: 'enum', required: true, values: ['240GB', '480GB', '960GB', '1.92TB', '3.84TB'] },
+              { name: '接口类型', type: 'enum', required: true, values: ['SATA 6Gb/s', 'mSATA'] },
+              { name: '寿命等级', type: 'enum', required: false, values: ['1 DWPD', '3 DWPD', '读密集型', '写密集型'] },
+              { name: '品牌', type: 'enum', required: true, values: ['三星', '英特尔', '镁光', '金士顿'] }
+            ]
+          },
+          {
+            name: 'NVMe固态硬盘', icon: '💽',
+            attrs: [
+              { name: '容量', type: 'enum', required: true, values: ['480GB', '960GB', '1.6TB', '3.2TB', '6.4TB', '12.8TB'] },
+              { name: '接口类型', type: 'enum', required: true, values: ['U.2', 'U.3', 'M.2', 'E1.S', 'E3.S'] },
+              { name: 'PCIe代数', type: 'enum', required: true, values: ['PCIe 3.0', 'PCIe 4.0', 'PCIe 5.0'] },
+              { name: '品牌', type: 'enum', required: true, values: ['三星', '英特尔', '铠侠', '西数', '致态'] }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
+
+// 物料主数据（来自用户提供的截图）
+const matData = [
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR5内存', sap:'69-002464' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200142' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200141' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200140' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200139' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR5内存', sap:'302-200117' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200105' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR5内存', sap:'69-002463' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR5内存', sap:'302-200076' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200053' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200052' },
+  { lv1:'服务器配件', lv2:'内存', lv3:'DDR4内存', sap:'302-200051' }
+];
+
+/* ================= 状态与持久化 ================= */
+const LS_KEY = 'material_tags_v1';
+let tree, tags;
+try {
+  const saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+  if (saved && saved.tree) { tree = saved.tree; tags = saved.tags || {}; }
+  else { tree = defaultTree; tags = saved || {}; }   // 兼容旧版（{lib,tags} 或纯 tags）
+} catch (e) { tree = defaultTree; tags = {}; }
+matData.forEach(m => { if (!(m.sap in tags)) tags[m.sap] = []; });
+
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ tree: tree, tags: tags })); } catch (e) {}
+}
+
+let selectedRows = new Set();
+let filterMode = 'all';
+let matKw = '';
+
+/* 弹窗状态 */
+let modalTarget = null;        // 'row' | 'batch'
+let modalOp = 'add';           // 批量增量模式：'add' 追加 | 'remove' 移除
+let modalBatchSaps = [];
+let modalPicked = {};           // { attrName: Set(values) }
+let dlgSelectedLeaf = null;     // 弹窗树当前选中的叶子节点
+let dlgExpanded = new Set();
+let dlgKeyword = '';
+
+/* ================= 工具函数 ================= */
+function esc(s) {
+  return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function flattenNodes(list, parents = [], out = []) {
+  list.forEach(n => { out.push({ node: n, parents }); if (n.children) flattenNodes(n.children, [...parents, n], out); });
+  return out;
+}
+function findLeaf(lv3) {
+  for (const f of flattenNodes(tree)) if (f.node.name === lv3 && f.node.attrs) return f.node;
+  return null;
+}
+function leafPath(lv3) {
+  for (const f of flattenNodes(tree)) if (f.node.name === lv3 && f.node.attrs)
+    return [...f.parents.map(p => p.name), f.node.name].join('/');
+  return lv3;
+}
+function matsUnderName(lv3) { return matData.filter(m => m.lv3 === lv3).length; }
+function tagCount(sap) { return (tags[sap] || []).length; }
+function uniqueTagsCount() {
+  const s = new Set();
+  Object.values(tags).forEach(arr => arr.forEach(t => s.add(t.attr + '::' + t.value)));
+  return s.size;
+}
+function totalUse() { let n = 0; Object.values(tags).forEach(arr => n += arr.length); return n; }
+function dMatch(n) { return !dlgKeyword || n.name.includes(dlgKeyword); }
+function dSubtreeMatch(n) { return dMatch(n) || (n.children || []).some(dSubtreeMatch); }
+function dHighlight(name) {
+  if (!dlgKeyword) return esc(name);
+  const i = name.indexOf(dlgKeyword);
+  if (i < 0) return esc(name);
+  return esc(name.slice(0, i)) + '<span class="dhighlight">' + esc(dlgKeyword) + '</span>' + esc(name.slice(i + dlgKeyword.length));
+}
+
+/* ================= 主表格 ================= */
+function renderTable() {
+  const tb = document.getElementById('tbody');
+  let rows = matData.filter(m => {
+    if (filterMode === 'untagged' && tagCount(m.sap) > 0) return false;
+    if (filterMode === 'tagged' && tagCount(m.sap) === 0) return false;
+    if (matKw) {
+      const k = matKw.toLowerCase();
+      if (!m.sap.toLowerCase().includes(k) && !m.lv3.includes(matKw)) return false;
+    }
+    return true;
+  });
+
+  let html = '';
+  rows.forEach(m => {
+    const arr = tags[m.sap] || [];
+    const sel = selectedRows.has(m.sap);
+    html += `<tr class="${sel?'selected':''}">`;
+    html += `<td><input type="checkbox" class="check row-chk" data-sap="${m.sap}" ${sel?'checked':''}></td>`;
+    html += `<td><span class="sap">${esc(m.sap)}</span></td>`;
+    html += `<td class="cat-cell"><div class="lv1">${esc(m.lv1)} / ${esc(m.lv2)}</div><div class="lv3">${esc(m.lv3)}</div></td>`;
+    html += `<td><div class="tags-cell">`;
+    if (arr.length === 0) html += '<span class="no-tag">未打标签</span>';
+    else arr.forEach((t,i) => {
+      html += `<span class="tag"><span class="attr">${esc(t.attr)}</span>${esc(t.value)}<span class="del" data-sap="${m.sap}" data-i="${i}" title="删除">×</span></span>`;
+    });
+    html += `</div></td>`;
+    html += `<td class="row-act"><a class="open-tag" data-sap="${m.sap}">打标签</a>${arr.length?`<a class="danger clear-row" data-sap="${m.sap}">清空</a>`:''}</td>`;
+    html += `</tr>`;
+  });
+  if (rows.length === 0) html = '<tr><td colspan="5" style="text-align:center;color:#909399;padding:40px;">没有匹配的物料</td></tr>';
+  tb.innerHTML = html;
+
+  tb.querySelectorAll('.row-chk').forEach(c => c.onchange = () => {
+    if (c.checked) selectedRows.add(c.dataset.sap); else selectedRows.delete(c.dataset.sap);
+    updateSel(); renderTable();
+  });
+  tb.querySelectorAll('.open-tag').forEach(a => a.onclick = () => openModal('row', a.dataset.sap));
+  tb.querySelectorAll('.clear-row').forEach(a => a.onclick = () => {
+    if (confirm('确定清空该物料的所有标签吗？')) { tags[a.dataset.sap] = []; save(); renderTable(); updateSummary(); }
+  });
+  tb.querySelectorAll('.tag .del').forEach(d => d.onclick = () => {
+    tags[d.dataset.sap].splice(+d.dataset.i, 1); save(); renderTable(); updateSummary();
+  });
+  document.getElementById('checkAll').checked = rows.length>0 && rows.every(r => selectedRows.has(r.sap));
+}
+
+function updateSel() {
+  document.getElementById('selInfo').textContent = selectedRows.size > 0 ? `已选 ${selectedRows.size} 条` : '未选择';
+  document.getElementById('sumSel').textContent = selectedRows.size;
+}
+function updateSummary() {
+  const total = matData.length;
+  const tagged = matData.filter(m => tagCount(m.sap) > 0).length;
+  document.getElementById('sumTotal').textContent = total;
+  document.getElementById('sumTagged').textContent = tagged;
+  document.getElementById('sumUntag').textContent = total - tagged;
+  document.getElementById('sumUse').textContent = totalUse();
+  document.getElementById('rightInfo').textContent =
+    `已加载 ${total} 条物料主数据 · 共 ${uniqueTagsCount()} 个不同标签值`;
+}
+
+/* ================= 打标签弹窗（内嵌物料标签管理） ================= */
+
+/* ---- 批量增量模式辅助 ---- */
+function involvedDist() {          // 所选物料按三级分类的分布
+  const dist = {};
+  modalBatchSaps.forEach(s => {
+    const m = matData.find(x => x.sap === s);
+    dist[m.lv3] = (dist[m.lv3] || 0) + 1;
+  });
+  return dist;
+}
+function mainInvolvedLv3() {       // 所选物料数量最多的三级分类（弹窗默认定位）
+  const dist = involvedDist();
+  return Object.entries(dist).sort((a, b) => b[1] - a[1])[0][0];
+}
+function batchStats() {            // 所选物料中各 attr::value 已打的数量
+  const stat = {};
+  modalBatchSaps.forEach(s => (tags[s] || []).forEach(t => {
+    const k = t.attr + '::' + t.value;
+    stat[k] = (stat[k] || 0) + 1;
+  }));
+  return stat;
+}
+function renderModeBar() {         // 批量模式切换条（单行模式隐藏）
+  const bar = document.getElementById('modeBar');
+  const saveBtn = document.getElementById('mSave');
+  if (modalTarget !== 'batch') {
+    bar.style.display = 'none';
+    saveBtn.textContent = '保存';
+    saveBtn.classList.remove('danger-save');
+    return;
+  }
+  bar.style.display = 'flex';
+  bar.querySelectorAll('.mode-tab').forEach(b => b.classList.toggle('active', b.dataset.mode === modalOp));
+  document.getElementById('modeTip').textContent = modalOp === 'add'
+    ? '勾选的标签将追加到所选物料，已有该标签的物料自动跳过，其他现有标签不受影响'
+    : '勾选的标签将从所选物料移除，未打该标签的物料自动跳过，其他现有标签保持不变';
+  document.getElementById('mHint').textContent = modalOp === 'add'
+    ? '增量模式：只加不减' : '增量模式：只减不加';
+  saveBtn.textContent = modalOp === 'add' ? '保存（追加）' : '保存（移除）';
+  saveBtn.classList.toggle('danger-save', modalOp === 'remove');
+}
+
+function openModal(mode, sap) {
+  modalTarget = mode;
+  modalPicked = {};
+  modalOp = 'add';                          // 批量模式默认"追加"，每次打开重置
+  dlgKeyword = '';
+  document.getElementById('dlgSearch').value = '';
+  document.getElementById('mClear').textContent = mode === 'row' ? '清空该行' : '清空所选物料标签';
+
+  if (mode === 'row') {
+    // 单条：编辑语义 —— 回显该行全部标签，保存即覆盖该行
+    const m = matData.find(x => x.sap === sap);
+    modalBatchSaps = [sap];
+    document.getElementById('mSap').textContent = `${m.sap} · ${m.lv1} / ${m.lv2} / ${m.lv3}`;
+    (tags[sap] || []).forEach(t => {
+      if (!modalPicked[t.attr]) modalPicked[t.attr] = new Set();
+      modalPicked[t.attr].add(t.value);
+    });
+    dlgSelectedLeaf = findLeaf(m.lv3);
+    document.getElementById('mHint').textContent = '';
+  } else {
+    // 批量：增量语义 —— 不回填现有标签，勾什么才动什么
+    const saps = Array.from(selectedRows);
+    if (saps.length === 0) { alert('请先勾选要打标签的物料！'); return; }
+    modalBatchSaps = saps;
+    const dist = involvedDist();
+    document.getElementById('mSap').textContent =
+      `批量打标签 · ${saps.length} 条物料 · ` + Object.entries(dist).map(([k, v]) => `${k}×${v}`).join('、');
+    dlgSelectedLeaf = findLeaf(mainInvolvedLv3());   // 默认定位到所选物料最多的分类
+  }
+
+  // 展开到默认选中叶子的路径
+  dlgExpanded = new Set(['服务器配件']);
+  if (dlgSelectedLeaf) {
+    const p = leafPath(dlgSelectedLeaf.name).split('/');
+    for (let i = 1; i < p.length; i++) dlgExpanded.add(p.slice(0, i).join('/'));
+  }
+
+  renderModeBar();
+  renderDlgTree();
+  renderDlgAttrs();
+  document.getElementById('mask').classList.add('show');
+}
+function closeModal() { document.getElementById('mask').classList.remove('show'); }
+
+/* ---- 弹窗左侧树 ---- */
+function renderDlgTree() {
+  const box = document.getElementById('dlgTree');
+  box.innerHTML = '';
+  const inv = modalTarget === 'batch' ? involvedDist() : null;   // 批量模式：所选物料的分类分布
+  const build = (list, parents, level, container) => {
+    list.filter(dSubtreeMatch).forEach(n => {
+      const path = [...parents.map(p => p.name), n.name].join('/');
+      const isLeaf = !n.children;
+      const isOpen = dlgKeyword ? !isLeaf : dlgExpanded.has(path);
+      const cnt = n.attrs ? matsUnderName(n.name)
+                          : flattenNodes(n.children, [...parents, n]).filter(f => f.node.attrs).reduce((s, f) => s + matsUnderName(f.node.name), 0);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'dnode dlv' + level;
+      const row = document.createElement('div');
+      row.className = 'dnode-row' + (dlgSelectedLeaf === n ? ' active' : '');
+      const invCnt = (inv && n.attrs && inv[n.name]) || 0;
+      row.innerHTML =
+        '<span class="arrow' + (isLeaf ? ' leaf' : (isOpen ? ' open' : '')) + '">▶</span>' +
+        '<span class="folder">' + (isLeaf ? '🏷' : (n.icon || '📂')) + '</span>' +
+        '<span class="label">' + dHighlight(n.name) + '</span>' +
+        (invCnt ? '<span class="inv" title="所选物料中属于该分类的数量">选' + invCnt + '</span>' : '') +
+        (cnt ? '<span class="cnt">' + cnt + '</span>' : '');
+
+      row.onclick = () => {
+        if (!isLeaf && !dlgKeyword) {
+          if (dlgExpanded.has(path)) dlgExpanded.delete(path); else dlgExpanded.add(path);
+        }
+        if (n.attrs) { dlgSelectedLeaf = n; renderDlgAttrs(); }
+        renderDlgTree();
+      };
+      wrap.appendChild(row);
+      if (!isLeaf && isOpen) {
+        const cb = document.createElement('div');
+        cb.className = 'dchildren';
+        build(n.children, [...parents, n], level + 1, cb);
+        wrap.appendChild(cb);
+      }
+      container.appendChild(wrap);
+    });
+  };
+  build(tree, [], 1, box);
+}
+
+/* ---- 弹窗右侧：已选标签 + 规格属性（可编辑） ---- */
+function renderDlgAttrs() {
+  renderPickedBar();
+  const box = document.getElementById('attrScroll');
+  const leaf = dlgSelectedLeaf;
+  if (!leaf) {
+    box.innerHTML = '<div style="text-align:center;color:#c0c4cc;padding:60px 0;font-size:13px;">请在左侧选择三级分类</div>';
+    return;
+  }
+  const isBatch = modalTarget === 'batch';
+  const stat = isBatch ? batchStats() : null;        // 所选物料已打各标签的数量
+  const total = modalBatchSaps.length;
+  const inv = isBatch ? involvedDist() : null;
+  const involvedHere = inv ? (inv[leaf.name] || 0) : 0;
+
+  let html =
+    '<div class="section-title">规格属性' +
+    '<span class="leaf-path">' + esc(leafPath(leaf.name)) + '</span>' +
+    '<button class="add-attr-btn" id="dlgAddAttr">＋ 新增属性</button>' +
+    '</div>';
+  if (isBatch) {
+    html += '<div class="batch-tip">所选 ' + total + ' 条物料中属于「' + esc(leaf.name) + '」的有 ' + involvedHere + ' 条' +
+      (involvedHere ? '' : '，当前分类下勾选的标签保存时将被跳过') +
+      '。标签值后的 n/' + total + ' 表示已打该标签的物料数。</div>';
+  }
+  html += '<div class="attr-grid">';
+
+  leaf.attrs.forEach((a, ai) => {
+    const picked = modalPicked[a.name] || new Set();
+    html += '<div class="attr-card"><div class="attr-head">' +
+      '<span class="attr-name">' + esc(a.name) + '</span>' +
+      '<span class="badge ' + (a.type === 'enum' ? 'enum">枚举</span>' : 'text">文本</span>') +
+      '<span class="badge ' + (a.required ? 'required">必填</span>' : 'optional">选填</span>') +
+      '<span class="attr-desc">' + a.values.length + ' 个值</span>' +
+      '</div><div class="tags">';
+    a.values.forEach((v, vi) => {
+      const k = a.name + '::' + v;
+      const n = stat ? (stat[k] || 0) : null;
+      // 对当前模式无实际变更的值置灰：追加模式=全部已打；移除模式=全都未打
+      const noEffect = stat && (modalOp === 'add' ? n >= total : n === 0);
+      const tip = noEffect ? (modalOp === 'add' ? '所选物料均已打该标签，追加无实际变更' : '所选物料均未打该标签，移除无实际变更') : '';
+      html += '<span class="tag-lib' + (picked.has(v) ? ' selected' : '') + (noEffect ? ' noeffect' : '') +
+        '" data-a="' + ai + '" data-v="' + vi + '"' + (tip ? ' title="' + tip + '"' : '') + '>' +
+        esc(v) +
+        (stat ? '<span class="stat">' + n + '/' + total + '</span>' : '') +
+        '<span class="del" data-a="' + ai + '" data-v="' + vi + '" title="删除">×</span></span>';
+    });
+    html += '<button class="tag-add" data-a="' + ai + '">＋ 添加</button>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  box.innerHTML = html;
+
+  /* 事件 */
+  document.getElementById('dlgAddAttr').onclick = () => {
+    const name = prompt('请输入新增属性名称：');
+    if (name && name.trim()) {
+      leaf.attrs.push({ name: name.trim(), type: 'enum', required: false, values: [] });
+      save(); renderDlgTree(); renderDlgAttrs();
+    }
+  };
+  box.querySelectorAll('.tag-lib').forEach(c => {
+    c.onclick = e => {
+      if (e.target.classList.contains('del')) return;   // 删除按钮单独处理
+      if (c.classList.contains('noeffect')) return;     // 批量模式下无实际变更的值不可勾选
+      togglePick(leaf, +c.dataset.a, +c.dataset.v);
+    };
+  });
+  box.querySelectorAll('.tag-lib .del').forEach(d => d.onclick = e => {
+    e.stopPropagation();
+    if (!confirm('确定删除该标签值吗？（仅从标签库移除，不影响已打在物料上的标签）')) return;
+    const a = leaf.attrs[+d.dataset.a];
+    const v = a.values[+d.dataset.v];
+    a.values.splice(+d.dataset.v, 1);
+    if (modalPicked[a.name]) modalPicked[a.name].delete(v);   // 同步取消已选
+    save(); renderDlgAttrs();
+  });
+  box.querySelectorAll('.tag-add').forEach(btn => btn.onclick = () => {
+    const ai = +btn.dataset.a;
+    btn.innerHTML = '＋ <input type="text" placeholder="输入后回车" maxlength="30">';
+    const input = btn.querySelector('input');
+    input.focus();
+    const commit = () => {
+      const v = input.value.trim();
+      if (v && !leaf.attrs[ai].values.includes(v)) {
+        leaf.attrs[ai].values.push(v);
+        if (modalTarget !== 'batch' || modalOp === 'add') {   // 移除模式下新增值无需预选
+          if (!modalPicked[leaf.attrs[ai].name]) modalPicked[leaf.attrs[ai].name] = new Set();
+          modalPicked[leaf.attrs[ai].name].add(v);   // 新增值自动选中
+        }
+      }
+      save(); renderDlgTree(); renderDlgAttrs();
+    };
+    input.onkeydown = e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') renderDlgAttrs(); };
+    input.onblur = () => { if (input.value.trim()) commit(); else btn.innerHTML = '＋ 添加'; };
+  });
+}
+
+function togglePick(leaf, ai, vi) {
+  const a = leaf.attrs[ai];
+  const v = a.values[vi];
+  if (!modalPicked[a.name]) modalPicked[a.name] = new Set();
+  if (modalPicked[a.name].has(v)) modalPicked[a.name].delete(v);
+  else modalPicked[a.name].add(v);
+  renderDlgAttrs();
+}
+
+/* ---- 已选标签栏 ---- */
+function renderPickedBar() {
+  const bar = document.getElementById('pickedBar');
+  const isBatch = modalTarget === 'batch';
+  const label = isBatch ? (modalOp === 'add' ? '将追加：' : '将移除：') : '已选标签：';
+  let html = '<span class="pb-label">' + label + '</span>';
+  let count = 0;
+  Object.keys(modalPicked).forEach(attr => {
+    modalPicked[attr].forEach(v => {
+      count++;
+      html += `<span class="p-tag"><span class="attr">${esc(attr)}</span>${esc(v)}<span class="del" data-attr="${esc(attr)}" data-val="${esc(v)}">×</span></span>`;
+    });
+  });
+  if (count === 0) html += isBatch
+    ? '<span class="none">' + (modalOp === 'add' ? '点击下方属性值，勾选要追加的标签' : '点击下方属性值，勾选要移除的标签') + '</span>'
+    : '<span class="none">点击下方属性值选择标签</span>';
+  bar.innerHTML = html;
+  bar.querySelectorAll('.p-tag .del').forEach(d => d.onclick = () => {
+    modalPicked[d.dataset.attr].delete(d.dataset.val);
+    renderDlgAttrs();
+  });
+}
+
+/* ---- 保存 ---- */
+function saveModal() {
+  const picked = [];
+  Object.keys(modalPicked).forEach(attr => {
+    modalPicked[attr].forEach(v => picked.push({ attr, value: v }));
+  });
+
+  /* 单条：编辑语义（回显了该行全部标签，保存即覆盖该行） */
+  if (modalTarget === 'row') {
+    tags[modalBatchSaps[0]] = picked;
+    save(); closeModal(); renderTable(); updateSummary();
+    return;
+  }
+
+  /* 批量：增量语义 —— 先计算变更计划，预览确认后再应用 */
+  if (picked.length === 0) {
+    alert('请先勾选要' + (modalOp === 'add' ? '追加' : '移除') + '的标签！');
+    return;
+  }
+  const plan = buildBatchPlan(picked);
+  if (plan.added + plan.removed === 0) {
+    alert('没有实际变更：' + (modalOp === 'add'
+      ? '所选物料均已打勾选的标签（或标签值不属于物料所属分类）。'
+      : '所选物料均未打勾选的标签。'));
+    return;
+  }
+  if (!confirm(batchPreviewText(plan))) return;   // 取消则不产生任何改动
+
+  plan.ops.forEach(op => {
+    if (modalOp === 'add') tags[op.sap] = (tags[op.sap] || []).concat(op.add);
+    else {
+      const rm = new Set(op.remove);
+      tags[op.sap] = (tags[op.sap] || []).filter(t => !rm.has(t.attr + '::' + t.value));
+    }
+  });
+  save(); closeModal(); renderTable(); updateSummary();
+}
+
+/* 批量增量变更计划：不直接改数据，先算出每条物料的增/删明细 */
+function buildBatchPlan(picked) {
+  const leafCache = {};
+  const leafOf = lv3 => {
+    if (!(lv3 in leafCache)) {
+      const leaf = findLeaf(lv3);
+      leafCache[lv3] = {
+        allow: new Set((leaf ? leaf.attrs : []).flatMap(a => a.values.map(v => a.name + '::' + v))),
+        requiredAttrs: new Set((leaf ? leaf.attrs : []).filter(a => a.required).map(a => a.name))
+      };
+    }
+    return leafCache[lv3];
+  };
+  const ops = [], detail = {};
+  let added = 0, removed = 0, skipped = 0, requiredHit = false;
+
+  modalBatchSaps.forEach(sap => {
+    const m = matData.find(x => x.sap === sap);
+    const meta = leafOf(m.lv3);
+    const cur = tags[sap] || [];
+    const exist = new Set(cur.map(t => t.attr + '::' + t.value));
+    const op = { sap, add: [], remove: [] };
+
+    picked.forEach(t => {
+      const k = t.attr + '::' + t.value;
+      if (modalOp === 'add') {
+        if (exist.has(k)) return;                        // 幂等：已存在则跳过
+        if (!meta.allow.has(k)) { skipped++; return; }   // 不属于物料分类的值：跳过
+        op.add.push(t); detail[k] = (detail[k] || 0) + 1; added++;
+      } else {
+        if (!exist.has(k)) return;                       // 未打该标签：跳过
+        op.remove.push(k); detail[k] = (detail[k] || 0) + 1; removed++;
+        if (meta.requiredAttrs.has(t.attr)) requiredHit = true;   // 移除必填属性需警示
+      }
+    });
+    if (op.add.length || op.remove.length) ops.push(op);
+  });
+  return { ops, detail, added, removed, skipped, requiredHit, affected: ops.length };
+}
+
+/* 变更预览文案 */
+function batchPreviewText(p) {
+  const opName = modalOp === 'add' ? '追加' : '移除';
+  const lines = Object.entries(p.detail)
+    .map(([k, n]) => '「' + k.replace('::', '：') + '」 ' + opName + ' ' + n + ' 条物料')
+    .join('\n');
+  let tip = '';
+  if (p.skipped > 0) tip += '\n⚠ 有 ' + p.skipped + ' 个（物料×标签）因不属于物料所属分类被自动跳过。';
+  if (p.requiredHit) tip += '\n⚠ 勾选的标签涉及必填属性，移除后部分物料的必填属性将缺失。';
+  return '确认按【' + opName + '】模式批量保存？\n\n' + lines +
+    '\n\n共影响 ' + p.affected + '/' + modalBatchSaps.length + ' 条物料，未涉及物料的现有标签一律保持不变。' + tip;
+}
+
+/* ================= 事件 ================= */
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('mCancel').onclick = closeModal;
+document.getElementById('mSave').onclick = saveModal;
+document.getElementById('mClear').onclick = () => {
+  if (confirm(modalTarget==='row' ? '清空该物料的全部标签？' : '清空所选 '+modalBatchSaps.length+' 条物料的全部标签？')) {
+    if (modalTarget === 'row') tags[modalBatchSaps[0]] = [];
+    else modalBatchSaps.forEach(s => tags[s] = []);
+    save(); closeModal(); renderTable(); updateSummary();
+  }
+};
+document.getElementById('mask').onclick = e => { if (e.target.id==='mask') closeModal(); };
+
+/* 批量增量模式切换：追加 / 移除 */
+document.querySelectorAll('#modeTabs .mode-tab').forEach(b => b.onclick = () => {
+  if (b.dataset.mode === modalOp) return;
+  const hasPick = Object.keys(modalPicked).some(a => modalPicked[a].size > 0);
+  if (hasPick && !confirm('切换模式将清空已勾选的标签，是否继续？')) return;
+  modalOp = b.dataset.mode;
+  modalPicked = {};
+  renderModeBar(); renderDlgTree(); renderDlgAttrs();
+});
+document.getElementById('dlgSearch').addEventListener('input', e => {
+  dlgKeyword = e.target.value.trim();
+  renderDlgTree();
+});
+
+document.getElementById('filterTabs').querySelectorAll('button').forEach(b => b.onclick = () => {
+  filterMode = b.dataset.f;
+  document.querySelectorAll('#filterTabs button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  renderTable();
+});
+document.getElementById('matSearch').oninput = e => { matKw = e.target.value.trim(); renderTable(); };
+document.getElementById('checkAll').onchange = e => {
+  document.querySelectorAll('.row-chk').forEach(c => {
+    if (e.target.checked) selectedRows.add(c.dataset.sap); else selectedRows.delete(c.dataset.sap);
+    c.checked = e.target.checked;
+  });
+  updateSel();
+};
+
+/* 工具栏"打标签"按钮：勾选 1 条=单行，多条=批量 */
+document.getElementById('tagBtn').onclick = () => {
+  if (selectedRows.size === 0) { alert('请先勾选要打标签的物料（支持多选批量打标签）！'); return; }
+  if (selectedRows.size === 1) openModal('row', Array.from(selectedRows)[0]);
+  else openModal('batch');
+};
+document.getElementById('batchClearBtn').onclick = () => {
+  if (selectedRows.size === 0) { alert('请先勾选要清空的物料！'); return; }
+  if (confirm('确定清空所选 '+selectedRows.size+' 条物料的全部标签？')) {
+    selectedRows.forEach(s => tags[s] = []);
+    save(); renderTable(); updateSummary();
+  }
+};
+
+document.getElementById('exportBtn').onclick = () => {
+  const out = matData.map(m => ({
+    SAP_No: m.sap,
+    产品I级分类: m.lv1,
+    产品II级分类: m.lv2,
+    产品III级分类: m.lv3,
+    已打标签: (tags[m.sap] || []).map(t => ({ 属性: t.attr, 值: t.value }))
+  }));
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '物料标签_'+ new Date().toISOString().slice(0,10) +'.json';
+  a.click(); URL.revokeObjectURL(url);
+};
+document.getElementById('clearAllBtn').onclick = () => {
+  if (!confirm('确定清空所有物料的标签？此操作不可恢复！')) return;
+  matData.forEach(m => tags[m.sap] = []);
+  save(); renderTable(); updateSummary();
+};
+
+/* ================= 初始化 ================= */
+renderTable();
+updateSummary();
+updateSel();
+</script>
+
+
+</body></html>

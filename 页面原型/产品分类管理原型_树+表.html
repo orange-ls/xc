@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品分类管理 · 前端原型 · 信创物料管理系统</title>
+<style>
+/* ================= 基础与变量（Odoo 14 风格基色） ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --purple: #714b67;        /* Odoo 主紫 */
+  --purple-d: #5b3e52;
+  --purple-l: #f4eef2;
+  --ink: #303841;
+  --muted: #737a83;
+  --line: #e4e7eb;
+  --line-d: #d3d8de;
+  --bg: #f2f3f5;
+  --card: #ffffff;
+  --lv1: #714b67;           /* Ⅰ级 紫色 */
+  --lv2: #2563eb;           /* Ⅱ级 蓝色 */
+  --lv3: #059669;           /* Ⅲ级 绿色 */
+  --lv4: #b45309;           /* Ⅳ级 棕黄色 */
+  --ok: #16a34a;
+  --err: #dc2626;
+  --warn: #d97706;
+  --info: #2563eb;
+  --r: 8px;
+  --shadow: 0 1px 3px rgba(16, 24, 40, .08);
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  background: var(--bg); color: var(--ink); font-size: 13px; line-height: 1.6;
+}
+.hidden { display: none !important; }
+
+/* ================= 顶部导航（模拟 Odoo 14 应用栏与面包屑） ================= */
+.topbar {
+  height: 46px; background: #212529; color: #e9ecef;
+  display: flex; align-items: center; padding: 0 16px; gap: 14px;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar .brand { font-weight: 600; font-size: 14px; letter-spacing: .5px; white-space: nowrap; }
+.topbar .brand .logo {
+  display: inline-block; width: 20px; height: 20px; border-radius: 4px;
+  background: linear-gradient(135deg, #9c6d8f, var(--purple));
+  vertical-align: -4px; margin-right: 8px;
+}
+.topbar .crumb { color: #adb5bd; font-size: 12.5px; }
+.topbar .crumb b { color: #fff; font-weight: 600; }
+.topbar .crumb .sep { margin: 0 6px; color: #6c757d; }
+.topbar .spacer { flex: 1; }
+.topbar .user { font-size: 12px; color: #ced4da; }
+.topbar .user .avatar {
+  display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--purple); color: #fff; text-align: center; line-height: 22px;
+  font-size: 12px; margin-right: 6px; vertical-align: -6px;
+}
+
+/* ================= 页头 ================= */
+.page-header {
+  background: var(--card); border-bottom: 1px solid var(--line);
+  padding: 14px 20px 0;
+}
+.page-header .title-row { display: flex; align-items: center; justify-content: space-between; }
+.page-header h1 { font-size: 19px; font-weight: 600; }
+.proto-tag {
+  display: inline-block; background: var(--warn); color: #fff; font-size: 11px;
+  border-radius: 10px; padding: 1px 8px; margin-left: 8px; vertical-align: 2px; font-weight: 600;
+}
+
+/* ================= 页签 ================= */
+.tabs { display: flex; gap: 4px; margin-top: 12px; }
+.tab {
+  border: none; background: transparent; padding: 9px 18px; cursor: pointer;
+  font-size: 13.5px; color: var(--muted); border-bottom: 3px solid transparent;
+  border-radius: 6px 6px 0 0; font-family: inherit;
+}
+.tab:hover { background: #f1f3f5; color: var(--ink); }
+.tab.active {
+  color: var(--purple); font-weight: 600;
+  border-bottom-color: var(--purple); background: var(--purple-l);
+}
+.tab-panel { padding: 16px 20px 28px; max-width: 1400px; margin: 0 auto; }
+
+/* ================= 布局：分类维护 ================= */
+.maintain-layout { display: flex; gap: 14px; align-items: stretch; }
+.tree-panel {
+  width: 320px; flex-shrink: 0; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--r); box-shadow: var(--shadow); display: flex; flex-direction: column;
+  max-height: 660px;
+}
+.tree-toolbar { padding: 10px 12px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; }
+.tree-toolbar input {
+  flex: 1; border: 1px solid var(--line-d); border-radius: 6px; padding: 5px 9px;
+  font-size: 12.5px; outline: none; font-family: inherit;
+}
+.tree-toolbar input:focus { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(113, 75, 103, .12); }
+.tree-body { overflow: auto; padding: 6px 4px 12px; flex: 1; }
+.tree-legend { padding: 8px 12px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+.table-panel { flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+
+/* ================= 分类树 ================= */
+.tree-node {
+  display: flex; align-items: center; padding: 3px 8px; border-radius: 5px; cursor: pointer;
+  position: relative; white-space: nowrap;
+}
+.tree-node:hover { background: #f1f3f5; }
+.tree-node.selected { background: var(--purple-l); outline: 1px solid #d9c3d4; }
+.tree-node .indent { display: inline-block; }
+.tree-node .toggle {
+  width: 16px; height: 16px; flex-shrink: 0; position: relative; margin-right: 2px;
+}
+.tree-node .toggle::before {
+  content: ''; position: absolute; left: 4px; top: 4.5px;
+  border: 4.5px solid transparent; border-left-color: #9aa1a9; border-left-width: 5.5px;
+  transition: transform .12s;
+}
+.tree-node.expanded > .toggle::before { transform: rotate(90deg); }
+.tree-node.leaf > .toggle::before { display: none; }
+.tree-node .toggle.leaf-dot::after {
+  content: ''; position: absolute; left: 6px; top: 6px; width: 5px; height: 5px;
+  border-radius: 50%; background: #c3c8ce;
+}
+.tree-node .node-icon {
+  width: 8px; height: 8px; border-radius: 2px; margin-right: 7px; flex-shrink: 0;
+}
+.tree-node .node-name { font-size: 12.8px; overflow: hidden; text-overflow: ellipsis; }
+.tree-node .node-cnt { color: #adb5bd; font-size: 11px; margin-left: 4px; }
+.tree-node .node-actions { margin-left: auto; display: none; gap: 2px; }
+.tree-node:hover .node-actions { display: inline-flex; }
+.tree-node .node-actions button {
+  border: none; background: #fff; cursor: pointer; font-size: 11px;
+  height: 19px; padding: 0 6px; border-radius: 4px; color: var(--purple); line-height: 1;
+  border: 1px solid var(--line-d); white-space: nowrap;
+}
+.tree-node .node-actions button:hover { background: var(--purple); border-color: var(--purple); color: #fff; }
+.tree-node .node-actions button.del:hover { color: var(--err); }
+.tree-node.disabled .node-name { color: #adb5bd; text-decoration: line-through; }
+.tree-children { margin-left: 14px; border-left: 1px dashed var(--line-d); padding-left: 4px; }
+
+/* 层级徽章 */
+.lv-badge {
+  display: inline-block; font-size: 10px; font-weight: 700; color: #fff;
+  border-radius: 3px; padding: 0 4px; line-height: 15px; margin-left: 6px; flex-shrink: 0;
+}
+.lv-badge.l1 { background: var(--lv1); }
+.lv-badge.l2 { background: var(--lv2); }
+.lv-badge.l3 { background: var(--lv3); }
+.lv-badge.l4 { background: var(--lv4); }
+.th-new {
+  background: var(--warn); color: #fff; font-size: 10px; border-radius: 3px;
+  padding: 0 4px; margin-left: 3px; vertical-align: 1px; font-weight: 700;
+}
+
+/* ================= 通用表格 ================= */
+.table-toolbar {
+  padding: 10px 14px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.table-toolbar .tb-title { font-weight: 600; font-size: 13.5px; }
+.table-toolbar .tb-sub { color: var(--muted); font-size: 12px; }
+.table-scroll { overflow: auto; flex: 1; }
+table.grid { width: 100%; border-collapse: collapse; font-size: 12.6px; }
+table.grid thead th {
+  position: sticky; top: 0; background: #f8f9fa; color: #495057; font-weight: 600;
+  text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line-d);
+  white-space: nowrap; z-index: 2;
+}
+table.grid tbody td { padding: 7px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.grid tbody tr:hover { background: #f6f7f8; }
+table.grid tbody tr:last-child td { border-bottom: none; }
+td.cat-cell { color: var(--ink); }
+td.cat-empty { color: #c3c8ce; }
+tr.flash td { animation: cellFlash 1.6s ease 2; }
+@keyframes cellFlash { 0% { background: #d3f3df; } 100% { background: transparent; } }
+.empty-tip { text-align: center; color: #adb5bd; padding: 30px 0 34px !important; }
+.path-brief { display: flex; flex-wrap: wrap; gap: 2px 0; align-items: center; }
+.path-brief .p-sep { color: #c3c8ce; margin: 0 4px; }
+
+/* ================= 按钮 ================= */
+.btn {
+  border: 1px solid var(--line-d); background: var(--card); color: var(--ink);
+  border-radius: 6px; padding: 6px 14px; font-size: 12.8px; cursor: pointer; font-family: inherit;
+  transition: all .12s; white-space: nowrap;
+}
+.btn:hover { border-color: #b9c0c8; background: #f6f7f8; }
+.btn-primary { background: var(--purple); border-color: var(--purple); color: #fff; }
+.btn-primary:hover { background: var(--purple-d); border-color: var(--purple-d); }
+.btn-danger { color: var(--err); border-color: #f3b4b4; }
+.btn-danger:hover { background: #fdf0f0; border-color: var(--err); }
+.btn-sm { padding: 3px 9px; font-size: 12px; border-radius: 5px; }
+.btn-link { border: none; background: none; color: var(--purple); cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
+.btn-link:hover { text-decoration: underline; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid rgba(113, 75, 103, .4); outline-offset: 1px; }
+
+/* ================= 搜索/筛选控件 ================= */
+input.flt, select.flt {
+  border: 1px solid var(--line-d); border-radius: 6px; padding: 5px 9px; font-size: 12.5px;
+  outline: none; font-family: inherit; background: #fff; color: var(--ink);
+}
+input.flt:focus, select.flt:focus { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(113, 75, 103, .12); }
+input.flt { min-width: 210px; }
+
+/* ================= 状态/自动带出徽章 ================= */
+.status-pill {
+  display: inline-block; font-size: 11px; border-radius: 9px; padding: 1px 8px; line-height: 16px;
+}
+.status-pill.on { background: #e3f4ea; color: var(--ok); }
+.status-pill.off { background: #f4e5e5; color: var(--err); }
+.auto-badge {
+  display: none; align-items: center; gap: 2px; background: #e3f4ea; color: #14804d;
+  font-size: 11px; border-radius: 9px; padding: 1px 8px; line-height: 16px;
+  font-weight: 600; white-space: nowrap; animation: badgePop .25s ease;
+}
+.auto-badge.show { display: inline-flex; }
+@keyframes badgePop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* ================= 弹窗 ================= */
+.modal-mask {
+  position: fixed; inset: 0; background: rgba(30, 34, 40, .45);
+  display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px;
+}
+.modal {
+  background: #fff; border-radius: 10px; box-shadow: 0 10px 40px rgba(0, 0, 0, .22);
+  width: 880px; max-width: 96vw; max-height: 92vh; display: flex; flex-direction: column;
+  animation: modalIn .18s ease;
+}
+.modal.small { width: 560px; }
+@keyframes modalIn { 0% { transform: translateY(14px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.modal-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head h3 { font-size: 15.5px; font-weight: 600; }
+.modal-head .x { border: none; background: none; font-size: 17px; color: var(--muted); cursor: pointer; line-height: 1; padding: 2px 4px; border-radius: 4px; }
+.modal-head .x:hover { background: #f1f3f5; color: var(--ink); }
+.modal-body { padding: 16px 20px; overflow: auto; }
+.modal-foot {
+  padding: 12px 20px; border-top: 1px solid var(--line);
+  display: flex; justify-content: flex-end; gap: 10px; align-items: center;
+}
+.modal-foot .foot-info { margin-right: auto; color: var(--muted); font-size: 12px; }
+
+/* ================= 分配分类弹窗（核心） ================= */
+
+/* 弹窗内双栏：分类树（带搜索） + 级联选择 */
+.assign-layout { display: flex; gap: 14px; }
+.assign-tree {
+  width: 300px; flex-shrink: 0; border: 1px solid var(--line); border-radius: 8px;
+  display: flex; flex-direction: column; max-height: 400px;
+}
+.assign-selectors .panel-title {
+  font-size: 12px; font-weight: 600; color: var(--muted); padding: 9px 12px 7px;
+  border-bottom: 1px solid var(--line); background: #f8f9fa; border-radius: 8px 8px 0 0;
+}
+.assign-selectors { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 8px; }
+.cascade-rows { padding: 10px 14px 6px; }
+.cascade-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.cascade-row .lv-tag {
+  width: 96px; flex-shrink: 0; font-size: 12.3px; font-weight: 600; display: flex; align-items: center; gap: 5px;
+}
+.cascade-row .lv-tag i { width: 7px; height: 7px; border-radius: 2px; display: inline-block; }
+.cascade-row select {
+  flex: 1; border: 1px solid var(--line-d); border-radius: 6px; padding: 6px 8px;
+  font-size: 12.6px; font-family: inherit; outline: none; background: #fff; min-width: 0;
+}
+.cascade-row select:focus { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(113, 75, 103, .12); }
+.cascade-row select.auto-filled {
+  background: #f0faf4; border-color: #9dd9ba; color: #14804d; font-weight: 600;
+}
+.cascade-row .auto-badge { margin-left: 2px; }
+.auto-tip {
+  display: none; margin: 2px 0 10px; padding: 7px 12px; border-radius: 6px;
+  background: #f0faf4; border: 1px dashed #9dd9ba; color: #14804d; font-size: 12px;
+}
+.auto-tip.show { display: block; }
+
+/* ================= 新增/编辑分类弹窗表单 ================= */
+.form-grid { display: grid; grid-template-columns: 110px 1fr; gap: 11px 14px; align-items: center; }
+.form-grid .full-row { grid-column: 1 / -1; }
+.form-grid label { font-size: 12.5px; color: #495057; font-weight: 600; text-align: right; }
+.form-grid label .req { color: var(--err); margin-left: 2px; }
+.form-grid input, .form-grid select, .form-grid textarea {
+  border: 1px solid var(--line-d); border-radius: 6px; padding: 6px 9px; font-size: 12.6px;
+  font-family: inherit; outline: none; width: 100%; background: #fff;
+}
+.form-grid textarea { resize: vertical; min-height: 52px; }
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
+  border-color: var(--purple); box-shadow: 0 0 0 2px rgba(113, 75, 103, .12);
+}
+.form-error { color: var(--err); font-size: 12px; min-height: 16px; }
+/* 新增/编辑弹窗：上级分类只读预览（添加下级时由入口节点自动带出，无需再逐级选择） */
+.cat-parent-preview {
+  background: #f8f9fa; border: 1px solid var(--line); border-radius: 6px; padding: 8px 11px;
+  font-size: 12.4px; line-height: 1.7;
+}
+.cat-parent-preview .cpp-path { color: var(--ink); font-weight: 600; }
+.cat-parent-preview .cpp-path .sep { color: #b9c0c8; font-weight: 400; margin: 0 2px; }
+.cat-parent-preview .cpp-hint { color: var(--muted); font-size: 11.8px; margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+
+/* ================= Toast ================= */
+.toast {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 200;
+  background: #212529; color: #fff; border-radius: 8px; padding: 10px 20px;
+  font-size: 13px; box-shadow: 0 6px 24px rgba(0, 0, 0, .25); max-width: 720px;
+  display: flex; align-items: center; gap: 8px; animation: toastIn .22s ease;
+}
+.toast.ok { background: #0f7b3d; }
+.toast.err { background: #b02a2a; }
+.toast.warn { background: #9a6700; }
+.toast .t-ico { font-size: 14px; }
+@keyframes toastIn { 0% { transform: translate(-50%, -14px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
+
+/* ================= 页脚说明 ================= */
+.proto-footer {
+  text-align: center; color: #adb5bd; font-size: 11.5px; padding: 6px 0 22px;
+}
+.proto-footer b { color: #8a929b; }
+
+/* 复选框列宽收紧 */
+td.ck, th.ck { width: 34px; text-align: center; }
+td.ck input, th.ck input { cursor: pointer; accent-color: var(--purple); }
+</style>
+</head>
+<body>
+
+<!-- ======================= 顶部导航（模拟 Odoo 14：应用名 + 菜单面包屑） ======================= -->
+<header class="topbar">
+  <div class="brand"><span class="logo"></span>信创物料管理系统</div>
+  <div class="crumb">PLM数据<span class="sep">/</span><b>产品分类管理</b><span class="sep">/</span>分类维护</div>
+  <div class="spacer"></div>
+  <div class="user"><span class="avatar">管</span>管理员 · 物料数据组</div>
+</header>
+
+<!-- ======================= 页头 ======================= -->
+<div class="page-header">
+  <div class="title-row">
+    <h1>产品分类管理<span class="proto-tag">前端原型</span></h1>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="tab-maintain">分类维护</button>
+    <button class="tab" data-tab="tab-assign">物料分类分配</button>
+  </div>
+</div>
+
+<!-- ======================= 页签一：分类维护 ======================= -->
+<section id="tab-maintain" class="tab-panel">
+  <div class="maintain-layout">
+    <!-- 左侧：四级分类树（浏览与定位） -->
+    <aside class="tree-panel">
+      <div class="tree-toolbar">
+        <input id="maintainTreeSearch" type="text" placeholder="搜索分类名称…">
+        <button class="btn btn-primary btn-sm" id="btnAddRoot" title="新增一级分类">＋ Ⅰ级</button>
+      </div>
+      <div class="tree-body"><div id="maintainTree"></div></div>
+      <div class="tree-legend">
+        <span><i style="display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--lv1);vertical-align:0"></i> Ⅰ</span>
+        <span><i style="display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--lv2);vertical-align:0"></i> Ⅱ</span>
+        <span><i style="display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--lv3);vertical-align:0"></i> Ⅲ</span>
+        <span><i style="display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--lv4);vertical-align:0"></i> Ⅳ（最细级）</span>
+        <span style="margin-left:auto">悬停节点＋下级 · 点击过滤右侧列表</span>
+      </div>
+    </aside>
+
+    <!-- 右侧：分类路径矩阵（每行一条根→叶完整路径；增删改操作集中在此） -->
+    <div class="table-panel">
+      <div class="table-toolbar">
+        <span class="tb-title" id="catTableTitle">全部分类</span>
+        <span class="tb-sub" id="catTableSub"></span>
+      </div>
+      <div class="table-scroll">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th>产品Ⅰ级分类</th>
+              <th>产品Ⅱ级分类</th>
+              <th>产品Ⅲ级分类</th>
+              <th>产品Ⅳ级分类</th>
+              <th style="width:150px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="catTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 页签二：物料分类分配（在现有 PLM 物料列表上扩展） ======================= -->
+<section id="tab-assign" class="tab-panel hidden">
+  <div class="table-panel">
+    <div class="table-toolbar">
+      <input class="flt" id="materialSearch" type="text" placeholder="搜索 SAP.No / 物料名称…">
+      <select class="flt" id="materialFilter">
+        <option value="all">全部物料</option>
+        <option value="no-l4">Ⅳ级分类未分配</option>
+        <option value="no-cat">完全未分类</option>
+      </select>
+      <span class="tb-sub" id="assignTableSub"></span>
+      <span style="flex:1"></span>
+      <button class="btn btn-primary" id="btnBatchAssign">批量分配分类</button>
+    </div>
+    <div class="table-scroll">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th class="ck"><input type="checkbox" id="checkAll"></th>
+            <th>SAP.No</th><th>物料名称</th><th>物料类型</th>
+            <th>Ⅰ级分类</th><th>Ⅱ级分类</th><th>Ⅲ级分类</th>
+            <th>Ⅳ级分类<span class="th-new">新</span></th>
+            <th style="width:96px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="materialTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="proto-footer" style="text-align:left">
+    说明：本页签在现有「PLM物料」列表（<b>xc.plm.material</b>）基础上新增 <b>Ⅳ级分类</b> 列与 <b>分配分类</b> 操作；入库写入
+    <b>product_category1 ~ product_category4</b> 四个分类字段。
+  </div>
+</section>
+
+<!-- ======================= 弹窗：分配产品分类（核心交互） ======================= -->
+<div class="modal-mask hidden" id="assignModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="assignModalTitle">分配产品分类</h3>
+      <button class="x" data-close="assignModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="assign-layout">
+        <!-- 左侧：分类树（搜索与点选，点任意层级节点即带出整条路径） -->
+        <div class="assign-tree">
+          <div class="tree-toolbar">
+            <input id="assignTreeSearch" type="text" placeholder="搜索分类名称…">
+          </div>
+          <div class="tree-body"><div id="assignTree"></div></div>
+        </div>
+
+        <!-- 右侧：所选分类（竖排四级；选中细级分类后，上级自动带出） -->
+        <div class="assign-selectors">
+          <div class="panel-title">所选分类（选择细级分类自动带出上级）</div>
+          <div class="cascade-rows">
+            <div class="cascade-row">
+              <span class="lv-tag"><i style="background:var(--lv1)"></i>产品Ⅰ级分类</span>
+              <select id="selL1"></select>
+              <span class="auto-badge" id="badgeL1">⚡ 自动带出</span>
+            </div>
+            <div class="cascade-row">
+              <span class="lv-tag"><i style="background:var(--lv2)"></i>产品Ⅱ级分类</span>
+              <select id="selL2"></select>
+              <span class="auto-badge" id="badgeL2">⚡ 自动带出</span>
+            </div>
+            <div class="cascade-row">
+              <span class="lv-tag"><i style="background:var(--lv3)"></i>产品Ⅲ级分类</span>
+              <select id="selL3"></select>
+              <span class="auto-badge" id="badgeL3">⚡ 自动带出</span>
+            </div>
+            <div class="cascade-row">
+              <span class="lv-tag"><i style="background:var(--lv4)"></i>产品Ⅳ级分类</span>
+              <select id="selL4"></select>
+            </div>
+          </div>
+          <div class="auto-tip" id="autoTip">
+            ⚡ 已直接选择 Ⅳ 级（细）分类，Ⅰ / Ⅱ / Ⅲ 级分类已自动带出，确认后将一并写入。
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="btnAssignClear">清空选择</button>
+      <button class="btn" data-close="assignModal">取消</button>
+      <button class="btn btn-primary" id="btnAssignConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= 弹窗：新增 / 编辑分类 ======================= -->
+<div class="modal-mask hidden" id="categoryModal">
+  <div class="modal small">
+    <div class="modal-head">
+      <h3 id="categoryModalTitle">新增分类</h3>
+      <button class="x" data-close="categoryModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <label>上级分类</label>
+        <div class="cat-parent-preview" id="catParentPreview"></div>
+        <label>分类名称<span class="req">*</span></label>
+        <input id="catName" type="text" placeholder="如：DDR4 32GB 3200MHz">
+        <div class="full-row form-error" id="catFormError"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-info">同级名称不可重复；层级最深 Ⅳ 级</span>
+      <button class="btn" data-close="categoryModal">取消</button>
+      <button class="btn btn-primary" id="btnCatConfirm">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast 提示 -->
+<div class="toast hidden" id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+ * 原型数据与交互逻辑（纯前端模拟，不涉及后端开发）
+ * ===================================================================== */
+
+/* ==================== 一、原型数据（四级分类字典 + 物料示例） ==================== */
+
+// 四级分类树：id 由 refreshIndex 按层级位置自动生成并固化；层级最深 Ⅳ 级；
+// children 为空数组表示该分支未细分到底（业务允许分类停留在任意中间层级）
+const CAT_TREE = [
+  { name: '服务器配件', code: '01', sort: 10, active: true, children: [
+    { name: '处理器(CPU)', code: '0101', sort: 10, active: true, children: [
+      { name: '鲲鹏系列', code: '010101', sort: 10, active: true, children: [
+        { name: '鲲鹏920 3210K', code: '01010101', sort: 10, active: true, children: [] },
+        { name: '鲲鹏920 5220', code: '01010102', sort: 20, active: true, children: [] },
+        { name: '鲲鹏920 5250', code: '01010103', sort: 30, active: true, children: [] },
+        { name: '鲲鹏920 7260', code: '01010104', sort: 40, active: true, children: [] },
+      ]},
+      { name: '海光系列', code: '010102', sort: 20, active: true, children: [
+        { name: '海光7185', code: '01010201', sort: 10, active: true, children: [] },
+        { name: '海光7285', code: '01010202', sort: 20, active: true, children: [] },
+        { name: '海光7365', code: '01010203', sort: 30, active: true, children: [] },
+      ]},
+      { name: '飞腾系列', code: '010103', sort: 30, active: true, children: [
+        { name: '飞腾S2500', code: '01010301', sort: 10, active: true, children: [] },
+        { name: '飞腾D2000', code: '01010302', sort: 20, active: true, children: [] },
+      ]},
+    ]},
+    { name: '内存', code: '0102', sort: 20, active: true, children: [
+      { name: 'DDR4内存', code: '010201', sort: 10, active: true, children: [
+        { name: 'DDR4 16GB 3200MHz', code: '01020101', sort: 10, active: true, children: [] },
+        { name: 'DDR4 32GB 3200MHz', code: '01020102', sort: 20, active: true, children: [] },
+        { name: 'DDR4 64GB 2933MHz', code: '01020103', sort: 30, active: true, children: [] },
+      ]},
+      { name: 'DDR5内存', code: '010202', sort: 20, active: true, children: [
+        { name: 'DDR5 16GB 4800MHz', code: '01020201', sort: 10, active: true, children: [] },
+        { name: 'DDR5 32GB 5600MHz', code: '01020202', sort: 20, active: true, children: [] },
+      ]},
+    ]},
+    { name: '硬盘', code: '0103', sort: 30, active: true, children: [
+      { name: '固态硬盘(SSD)', code: '010301', sort: 10, active: true, children: [
+        { name: 'SATA SSD 480GB', code: '01030101', sort: 10, active: true, children: [] },
+        { name: 'SATA SSD 960GB', code: '01030102', sort: 20, active: true, children: [] },
+        { name: 'NVMe SSD 1.92TB', code: '01030103', sort: 30, active: true, children: [] },
+        { name: 'NVMe SSD 3.84TB', code: '01030104', sort: 40, active: true, children: [] },
+      ]},
+      { name: '机械硬盘(HDD)', code: '010302', sort: 20, active: true, children: [
+        { name: 'HDD 4TB 7200转', code: '01030201', sort: 10, active: true, children: [] },
+        { name: 'HDD 8TB 7200转', code: '01030202', sort: 20, active: true, children: [] },
+      ]},
+    ]},
+    { name: '电源', code: '0104', sort: 40, active: true, children: [
+      { name: '钛金电源', code: '010401', sort: 10, active: true, children: [
+        { name: '800W钛金电源', code: '01040101', sort: 10, active: true, children: [] },
+        { name: '1300W钛金电源', code: '01040102', sort: 20, active: true, children: [] },
+      ]},
+      { name: '白金电源', code: '010402', sort: 20, active: true, children: [
+        { name: '550W白金电源', code: '01040201', sort: 10, active: true, children: [] },
+      ]},
+    ]},
+    { name: '网卡', code: '0105', sort: 50, active: true, children: [
+      { name: '电口网卡', code: '010501', sort: 10, active: true, children: [
+        { name: '千兆双电口网卡', code: '01050101', sort: 10, active: true, children: [] },
+        { name: '万兆双电口网卡', code: '01050102', sort: 20, active: true, children: [] },
+      ]},
+      { name: '光口网卡', code: '010502', sort: 20, active: true, children: [
+        { name: '万兆双光口网卡', code: '01050201', sort: 10, active: true, children: [] },
+        { name: '25G双光口网卡', code: '01050202', sort: 20, active: true, children: [] },
+      ]},
+    ]},
+  ]},
+  { name: '网络设备', code: '02', sort: 20, active: true, children: [
+    { name: '交换机', code: '0201', sort: 10, active: true, children: [
+      { name: '千兆交换机', code: '020101', sort: 10, active: true, children: [
+        { name: '24口千兆交换机', code: '02010101', sort: 10, active: true, children: [] },
+        { name: '48口千兆交换机', code: '02010102', sort: 20, active: true, children: [] },
+      ]},
+      { name: '万兆交换机', code: '020102', sort: 20, active: true, children: [
+        { name: '12口万兆交换机', code: '02010201', sort: 10, active: true, children: [] },
+        { name: '24口万兆交换机', code: '02010202', sort: 20, active: true, children: [] },
+      ]},
+    ]},
+    { name: '光模块', code: '0202', sort: 20, active: true, children: [
+      { name: '10G光模块', code: '020201', sort: 10, active: true, children: [
+        { name: '10G SFP+光模块', code: '02020101', sort: 10, active: true, children: [] },
+      ]},
+      { name: '100G光模块', code: '020202', sort: 20, active: true, children: [
+        { name: '100G QSFP28光模块', code: '02020201', sort: 10, active: true, children: [] },
+      ]},
+    ]},
+    { name: '网线', code: '0203', sort: 30, active: true, children: [] },  // Ⅱ级即叶子：体现层级不强制到底
+  ]},
+  { name: '存储设备', code: '03', sort: 30, active: true, children: [
+    { name: '磁盘阵列', code: '0301', sort: 10, active: true, children: [
+      { name: '分布式存储', code: '030101', sort: 10, active: true, children: [
+        { name: '分布式存储节点', code: '03010101', sort: 10, active: true, children: [] },
+      ]},
+    ]},
+    { name: '备份设备', code: '0302', sort: 20, active: false, children: [] },  // 演示停用状态
+  ]},
+  { name: '办公耗材', code: '04', sort: 40, active: true, children: [] },  // Ⅰ级即叶子
+];
+
+// 物料示例（catPath 为已入库分类名称路径；空数组 = 完全未分类）
+const MATERIALS_RAW = [
+  { sapNo: '3110000234', name: '鲲鹏920处理器 5250（24C / 2.6GHz / 120W）', type: '组件',
+    catPath: ['服务器配件', '处理器(CPU)', '鲲鹏系列', '鲲鹏920 5250'] },
+  { sapNo: '3110000567', name: 'DDR4 32GB 3200MHz RDIMM 内存条', type: '组件',
+    catPath: ['服务器配件', '内存', 'DDR4内存'] },          // Ⅲ级止步，可演示"补选Ⅳ级"
+  { sapNo: '3110000598', name: '鲲鹏920 3210K 处理器（12C / 2.5GHz）', type: '组件',
+    catPath: ['服务器配件', '处理器(CPU)'] },               // Ⅱ级止步
+  { sapNo: '3110000612', name: 'NVMe SSD 1.92TB 企业级固态硬盘', type: '组件',
+    catPath: ['服务器配件'] },                              // Ⅰ级止步
+  { sapNo: '3110000645', name: '千兆双电口网卡（OCP 2.0）', type: '组件',
+    catPath: [] },                                          // 完全未分类
+  { sapNo: '3110000678', name: '100G QSFP28 光模块（SR4）', type: '材料',
+    catPath: ['网络设备', '光模块', '100G光模块', '100G QSFP28光模块'] },  // 完整四级示例
+  { sapNo: '3110000701', name: '800W 钛金电源模块', type: '组件',
+    catPath: ['服务器配件', '电源', '钛金电源'] },
+  { sapNo: '3110000733', name: '24口万兆交换机（二层）', type: '材料',
+    catPath: ['网络设备', '交换机', '万兆交换机'] },
+  { sapNo: '3110000756', name: 'DDR5 32GB 5600MHz RDIMM 内存条', type: '组件',
+    catPath: [] },                                          // 完全未分类
+];
+
+/* ==================== 二、索引与通用工具 ==================== */
+
+const nodeById = new Map();   // id -> 节点对象
+const pathById = new Map();   // id -> [祖先id, ..., 自身id]（根→自身完整路径）
+let idSeq = 0;                // 新增节点 id 自增序列（保证删除/新增后 id 不冲突、物料引用稳定）
+let MATERIALS = [];           // 初始化后：{ sapNo, name, type, cats: [节点id路径] }
+
+// 重建索引：递归为无 id 节点生成 id（父id + 自增序号），计算 level/parentId/完整路径
+function refreshIndex() {
+  nodeById.clear(); pathById.clear();
+  (function walk(nodes, parentPath) {
+    nodes.forEach(n => {
+      if (!n.id) {
+        idSeq++;
+        n.id = (parentPath.length ? nodeById.get(parentPath[parentPath.length - 1]).id : 'c')
+            + '-n' + String(idSeq).padStart(3, '0');
+      }
+      n.level = parentPath.length + 1;
+      n.parentId = parentPath[parentPath.length - 1] || null;
+      const path = parentPath.concat(n.id);
+      nodeById.set(n.id, n); pathById.set(n.id, path);
+      if (n.children) walk(n.children, path);
+    });
+  })(CAT_TREE, []);
+}
+
+// 名称路径 -> 节点 id 路径（初始物料分类绑定；后续节点找不到则返回已匹配前缀）
+function resolvePath(names) {
+  let nodes = CAT_TREE; const ids = [];
+  for (const nm of names) {
+    const hit = nodes.find(n => n.name === nm);
+    if (!hit) break;
+    ids.push(hit.id); nodes = hit.children || [];
+  }
+  return ids;
+}
+
+function lvRoman(l) { return ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ'][l - 1] || l; }
+function lvColor(l) { return ['var(--lv1)', 'var(--lv2)', 'var(--lv3)', 'var(--lv4)'][l - 1] || '#999'; }
+function allNodes() { return Array.from(nodeById.values()); }
+function pathNames(ids) { return ids.map(id => (nodeById.get(id) || { name: '(已删除)' }).name); }
+// 节点关联物料数：物料分类路径包含该节点 id
+function materialCount(id) { return MATERIALS.filter(m => m.cats.includes(id)).length; }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ==================== 三、Toast 轻提示 ==================== */
+
+let toastTimer = null;
+function showToast(msg, type, duration) {
+  const el = document.getElementById('toast');
+  const ico = { ok: '✔', err: '✖', warn: '⚠', info: 'ℹ' }[type] || 'ℹ';
+  el.innerHTML = '<span class="t-ico">' + ico + '</span><span>' + msg + '</span>';
+  el.className = 'toast ' + (type || 'info');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.add('hidden'), duration || 2600);
+}
+
+/* ==================== 四、通用四级级联选择组件（核心交互） ====================
+ * 核心规则：
+ *   1. 用户在任意层级下拉选中某节点 -> selected = 根→该节点的完整路径（自动带出上级）
+ *   2. manualDepth = 用户主动选择的层级深度；深度小于 manualDepth 的已选层级视为"自动带出"（徽章提示）
+ *   3. Ⅰ~Ⅲ 级为受上级约束的普通级联；Ⅳ 级为平铺式下拉（选项带完整路径后缀），
+ *      可不通选上级直接选择最细分类，选中后上级全部自动填充
+ *   4. 手动改选某级会清空其下级，保证路径数据父子一致                             */
+function makeCascade(cfg) {
+  const sels = cfg.selIds.map(id => document.getElementById(id));
+  const badges = (cfg.badges || []).map(id => id ? document.getElementById(id) : null);
+  const tip = cfg.tipId ? document.getElementById(cfg.tipId) : null;
+  const state = { selected: [], manualDepth: 0 };   // selected: id路径；manualDepth: 0=未手选
+
+  // 收集与当前已选路径"前缀匹配"的全部Ⅳ级节点（含各自身完整路径），用于Ⅳ级平铺下拉
+  function l4Options() {
+    const prefix = state.selected.slice(0, 3);
+    const res = [];
+    (function walk(nodes, path) {
+      nodes.forEach(n => {
+        const p = path.concat(n.id);
+        const clipped = Math.min(prefix.length, p.length);
+        let ok = true;
+        for (let i = 0; i < clipped; i++) { if (prefix[i] !== p[i]) { ok = false; break; } }
+        if (n.level === 4) { if (ok) res.push({ node: n, path: p }); }
+        else if (n.children && n.children.length) walk(n.children, p);
+      });
+    })(CAT_TREE, []);
+    return res;
+  }
+
+  // 填充普通级联下拉；当前值因节点停用不在列表时补充灰显选项，保证回显不丢
+  function fill(sel, nodes, value, placeholder) {
+    let html = '<option value="">' + placeholder + '</option>';
+    let hasVal = false;
+    nodes.forEach(n => {
+      html += '<option value="' + n.id + '">' + esc(n.name) + '</option>';
+      if (n.id === value) hasVal = true;
+    });
+    if (value && !hasVal) {
+      const v = nodeById.get(value);
+      html += '<option value="' + value + '">' + (v ? esc(v.name) : '') + '（已停用）</option>';
+    }
+    sel.innerHTML = html;
+    sel.value = value || '';
+  }
+
+  function render() {
+    // Ⅰ~Ⅲ 级：选项受上级约束；"不选/到此为止"占位项显示为空（下拉首项为空白，用于清空本级）
+    fill(sels[0], CAT_TREE.filter(n => n.active), state.selected[0] || '', '');
+    fill(sels[1], state.selected[0] ? (nodeById.get(state.selected[0]).children || []).filter(n => n.active) : [],
+         state.selected[1] || '', state.selected[0] ? '' : '请先选择 Ⅰ 级分类');
+    fill(sels[2], state.selected[1] ? (nodeById.get(state.selected[1]).children || []).filter(n => n.active) : [],
+         state.selected[2] || '', state.selected[1] ? '' : '请先选择 Ⅱ 级分类');
+    // Ⅳ 级：平铺展示（名称 + 所属路径），直接选择即可带出上级 —— 核心卖点
+    const l4s = l4Options();
+    let l4html = '<option value=""></option>';
+    let hasL4 = false;
+    l4s.forEach(it => {
+      const trail = it.path.slice(0, 3).map(id => nodeById.get(id).name).join(' › ');
+      l4html += '<option value="' + it.node.id + '">' + esc(it.node.name) + '（' + trail + '）</option>';
+      if (it.node.id === state.selected[3]) hasL4 = true;
+    });
+    if (state.selected[3] && !hasL4) {
+      const v = nodeById.get(state.selected[3]);
+      l4html += '<option value="' + state.selected[3] + '">' + (v ? esc(v.name) : '') + '（已停用）</option>';
+    }
+    sels[3].innerHTML = l4html;
+    sels[3].value = state.selected[3] || '';
+
+    // "自动带出"徽章与高亮：层级深度 < manualDepth 的已选层级为带出值
+    for (let i = 0; i < 3; i++) {
+      const isAuto = state.selected.length >= (i + 1) && state.manualDepth > (i + 1);
+      if (badges[i]) badges[i].classList.toggle('show', isAuto);
+      sels[i].classList.toggle('auto-filled', isAuto);
+    }
+    if (tip) {
+      const show = state.manualDepth >= 2 && state.selected.length >= state.manualDepth;
+      tip.classList.toggle('show', show);
+      if (show) tip.textContent = '⚡ 已直接选择 ' + lvRoman(state.manualDepth) +
+        ' 级分类，其上各级分类已自动带出，确认入库后将一并写入。';
+    }
+    if (cfg.onChange) cfg.onChange(state.selected.slice());
+  }
+
+  sels.forEach((sel, i) => {
+    sel.addEventListener('change', () => {
+      const v = sel.value;
+      if (!v) {                       // 清空本级 -> 路径截断到上一级
+        state.selected = state.selected.slice(0, i);
+        state.manualDepth = i;
+      } else {                        // 选中任一节点 -> 整条路径带出（核心）
+        state.selected = pathById.get(v).slice();
+        state.manualDepth = state.selected.length;
+      }
+      render();
+    });
+  });
+
+  return {
+    get: () => state.selected.slice(),
+    setByPath: path => { state.selected = (path || []).slice(); state.manualDepth = state.selected.length; render(); },
+    clear: () => { state.selected = []; state.manualDepth = 0; render(); },
+    render: render,
+  };
+}
+
+/* ==================== 五、分类树渲染（分类维护 / 分配弹窗共用） ==================== */
+
+const expandedSet = new Set();   // 展开/折叠状态（按节点 id）
+
+// 树 HTML：搜索模式传 visibleSet（仅渲染命中节点及其祖先链）；assign 模式不渲染操作按钮
+function buildTreeHtml(nodes, ctx) {
+  let html = '';
+  nodes.forEach(n => {
+    if (ctx.visibleSet && !ctx.visibleSet.has(n.id)) return;
+    const hasChildren = n.children && n.children.length > 0;
+    const expanded = ctx.visibleSet ? true : expandedSet.has(n.id);
+    const cnt = ctx.showCount ? materialCount(n.id) : 0;
+    html += '<div class="tree-node ' + (hasChildren ? '' : 'leaf ') + (expanded ? 'expanded ' : '') +
+        (ctx.selectedId === n.id ? 'selected ' : '') + (!n.active ? 'disabled ' : '') +
+        '" data-id="' + n.id + '">' +
+      '<span class="toggle' + (hasChildren ? '' : ' leaf-dot') + '"></span>' +
+      '<span class="node-icon" style="background:' + lvColor(n.level) + '"></span>' +
+      '<span class="node-name">' + esc(n.name) + '</span>' +
+      '<span class="lv-badge lv' + n.level + '">' + lvRoman(n.level) + '</span>' +
+      (cnt ? '<span class="node-cnt">(' + cnt + ')</span>' : '') +
+      (ctx.showActions && n.level < 4 ? '<span class="node-actions"><button data-act="add" title="在此节点下新增下级分类">＋ 下级</button></span>' : '') +
+      '</div>';
+    if (hasChildren && expanded) {
+      html += '<div class="tree-children">' + buildTreeHtml(n.children, ctx) + '</div>';
+    }
+  });
+  return html;
+}
+
+// 搜索过滤（仅按分类名称匹配）：返回命中节点及其祖先的可见集合（同时用于强制展开祖先链）
+function visibleSetByQuery(q) {
+  if (!q) return null;
+  const s = q.toLowerCase(); const visible = new Set();
+  allNodes().forEach(n => {
+    if (n.name.toLowerCase().includes(s)) {
+      pathById.get(n.id).forEach(id => visible.add(id));
+    }
+  });
+  return visible;
+}
+
+// 树容器事件绑定（委托）：操作按钮 > 折叠开关 > 节点选中
+function bindTreeContainer(container, handlers) {
+  container.addEventListener('click', e => {
+    const nodeEl = e.target.closest('.tree-node');
+    if (!nodeEl) return;
+    const id = nodeEl.dataset.id;
+    const node = nodeById.get(id);
+    if (!node) return;
+    const actBtn = e.target.closest('[data-act]');
+    if (actBtn && handlers.onAction) {           // 增/编/删按钮
+      e.stopPropagation();
+      handlers.onAction(actBtn.dataset.act, node);
+      return;
+    }
+    if (e.target.closest('.toggle') && node.children && node.children.length) {
+      expandedSet.has(id) ? expandedSet.delete(id) : expandedSet.add(id);  // 展开/折叠
+      handlers.onRefresh();
+      return;
+    }
+    handlers.onSelect(node);                     // 点选节点：选中；有子级时自动展开
+    if (node.children && node.children.length) expandedSet.add(id);
+    handlers.onRefresh();
+  });
+}
+
+/* ==================== 六、弹窗通用开关 ==================== */
+
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+/* ==================== 七、页签切换 ==================== */
+
+function bindTabs() {
+  document.querySelectorAll('.tabs .tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tabs .tab').forEach(x => x.classList.toggle('active', x === t));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== t.dataset.tab));
+      const leaf = document.getElementById('crumbLeaf');
+      if (leaf) leaf.textContent = t.textContent;
+    });
+  });
+}
+
+/* ==================== 八、页签一：分类维护 ==================== */
+
+let selectedNodeId = null;   // 左侧树选中节点（null = 全部分类）
+
+function renderMaintainTree() {
+  const q = document.getElementById('maintainTreeSearch').value.trim();
+  const visible = visibleSetByQuery(q);
+  const html = buildTreeHtml(CAT_TREE, {
+    visibleSet: visible, selectedId: selectedNodeId, showActions: true, showCount: false,
+  });
+  document.getElementById('maintainTree').innerHTML = html ||
+    '<div style="padding:22px;text-align:center;color:#adb5bd">无匹配的分类</div>';
+}
+
+// 右侧矩阵：每行一条「根→叶」完整四级路径，未细分到底的层级空位显示 —；
+// 树选中节点时仅展示其子树下的路径（列仍按全局 Ⅰ~Ⅳ 级对齐）；行操作针对路径末端节点
+function renderCatTable() {
+  const selNode = selectedNodeId ? nodeById.get(selectedNodeId) : null;
+  const leaves = [];
+  const collect = n => {
+    if (!n.children || !n.children.length) { leaves.push(n); return; }
+    n.children.forEach(collect);
+  };
+  selNode ? collect(selNode) : CAT_TREE.forEach(collect);
+
+  document.getElementById('catTableTitle').textContent = selNode ? selNode.name : '全部分类';
+  document.getElementById('catTableSub').textContent = selNode
+    ? '（含子级共 ' + leaves.length + ' 条分类路径）' : '（共 ' + leaves.length + ' 条分类路径）';
+
+  const tb = document.getElementById('catTableBody');
+  if (!leaves.length) { tb.innerHTML = '<tr><td colspan="5" class="empty-tip">暂无分类数据</td></tr>'; return; }
+  tb.innerHTML = leaves.map(leaf => {
+    // 按节点层级填入 Ⅰ~Ⅳ 级槽位，路径未到达的层级为空
+    const cells = [null, null, null, null];
+    pathById.get(leaf.id).forEach(id => { const n = nodeById.get(id); cells[n.level - 1] = n; });
+    const cell = c => c
+      ? '<span class="node-icon" style="background:' + lvColor(c.level) + ';display:inline-block;vertical-align:-1px;margin-right:6px"></span>' + esc(c.name)
+      : '<span style="color:#c3c8ce">—</span>';
+    return '<tr>' +
+      '<td class="cat-cell">' + cell(cells[0]) + '</td>' +
+      '<td class="cat-cell">' + cell(cells[1]) + '</td>' +
+      '<td class="cat-cell">' + cell(cells[2]) + '</td>' +
+      '<td class="cat-cell">' + cell(cells[3]) + '</td>' +
+      '<td>' +
+        '<button class="btn-link" data-cat-act="del" data-id="' + leaf.id + '" style="color:var(--err)">删除</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+function refreshMaintainAll() { renderMaintainTree(); renderCatTable(); }
+
+// 左侧树交互：点选联动右侧矩阵过滤；悬停「＋下级」为新增分类入口（新增统一在树，编辑/删除在表格）
+bindTreeContainer(document.getElementById('maintainTree'), {
+  onSelect: node => { selectedNodeId = node.id; renderCatTable(); },
+  onRefresh: renderMaintainTree,
+  onAction: (act, node) => { if (act === 'add') openCategoryModal('add-child', node); },
+});
+
+/* ==================== 九、页签二：物料分类分配 ==================== */
+
+function renderMaterialTable() {
+  const q = document.getElementById('materialSearch').value.trim().toLowerCase();
+  const filter = document.getElementById('materialFilter').value;
+  const list = MATERIALS.filter(m => {
+    if (q && !(m.sapNo.toLowerCase().includes(q) || m.name.toLowerCase().includes(q))) return false;
+    if (filter === 'no-l4' && m.cats.length >= 4) return false;
+    if (filter === 'no-cat' && m.cats.length > 0) return false;
+    return true;
+  });
+  document.getElementById('assignTableSub').textContent =
+    '共 ' + list.length + ' 条，其中 Ⅳ 级未分配 ' + MATERIALS.filter(m => m.cats.length < 4).length + ' 条';
+  const tb = document.getElementById('materialTableBody');
+  if (!list.length) { tb.innerHTML = '<tr><td colspan="9" class="empty-tip">无符合条件的物料</td></tr>'; return; }
+  tb.innerHTML = list.map(m => {
+    const cats = m.cats.map(id => nodeById.get(id));
+    const cell = i => cats[i]
+      ? '<td class="cat-cell">' + esc(cats[i].name) + '</td>'
+      : '<td class="cat-empty">—</td>';
+    return '<tr data-sap="' + m.sapNo + '">' +
+      '<td class="ck"><input type="checkbox" class="mat-ck" data-sap="' + m.sapNo + '"></td>' +
+      '<td style="font-family:Consolas,monospace">' + m.sapNo + '</td>' +
+      '<td>' + esc(m.name) + '</td>' +
+      '<td>' + esc(m.type) + '</td>' +
+      cell(0) + cell(1) + cell(2) + cell(3) +
+      '<td><button class="btn-link mat-assign" data-sap="' + m.sapNo + '">分配分类</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+// 入库后目标行闪烁提示
+function flashRows(sapNos) {
+  sapNos.forEach(sap => {
+    const tr = document.querySelector('#materialTableBody tr[data-sap="' + sap + '"]');
+    if (tr) { tr.classList.add('flash'); setTimeout(() => tr.classList.remove('flash'), 3400); }
+  });
+}
+
+document.getElementById('materialSearch').addEventListener('input', renderMaterialTable);
+document.getElementById('materialFilter').addEventListener('change', renderMaterialTable);
+document.getElementById('checkAll').addEventListener('change', e => {
+  document.querySelectorAll('#materialTableBody .mat-ck').forEach(cb => { cb.checked = e.target.checked; });
+});
+document.getElementById('materialTableBody').addEventListener('click', e => {
+  const btn = e.target.closest('.mat-assign');
+  if (btn) openAssignModal([btn.dataset.sap]);   // 单条分配
+});
+document.getElementById('btnBatchAssign').addEventListener('click', () => {
+  const checked = Array.from(document.querySelectorAll('#materialTableBody .mat-ck'))
+    .filter(cb => cb.checked).map(cb => cb.dataset.sap);
+  if (!checked.length) { showToast('请先勾选需要分配分类的物料', 'warn'); return; }
+  openAssignModal(checked);                      // 批量分配
+});
+
+/* ==================== 十、分配产品分类弹窗（核心交互入口） ==================== */
+
+let assignTargets = [];        // 待入库物料 sapNo 列表
+let assignTreeSelId = null;    // 弹窗内分类树当前选中节点
+
+// 级联组件：直接选择细级分类（含Ⅳ级）时，上级自动带出并标记
+const assignCascade = makeCascade({
+  selIds: ['selL1', 'selL2', 'selL3', 'selL4'],
+  badges: ['badgeL1', 'badgeL2', 'badgeL3'],
+  tipId: 'autoTip',
+});
+
+function renderAssignTree() {
+  // 搜索过滤逻辑与「分类维护」页面一致：命中节点及其祖先链可见
+  const q = document.getElementById('assignTreeSearch').value.trim();
+  const visible = visibleSetByQuery(q);
+  const html = buildTreeHtml(CAT_TREE, {
+    visibleSet: visible, selectedId: assignTreeSelId, showActions: false, showCount: false,
+  });
+  document.getElementById('assignTree').innerHTML = html ||
+    '<div style="padding:22px;text-align:center;color:#adb5bd">无匹配的分类</div>';
+}
+
+bindTreeContainer(document.getElementById('assignTree'), {
+  onSelect: node => {           // 树点选：根→该节点整条路径带出
+    assignCascade.setByPath(pathById.get(node.id));
+    assignTreeSelId = node.id;
+  },
+  onRefresh: renderAssignTree,
+});
+document.getElementById('assignTreeSearch').addEventListener('input', renderAssignTree);
+
+function openAssignModal(targets) {
+  assignTargets = targets;
+  const single = targets.length === 1 ? MATERIALS.find(x => x.sapNo === targets[0]) : null;
+  document.getElementById('assignModalTitle').textContent = single
+    ? '分配产品分类' : '批量分配产品分类（' + targets.length + ' 条物料）';
+  if (single) {
+    assignTreeSelId = single.cats.length ? single.cats[single.cats.length - 1] : null;
+    single.cats.forEach(id => expandedSet.add(id));   // 展开物料已有分类路径
+    assignCascade.setByPath(single.cats);             // 预填当前分类
+  } else {
+    assignTreeSelId = null;
+    assignCascade.clear();
+  }
+  document.getElementById('assignTreeSearch').value = '';
+  renderAssignTree();
+  showModal('assignModal');
+}
+
+// 清空 / 确认入库
+document.getElementById('btnAssignClear').addEventListener('click', () => {
+  assignCascade.clear();
+  assignTreeSelId = null;
+  renderAssignTree();
+});
+document.getElementById('btnAssignConfirm').addEventListener('click', () => {
+  const path = assignCascade.get();
+  if (!path.length) { showToast('请至少选择一级分类后再入库', 'warn'); return; }
+  let n = 0;
+  assignTargets.forEach(sap => {
+    const m = MATERIALS.find(x => x.sapNo === sap);
+    if (m) { m.cats = path.slice(); n++; }          // 按所选最细分类一次性写入四级路径
+  });
+  renderMaterialTable();
+  flashRows(assignTargets);
+  hideModal('assignModal');
+  showToast('入库成功（' + n + ' 条物料）：' + esc(pathNames(path).join(' / ')), 'ok', 4200);
+});
+
+/* ==================== 十一、新增 / 编辑分类弹窗 ==================== */
+
+// 弹窗状态：mode(add-root|add-child|edit) + 目标/上级节点 + 由入口带出的上级路径(id 数组)
+let catModal = { mode: 'add-root', node: null, parentPath: [] };
+
+// 编码自动建议：父编码 + 兄弟序号（两位）；界面不再展示编码，仅内部维护保证与既有数据兼容
+function suggestCode(parent) {
+  if (!parent) return String(CAT_TREE.length + 1).padStart(2, '0');
+  return (parent.code || '') + String((parent.children || []).length + 1).padStart(2, '0');
+}
+
+// 上级路径只读预览 + 将创建的层级：新增下级时上级由入口节点直接带出，用户无需再逐级选择
+function renderParentPreview(path, newLevel, locked) {
+  const el = document.getElementById('catParentPreview');
+  const names = pathNames(path);
+  const crumb = names.length
+    ? names.map(esc).join('<span class="sep">/</span>')
+    : '<span style="color:#c3c8ce">（无 · 顶级分类）</span>';
+  const badge = '<span class="lv-badge lv' + Math.min(newLevel, 4) + '">' + lvRoman(newLevel) + '</span>';
+  el.innerHTML = '<div class="cpp-path">' + crumb + '</div>' +
+    '<div class="cpp-hint">' + badge + ' ' + (locked
+      ? '上级与层级已固定（编辑仅支持修改名称）'
+      : '将创建为第 ' + newLevel + ' 级分类（上级由入口自动带出）') + '</div>';
+  // 新增下级且超出 Ⅳ 级时禁用保存（正常入口已按层级隐藏按钮，此处兜底）
+  document.getElementById('btnCatConfirm').disabled = !locked && newLevel > 4;
+}
+
+// mode：add-root 顶级新增 / add-child 上级为传入 node / edit 被编辑节点为传入 node
+function openCategoryModal(mode, node) {
+  catModal = { mode: mode, node: node || null, parentPath: [] };
+  const title = document.getElementById('categoryModalTitle');
+  const nameEl = document.getElementById('catName');
+  document.getElementById('catFormError').textContent = '';
+  if (mode === 'edit') {
+    title.textContent = '编辑分类：' + node.name;
+    catModal.parentPath = pathById.get(node.id).slice(0, -1);   // 上级 = 去掉自身的祖先路径
+    nameEl.value = node.name;
+    renderParentPreview(catModal.parentPath, node.level, true);
+  } else if (mode === 'add-child') {
+    title.textContent = '新增下级分类（上级：' + node.name + '）';
+    catModal.parentPath = pathById.get(node.id);                // 上级整条路径自动带出
+    nameEl.value = '';
+    renderParentPreview(catModal.parentPath, node.level + 1, false);
+  } else {
+    title.textContent = '新增 Ⅰ 级分类';
+    catModal.parentPath = [];
+    nameEl.value = '';
+    renderParentPreview([], 1, false);
+  }
+  showModal('categoryModal');
+}
+
+function saveCategory() {
+  const errEl = document.getElementById('catFormError');
+  errEl.textContent = '';
+  const name = document.getElementById('catName').value.trim();
+  if (!name) { errEl.textContent = '请填写分类名称'; return; }
+  const path = catModal.parentPath;
+
+  if (catModal.mode === 'edit') {
+    // 编辑仅改名：同级重名校验（排除自身）；层级与上级固定不变
+    const node = catModal.node;
+    const siblings = node.parentId ? nodeById.get(node.parentId).children : CAT_TREE;
+    if (siblings.some(n => n.id !== node.id && n.name === name)) {
+      errEl.textContent = '同级已存在同名分类「' + name + '」'; return;
+    }
+    node.name = name;
+    showToast('分类「' + esc(name) + '」已保存', 'ok');
+  } else {
+    const newLevel = path.length + 1;
+    if (newLevel > 4) { errEl.textContent = '分类层级最深为 Ⅳ 级，无法再新增下级'; return; }
+    const parent = path.length ? nodeById.get(path[path.length - 1]) : null;
+    const siblings = parent ? (parent.children || []) : CAT_TREE;
+    if (siblings.some(n => n.name === name)) {
+      errEl.textContent = '同级已存在同名分类「' + name + '」'; return;
+    }
+    const newNode = {
+      name: name, code: suggestCode(parent),
+      sort: (siblings.length + 1) * 10, active: true, remark: '', children: [],
+    };
+    if (parent) { parent.children = parent.children || []; parent.children.push(newNode); }
+    else CAT_TREE.push(newNode);
+    showToast('已在「' + esc(parent ? parent.name : '顶级') + '」下新增 ' + lvRoman(newLevel) + ' 级分类「' + esc(name) + '」', 'ok');
+  }
+  refreshIndex();
+  refreshMaintainAll();
+  hideModal('categoryModal');
+}
+
+function deleteCategory(node) {
+  if (node.children && node.children.length) {
+    showToast('「' + esc(node.name) + '」下存在 ' + node.children.length + ' 个子分类，请先删除子分类', 'err'); return;
+  }
+  const cnt = materialCount(node.id);
+  if (cnt > 0) {
+    showToast('「' + esc(node.name) + '」已被 ' + cnt + ' 条物料引用，不可删除', 'err'); return;
+  }
+  const siblings = node.parentId ? nodeById.get(node.parentId).children : CAT_TREE;
+  const idx = siblings.indexOf(node);
+  if (idx > -1) siblings.splice(idx, 1);
+  if (selectedNodeId === node.id) selectedNodeId = null;
+  refreshIndex();
+  refreshMaintainAll();
+  showToast('分类「' + esc(node.name) + '」已删除（实际开发为逻辑删除 active=false）', 'ok');
+}
+
+document.getElementById('btnAddRoot').addEventListener('click', () => openCategoryModal('add-root'));
+document.getElementById('btnCatConfirm').addEventListener('click', saveCategory);
+document.getElementById('catTableBody').addEventListener('click', e => {
+  const btn = e.target.closest('[data-cat-act]');
+  if (!btn) return;
+  const node = nodeById.get(btn.dataset.id);
+  if (!node) return;
+  if (btn.dataset.catAct === 'edit') openCategoryModal('edit', node);
+  else if (btn.dataset.catAct === 'del') deleteCategory(node);
+});
+document.getElementById('maintainTreeSearch').addEventListener('input', renderMaintainTree);
+
+/* ==================== 十二、全局事件与初始化 ==================== */
+
+// 弹窗关闭：data-close 按钮与遮罩空白点击
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => hideModal(btn.dataset.close));
+});
+document.querySelectorAll('.modal-mask').forEach(mask => {
+  mask.addEventListener('click', e => { if (e.target === mask) mask.classList.add('hidden'); });
+});
+
+(function init() {
+  refreshIndex();
+  MATERIALS = MATERIALS_RAW.map(m => ({
+    sapNo: m.sapNo, name: m.name, type: m.type, cats: resolvePath(m.catPath),
+  }));
+  // 默认展开第一条完整四级链路，打开即见 Ⅳ 级分类
+  let n = CAT_TREE[0];
+  while (n) { expandedSet.add(n.id); n = (n.children && n.children[0]) || null; }
+  // 面包屑末段加 id，供页签切换联动
+  document.querySelector('.topbar .crumb').innerHTML =
+    'PLM数据<span class="sep">/</span><b>产品分类管理</b><span class="sep">/</span><b id="crumbLeaf">分类维护</b>';
+
+  bindTabs();
+  renderMaintainTree();
+  renderCatTable();
+  renderMaterialTable();
+})();
+</script>
+</body>
+</html>
