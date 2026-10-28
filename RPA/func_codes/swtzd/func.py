@@ -5,6 +5,7 @@
 import os
 import re
 import shutil
+import time
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -60,6 +61,63 @@ def excelInserRow(ws, startRow, totalNum):
             calRow = totalNum - baseNum + startRow - 1
         else:
             calRow = baseNum + startRow - 1
+
+
+# Excel 弹窗或忙碌时 COM 调用会被拒绝，错误码固定为以下两个（RETRYLATER / CALL_REJECTED）
+COM_BUSY_ERRNOS = (-2147418111, -2147417846)
+
+
+# COM 调用重试：Excel 短暂忙碌时等待重试，避免直接抛出“消息筛选器显示应用程序正在使用中”
+def comRetry(func, *args, **kwargs):
+    for attempt in range(10):
+        try:
+            return func(*args, **kwargs)
+        except Exception as err:
+            if err.args and err.args[0] in COM_BUSY_ERRNOS and attempt < 9:
+                time.sleep(1)
+                continue
+            raise
+
+
+# 同步复制文件，替代 cmd 的 copy（copy 异步返回，且目标已存在时会等待覆盖确认导致文件被占）
+def copyFile(src, dst, timeout=60):
+    deadline = time.time() + timeout
+    while True:
+        try:
+            shutil.copyfile(src, dst)
+            return
+        except PermissionError:
+            if time.time() > deadline:
+                raise RuntimeError(f"文件被其他程序占用，无法写入：{dst}")
+            time.sleep(1)
+
+
+# 释放上一轮未正常结束的 Excel 实例对目标文件的占用
+# 只处理与目标同路径的工作簿（本流程自己生成的结果文件），不动其他表格
+def releaseExcelLock(path):
+    target = os.path.normcase(os.path.abspath(path))
+    for app in list(xw.apps):
+        try:
+            books = list(app.books)
+        except Exception:
+            continue  # 该实例正处于弹窗状态，无法交互
+        matched = [book for book in books if os.path.normcase(os.path.abspath(book.fullname)) == target]
+        if not matched:
+            continue
+        try:
+            app.display_alerts = False
+        except Exception:
+            pass
+        for book in matched:
+            try:
+                book.close(save_changes=False)
+            except Exception:
+                pass
+        try:
+            if not list(app.books):
+                app.quit()
+        except Exception:
+            pass
 
 
 # 获取服务对应的厂商物料编码
@@ -179,13 +237,43 @@ def getNoticeFileContent(noticeFile, templatePath, saveDir, relationPath):
         finalPath = os.path.join(saveDir, f"【{msgDict['华为订单号：']}】-合同清单.xlsx")
     else:
         finalPath = os.path.join(saveDir, f"【{msgDict['华为订单号：']}】-合同清单.xlsx")
-    os.popen(f'copy "{templatePath}" "{finalPath}"')
+    releaseExcelLock(finalPath)  # 先释放残留实例的占用，否则 copy 与 open 都会碰壁
+    copyFile(templatePath, finalPath)
 
     # 5. 打开结果文件，写入数据
     app = xw.App(visible=True, add_book=False)
-    # app.display_alerts = False
+    app.display_alerts = False  # 弹窗会阻塞 COM 调用（报“应用程序正在使用中”），必须关闭
     app.screen_updating = True
-    wb = app.books.open(finalPath)
+    wb = None
+    try:
+        # 外部链接更新提示同样是弹窗，open 时直接跳过
+        wb = comRetry(app.books.open, finalPath, update_links=False)
+        writeContractBook(wb, msgDict, inputArray, dataNum, attachDict)
+        comRetry(wb.save, finalPath)
+    finally:
+        # 写入异常也必须退出 Excel：残留进程会锁住结果文件，下次运行继续报占用
+        if wb is not None:
+            try:
+                wb.close()
+            except Exception:
+                pass
+        try:
+            app.quit()
+        except Exception:
+            pass
+
+    # 商务通知单源文件复制到结果文件夹下，用于备份
+    bakPath = os.path.join(saveDir, f"【{msgDict['华为订单号：']}】-商务通知单.xlsm")
+    try:
+        copyFile(noticeFile, bakPath, 10)
+    except Exception as err:  # 备份失败不影响结果文件
+        print(f"商务通知单备份失败：{err}")
+
+    return finalPath
+
+
+# 将合同清单数据写入已打开的工作簿，保存与退出 Excel 由调用方负责
+def writeContractBook(wb, msgDict, inputArray, dataNum, attachDict):
     insertRowFlag = False  # 记录是否进行拆行
     for sheetName in ["合同清单表【模板】", "合同清单-word"]:
         ws = wb.sheets[sheetName]
@@ -300,15 +388,6 @@ def getNoticeFileContent(noticeFile, templatePath, saveDir, relationPath):
                 idx += 1
     else:
         wb.sheets["附件"].delete()
-    wb.save(finalPath)
-    wb.close()
-    app.quit()
-
-    # 商务通知单源文件复制到结果文件夹下，用于备份
-    bakPath = os.path.join(saveDir, f"【{msgDict['华为订单号：']}】-商务通知单.xlsm")
-    os.popen(f'copy "{noticeFile}" "{bakPath}"')
-
-    return finalPath
 
 
 # 四舍五入
