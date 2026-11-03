@@ -342,17 +342,18 @@ def matchProject1(series, originalDict, originalDictCJB, hisRecordDict):
             return pd.Series(data=[""] * 3, index=matchCol + ["备注"])
 
 
-# 将“订单类型备注”拼接到“备注”列
+# 处理“备注”列：“订单类型备注”为“政企分销”的统一标记为“政企分销订单”，其余保持原“备注”值
 def mergeRemark(series):
     """
     :param series: DataFrame行series
-    :return: 返回拼接后的“备注”，格式为“原备注-订单类型备注”，任一方为空时取另一方
+    :return: 返回“备注”：“订单类型备注”为“政企分销”时（无论原备注是城投/合神/北神/空），
+             统一强制标记为“政企分销订单”，不保留账号前缀；其余订单类型不拼接，按原“备注”列值复制
     """
-    remarkText = "" if pd.isna(series["备注"]) else str(series["备注"]).strip()
     typeRemark = "" if pd.isna(series["订单类型备注"]) else str(series["订单类型备注"]).strip()
-    if remarkText and typeRemark:
-        return f"{remarkText}-{typeRemark}"
-    return remarkText or typeRemark
+    if typeRemark == "政企分销":
+        return "政企分销订单"
+    remarkText = "" if pd.isna(series["备注"]) else str(series["备注"]).strip()
+    return remarkText
 
 
 # @logfun
@@ -439,7 +440,7 @@ def calDataStep1(df: pd.DataFrame, allFieldfpList, cjbFp, recordfp, historyRecor
     df[matchCol + ["备注"]] = df.apply(matchProject1,
                                      args=(originalDict, originalDictCJB, hisRecordDict),
                                      axis=1)
-    # 将“订单类型备注”拼接至“备注”列，如“合神”+“政企分销”->“合神-政企分销”
+    # 处理“备注”列：“订单类型备注”为“政企分销”的标记为“政企分销订单”，其余保持原“备注”值
     df["备注"] = df.apply(mergeRemark, axis=1)
 
     # 更新记录
@@ -474,8 +475,8 @@ def calDataStep2(df):
     # 向df写入"实际总成本"、"实际毛利"、"实际毛利率"的公式
     for idx in df.index:
         row = idx + 2
-        # 备注以“城投”开头的数据（可能已拼接“订单类型备注”，如“城投-政企分销”），“实际总成本”公式与普通情况不同
-        if str(df.loc[idx, "备注"]).startswith("城投"):
+        # 备注以“城投”开头，或“下单合同号”属于城投账号（“订单类型备注”为“政企分销”时备注被统一标记为“政企分销订单”，城投标识丢失，需按合同号兜底），“实际总成本”公式与普通情况不同
+        if str(df.loc[idx, "备注"]).startswith("城投") or df.loc[idx, "下单合同号"] in ctOrderList:
             df.loc[idx, "实际总成本"] = f"={letter2}{row}/1.016+{letter3}{row}+{letter4}{row}"
         else:
             df.loc[idx, "实际总成本"] = f"={letter2}{row}+{letter3}{row}+{letter4}{row}"
@@ -579,6 +580,7 @@ outCol：毛利分析结果表标题列表
 matchFlag：用于防止df.apply对第一条数据重复操作
 logger：用于打印日志
 calYearMonth：操作的年月 yyyymm
+ctOrderList：‘城投’账号‘订单全字段报表’中的“华为合同号”列表（calDataStep1中赋值，此处为默认空列表）
 """
 dateColList = ["出具发票日", "预计还款日"]
 pivotIndex = ["出具发票日", "销售员", "销售员编码", "事业部", "区域", "平台", "客户名称", "下单合同号", "项目名称", "是否直发", "实际税率", "采购类型"]
@@ -595,6 +597,7 @@ outCol = colType1 + colType2 + colType3 + colType4
 matchFlag = False
 logger = None
 calYearMonth = ""
+ctOrderList = []
 
 if __name__ == "__main__":
     g_dictGlobal = {"销售日报": r"E:\Uibot项目文件\result\2022年\7月\1日\FY22销售明细(7月)_0731.xlsx",
