@@ -1226,8 +1226,8 @@ def matchProduct(series, confDict):
     # 显式指定返回Series的index，避免依赖pandas版本差异下的按位置对齐行为
     resultIndex = ["产品", "产品线", "市场类型"]
 
-    # 前置规则：“批次”以“BJ”结尾的订单，产品、产品线均标记为“XPN产品”（不再走业绩表匹配）
-    if str(batchNum).strip().endswith("BJ"):
+    # 前置规则：“批次”末两位为字母且末位为X的订单（不分大小写），产品、产品线均标记为“XPN产品”（不再走业绩表匹配）
+    if re.search(r"[A-Za-z][Xx]$", str(batchNum).strip()):
         return pd.Series(data=["XPN产品", "XPN产品", ""], index=resultIndex)
     elif purchaseType == "鲲泰":
         return pd.Series(data=["鲲泰", "鲲泰", ""], index=resultIndex)

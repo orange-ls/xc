@@ -7,6 +7,7 @@ import glob
 import logging.config
 import os
 import re
+import shutil
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import wraps
@@ -411,6 +412,13 @@ def addExtraData(df, extraPath):
     # “销售明细补充”外挂表中“销售订单号”列为extraOrderList中的值时为补充数据，其他数据为人工添加的matchCol未匹配到的数据
     df_extra = pd.read_excel(extraPath, dtype=str, parse_dates=dateColList,
                              date_parser=lambda x: myDateParser(x))
+    # 删除表头为空的多余列（如“Unnamed: 38”），避免随append进入结果表
+    df_extra = df_extra.loc[:, ~df_extra.columns.str.startswith("Unnamed")]
+    # 删除因表头重复被pandas自动加".1/.2"后缀的重名列（如“市场类型.1”、“合并前批次.1”），避免随append进入结果表
+    dupeSuffixCols = [c for c in df_extra.columns if re.fullmatch(r".+\.\d+", c)]
+    if dupeSuffixCols:
+        print(f"警告：销售明细补充表存在重复表头，已剔除列：{dupeSuffixCols}，请检查该表表头")
+        df_extra = df_extra.drop(columns=dupeSuffixCols)
     df_extra["销售订单号"] = df_extra["销售订单号"].str.strip()
     validDf = df_extra.query("销售订单号.isin(@extraOrderList)")
     initMatchDf = df_extra.query("~销售订单号.isin(@extraOrderList)")
@@ -446,6 +454,16 @@ def handleMovementDetail(addfilePath, finalPath, dateFlag, finalPathAdd, BO_file
     """
     # 读取物料移动明细表
     df_wl = pd.read_html(addfilePath, header=0)[0].fillna("").astype(str)
+    # 当表格仅为表头（无数据行）或缺少“参照”列时，无需处理数据，仅重命名文件并返回
+    if df_wl.empty or "参照" not in df_wl.columns:
+        newFileName = "物料移动明细汇总_" + dateFlag.replace("/", "") + ".xlsx"
+        newFileName_add = "物料移动明细汇总(新增列)_" + dateFlag.replace("/", "") + ".xlsx"
+        newFilePath = os.path.join(os.path.dirname(finalPath), newFileName)
+        newFilePathAdd = os.path.join(os.path.dirname(finalPathAdd), newFileName_add)
+        os.rename(finalPath, newFilePath)
+        os.rename(finalPathAdd, newFilePathAdd)
+        gc.collect()
+        return newFilePath
     # 删除后面的空记录行
     df_wl.drop(df_wl[df_wl["参照"] == ""].index, inplace=True)
     # 将“本位币金额列”转为float类型
@@ -1149,8 +1167,12 @@ def matchYSFS(series, BoTransDict, HWOrderDict):
         stock_last2 = series["库存地"][-2:]
         if stock_last2 == "99":
             return "汽运"
-        elif stock_last2 == "01" or stock_last2 == "XN" or stock_last2 == '':
+        else:
+            # 调整：库存地末两位非“99”的一律自提
             return "自提"
+        # 原自提逻辑（仅末两位为01/XN/空时判定自提），已被上面的else取代，保留备查
+        # elif stock_last2 == "01" or stock_last2 == "XN" or stock_last2 == '':
+        #     return "自提"
     elif purchaseType in ["公有云", "服务", "服务预提", "渠道分销", "价外费用", "折让"]:
         return "自提"
     # if purchaseType == "超聚变":
@@ -1200,13 +1222,19 @@ def matchProduct(series, confDict):
     purchaseType = series["采购类型"]
     contractNum = series["下单合同号"]
     productGroup = series["产品组"]
+    batchNum = series["批次"]
+    # 显式指定返回Series的index，避免依赖pandas版本差异下的按位置对齐行为
+    resultIndex = ["产品", "产品线", "市场类型"]
 
-    if purchaseType == "鲲泰":
-        return pd.Series(data=["鲲泰", "鲲泰", ""])
+    # 前置规则：“批次”以“BJ”结尾的订单，产品、产品线均标记为“XPN产品”（不再走业绩表匹配）
+    if str(batchNum).strip().endswith("BJ"):
+        return pd.Series(data=["XPN产品", "XPN产品", ""], index=resultIndex)
+    elif purchaseType == "鲲泰":
+        return pd.Series(data=["鲲泰", "鲲泰", ""], index=resultIndex)
     elif productGroup == "QJ":
-        return pd.Series(data=["超聚变", "超聚变", ""])
+        return pd.Series(data=["超聚变", "超聚变", ""], index=resultIndex)
     else:
-        return pd.Series(data=confDict.get(contractNum, ["不计入业绩", "不计入业绩", ""]))
+        return pd.Series(data=confDict.get(contractNum, ["不计入业绩", "不计入业绩", ""]), index=resultIndex)
 
 
 # 生成月份（不对na和空值处理）
@@ -1343,9 +1371,10 @@ def calDataStep2_crm(df, crm_file, matchDict):
     # "评审二代"：直接取df中的"客户名称"
     df.loc[fill_mask, "评审二代"] = df.loc[fill_mask, "客户名称"]
 
-    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
-
     df = pd.concat([df, df_zhe], ignore_index=True)
+
+    # 合并折让数据后再删除“项目注释”列，避免df_zhe将该列重新引入
+    df.drop(columns=["项目注释"], errors='ignore', inplace=True)
 
     # 清理内存
     gc.collect()
@@ -1672,6 +1701,16 @@ def calDataStep6(df: pd.DataFrame, HWYJPathList, productConfPath, saveDir):
     df.loc[df[addCol[-1]] != "", addCol[-1]] = df.loc[df[addCol[-1]] != ""].apply(
         lambda x: x[addCol[-1]] if x["下单合同号"] == "未匹配原因：采购信息表无该批次" else "", axis=1)
     # 数据写入文件
+    # 兜底删除多余列（表头为空的Unnamed列、“项目注释”列）
+    df = df.loc[:, ~df.columns.str.startswith("Unnamed")]
+    df = df.drop(columns=["项目注释"], errors="ignore")
+    # 兜底删除重复列（如外部表带入的“市场类型.1”、“合并前批次.1”），仅保留第一列
+    if df.columns.duplicated().any():
+        dupCols = df.columns[df.columns.duplicated()].tolist()
+        print(f"警告：结果数据存在重复列，已剔除：{dupCols}")
+        df = df.loc[:, ~df.columns.duplicated()]
+    # 将“订单类型备注”移到最后一列
+    df = df[[c for c in df.columns if c != "订单类型备注"] + ["订单类型备注"]]
     finalPath = os.path.join(saveDir, "销售明细.xlsx")
     df.to_excel(finalPath, sheet_name="销售明细", index=False)
 
@@ -1740,8 +1779,9 @@ def setStyle(finalPath, originalCols):
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).color = (255, 192, 0)
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.color = (0, 0, 0)
     ws.range("%s1:%s1" % (colIndex2, colIndex3)).font.bold = True
-    # "合并前批次"列背景色变为红色
-    ws.range("%s1" % colIndex3).color = (255, 0, 0)
+    # "合并前批次"列背景色变为红色（按列名定位，避免“订单类型备注”移到末列后被误标红）
+    mergeCol = get_column_letter(allColumnsList.index("合并前批次") + 1)
+    ws.range(f"{mergeCol}1").color = (255, 0, 0)
 
     # 新增数据设置格式, "实际税率"保留两位小数，其他数字列为千分位显示整数
     for col in ["订单成本（利润中心货币）", "实际税率", "合同金额", "合同不含税金额", "成本总价"]:
@@ -1799,6 +1839,17 @@ def findLatestSalesDetailFile(baseDir, maxBackDays=90):
     return ''
 
 
+# 将模板文件复制为目标文件
+def copyFile(templatePath, targetPath):
+    """
+    :param templatePath: 模板文件路径
+    :param targetPath: 目标文件路径
+    :return: 目标文件路径
+    """
+    shutil.copyfile(templatePath, targetPath)
+    return targetPath
+
+
 """
 extraOrderList:销售明细补充表中增加数据“销售订单号”值的列表
 BoDeliveryDict:BO采购信息表发货方式字典
@@ -1843,13 +1894,13 @@ if __name__ == "__main__":
     #                 "产品线": r"C:\Users\11598\Desktop\测试文件\产品线-22年.xlsx",
     #                 "结果保存路径": r"C:\Users\11598\Desktop\测试文件",
     #                 }
-    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\FY26销售明细(7月)_0715.xlsx",
+    g_dictGlobal = {"销售日报": r"D:\xc_files\销售明细\731\FY26销售明细(8月)_0803.xlsx",
                     "分销销售名单": r"D:\xc_files\销售明细\分销销售名单.xlsx",
                     "BO下载路径": r"D:\xc_files\销售明细\BO采购信息表.xls",
                     "CRM外挂表路径": r"D:\xc_files\销售明细\CRM外挂表.xlsx",
                     "销售明细补充表路径": r"D:\xc_files\销售明细\销售明细补充.xlsx",
-                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20250806.xlsx",
-                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20250807.xlsx",
+                    "物料移动明细": r"D:\xc_files\销售明细\物料移动明细汇总_20260803.xlsx",
+                    "OA预提表路径": r"D:\xc_files\销售明细\预提表_20260804.xlsx",
                     "产品线": r"D:\xc_files\销售明细\产品线-22年.xlsx",
                     "结果保存路径": r"D:\xc_files\销售明细\result",
                     }
